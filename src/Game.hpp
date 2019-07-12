@@ -146,7 +146,6 @@ private:
 			}
 		}
 		//全部放弃鸣牌或者没法鸣牌
-
 		if (mMountain.remainCount() == 0)
 		{
 			endThisRound(std::vector<AgariResult>());

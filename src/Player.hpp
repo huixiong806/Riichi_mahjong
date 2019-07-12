@@ -38,7 +38,42 @@ public:
 	}
 	bool canPeng(Single target, Group result,int relativePosition)
 	{
-		return false;
+		//检查类型
+		if (result.type != GroupType::Kezi)
+			return false;
+		//检查颜色
+		if (target.color != result.color)
+			return false;
+		//检查数值
+		if (target.value != result.value)
+			return false;
+		//检查位置
+		if (relativePosition != result.state%10)
+			return false;
+		//检查红宝牌是否正确
+		if ((result.akadora & 1) != target.isAkadora())
+			return false;
+		int akadoraCount = (result.akadora&2)+(result.akadora&4);
+		int realAkadoraCount = 0;
+		int tileCount = 0;
+		for (auto& item : handTile)
+		{
+			if (item.color == result.color&&item.value == result.value)
+			{
+				tileCount++; 
+				if (item.isAkadora())
+					realAkadoraCount++;
+			}
+		}
+		//牌数不够
+		if (tileCount < 2)return false;
+		//红宝牌不够
+		if (realAkadoraCount < akadoraCount)
+			return false;
+		//非红宝牌不够
+		if ((tileCount - realAkadoraCount) < (2 - akadoraCount))
+			return false;
+		return true;
 	}
 	bool canGang(Single target,Group result, int relativePosition)
 	{
@@ -50,7 +85,24 @@ public:
 	}
 	void peng(Group result)
 	{
-		
+		groupTile.push_back(result);
+		Single other0 = Single(result.value, result.color, result.akadora & 2);
+		Single other1 = Single(result.value, result.color, result.akadora & 4);
+		bool ok0, ok1;
+		for (auto& item : handTile)
+		{
+			if (!ok0&&other0 == item)
+			{
+				ok0 = true;
+				item = Null;
+			}else if (!ok1&&other1 == item)
+			{
+				ok1 = true;
+				item = Null;
+			}
+		}
+		sort(handTile.begin(), handTile.end());
+		while (handTile.back() == Null)handTile.pop_back();
 	}
 	void gang(Group result)
 	{
@@ -60,6 +112,7 @@ public:
 	{
 
 	}
+	//返回false时不应变动私有变量
 	bool dapai(Single target)//打牌
 	{
 		if (target == Null)return false;
@@ -86,14 +139,17 @@ public:
 		}
 		return false;
 	}
+	//返回false时不应变动私有变量
 	bool zimo()
 	{
 		return false;
 	}
+	//返回false时不应变动私有变量
 	bool liuju()
 	{
 		return false;
 	}
+	//返回false时不应变动私有变量
 	bool doLizhi()
 	{
 		return false;

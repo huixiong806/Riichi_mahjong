@@ -33,7 +33,7 @@ public:
 	{
 		return !(*this == rhs);
 	}
-	//判断两张牌的大小，不考虑是否为红宝牌，万<饼<索<字
+	//判断两张牌的大小，不考虑是否为红宝牌，万<饼<索<字<Null
 	bool operator <(const Single& rhs)const
 	{
 		return (int)mColor * 100 + mValue < (int)rhs.mColor * 100 + rhs.mValue;
@@ -65,6 +65,7 @@ bool Single::isAkadora()
 {
 	return mAkadora;
 }
+//Null永远是最大的
 const Single Null = { 1,'z'+1,false };
 Single::Single()
 {
