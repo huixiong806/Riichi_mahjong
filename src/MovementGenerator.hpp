@@ -28,10 +28,26 @@ enum class ErrorType
 struct Action
 {
 	ActionType type;
-	Single target;//表示打哪张牌
+	Single target;//表示打哪张牌,仅打牌时有效
 	Group group;//仅吃碰杠有效
 	Action() {
 		type = ActionType::Null;
+		target = Null;
+	}
+	Action(ActionType type_) {
+		type = type_;
+		target = Null;
+		group = Group_Null;
+	}
+	Action(ActionType type_,Single target_,Group group_) {
+		type = type_;
+		target = target_;
+		group = group_;
+	}
+	Action(ActionType type_,Group group_) {
+		type = type_;
+		target = Null;
+		group = group_;
 	}
 };
 struct PlayerInfo
@@ -70,5 +86,5 @@ class ActionGenerator
 protected:
 	std::string name;
 public:
-	virtual Action generateAction(const GameInfo&& info)=0;
+	virtual Action generateAction(const GameInfo& info)=0;
 };

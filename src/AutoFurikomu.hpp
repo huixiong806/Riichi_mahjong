@@ -12,7 +12,7 @@ public:
 	{
 		name = name_;
 	}
-	virtual Action generateAction(const GameInfo&& info)
+	virtual Action generateAction(const GameInfo& info)
 	{
 		Action res;
 		res.type = ActionType::Null;

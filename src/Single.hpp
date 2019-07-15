@@ -33,10 +33,15 @@ public:
 	{
 		return !(*this == rhs);
 	}
-	//判断两张牌的大小，不考虑是否为红宝牌，万<饼<索<字<Null
+	//判断两张牌的大小，考虑是否为红宝牌，万<饼<索<字<Null,数字相同的情况下红宝牌更大
 	bool operator <(const Single& rhs)const
 	{
-		return (int)mColor * 100 + mValue < (int)rhs.mColor * 100 + rhs.mValue;
+		return (int)mColor * 1000 + mValue*10+ (int)mAkadora < (int)rhs.mColor * 1000 + rhs.mValue*10+ (int)rhs.mAkadora;
+	}
+	//判断两张牌的大小，考虑是否为红宝牌，万<饼<索<字<Null,数字相同的情况下红宝牌更大
+	bool operator >(const Single& rhs)const
+	{
+		return (int)mColor * 1000 + mValue * 10 + (int)mAkadora > (int)rhs.mColor * 1000 + rhs.mValue * 10 + (int)rhs.mAkadora;
 	}
 	std::string getString()const
 	{
@@ -66,7 +71,7 @@ bool Single::isAkadora()
 	return mAkadora;
 }
 //Null永远是最大的
-const Single Null = { 1,'z'+1,false };
+const Single Null = { 1,'z'+1,true };
 Single::Single()
 {
 	*this = Null;

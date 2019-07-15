@@ -75,6 +75,8 @@ Single Mountain::getUraIndicator(int index) //获取里宝牌指示牌,下标范围0~4
 }
 void Mountain::reset(const Rule& rule)
 {
+	mHandPtr = 0;
+	mLingshangPtr = 0;
 	mMountain.clear();
 	mA.clear();
 	mB.clear();

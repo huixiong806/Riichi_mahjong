@@ -42,10 +42,10 @@ public:
 		if (result.type != GroupType::Kezi)
 			return false;
 		//检查颜色
-		if (target.color != result.color)
+		if (target.color() != result.color)
 			return false;
 		//检查数值
-		if (target.value != result.value)
+		if (target.value() != result.value)
 			return false;
 		//检查位置
 		if (relativePosition != result.state%10)
@@ -58,7 +58,7 @@ public:
 		int tileCount = 0;
 		for (auto& item : handTile)
 		{
-			if (item.color == result.color&&item.value == result.value)
+			if (item.color() == result.color&&item.value() == result.value)
 			{
 				tileCount++; 
 				if (item.isAkadora())
@@ -88,7 +88,7 @@ public:
 		groupTile.push_back(result);
 		Single other0 = Single(result.value, result.color, result.akadora & 2);
 		Single other1 = Single(result.value, result.color, result.akadora & 4);
-		bool ok0, ok1;
+		bool ok0=false, ok1=false;
 		for (auto& item : handTile)
 		{
 			if (!ok0&&other0 == item)

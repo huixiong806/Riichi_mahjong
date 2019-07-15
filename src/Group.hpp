@@ -12,8 +12,10 @@ struct Group
 	char color;//'m','p','s','z'
 	uint8_t value;//顺子的话value等于最小的那个
 	uint8_t akadora;//从低到高分别表示三张牌(从小到大)是否为红宝牌
-	uint8_t state;//低位表示吃/碰/杠的那张牌的来源(0,1,2,3对应自下对上,4,5,6,7也对应自下对上，并且为加杠(4无效))，高位0，10，20分别表示第一张，第二张，第三张。(刻子，杠子默认为0)
-	std::string getString()
+	uint8_t state;//低位表示吃/碰/杠的那张牌的来源(0,1,2,3对应吃、碰、荣杠、暗杠的自下对上,4,5,6,7对应加杠的自下对上(4无效))，高位0，10，20分别表示第一张，第二张，第三张。(刻子，杠子默认为0)
+	//source表示碰的那张牌的来源(0,1,2,3对应自下对上,4,5,6,7也对应自下对上，并且为加杠(4无效))
+	static Group createKezi(Single a, Single b, Single target, int source);
+	const std::string getString()const
 	{
 		std::string res;
 		if(type== GroupType::Shunzi)
@@ -23,21 +25,21 @@ struct Group
 				if (state % 10 == 3)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 1) ? value : 0) + '0');
+					res.push_back(((akadora & 1) ? 0 : value) + '0');
 					res.push_back(')');
 				}
-				res.push_back(((akadora & 2) ? value+1 : 0) + '0');
+				res.push_back(((akadora & 2) ? 0: value + 1) + '0');
 				if (state % 10 == 2)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 1) ? value : 0) + '0');
+					res.push_back(((akadora & 1) ? 0 : value) + '0');
 					res.push_back(')');
 				}
-				res.push_back(((akadora & 4) ? value+2 : 0) + '0');
+				res.push_back(((akadora & 4) ? 0:value+2) + '0');
 				if (state % 10 == 1)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 1) ? value : 0) + '0');
+					res.push_back(((akadora & 1) ? 0:value) + '0');
 					res.push_back(')');
 				}
 			}
@@ -46,21 +48,21 @@ struct Group
 				if (state % 10 == 3)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 2) ? value + 1 : 0) + '0');
+					res.push_back(((akadora & 2) ? 0:value + 1) + '0');
 					res.push_back(')');
 				}
-				res.push_back(((akadora & 1) ? value: 0) + '0');
+				res.push_back(((akadora & 1) ?0:value) + '0');
 				if (state % 10 == 2)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 2) ? value + 1 : 0) + '0');
+					res.push_back(((akadora & 2) ? 0:value + 1) + '0');
 					res.push_back(')');
 				}
-				res.push_back(((akadora & 4) ? value + 2 : 0) + '0');
+				res.push_back(((akadora & 4) ? 0:value + 2) + '0');
 				if (state % 10 == 1)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 2) ? value + 1 : 0) + '0');
+					res.push_back(((akadora & 2) ? 0:value + 1) + '0');
 					res.push_back(')');
 				}
 			}
@@ -69,21 +71,21 @@ struct Group
 				if (state % 10 == 3)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 4) ? value + 2 : 0) + '0');
+					res.push_back(((akadora & 4) ? 0:value + 2) + '0');
 					res.push_back(')');
 				}
-				res.push_back(((akadora & 1) ? value : 0) + '0');
+				res.push_back(((akadora & 1) ? 0:value) + '0');
 				if (state % 10 == 2)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 4) ? value + 2 : 0) + '0');
+					res.push_back(((akadora & 4) ? 0:value + 2) + '0');
 					res.push_back(')');
 				}
-				res.push_back(((akadora & 2) ? value + 1 : 0) + '0');
+				res.push_back(((akadora & 2) ? 0:value + 1) + '0');
 				if (state % 10 == 1)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 4) ? value + 2 : 0) + '0');
+					res.push_back(((akadora & 4) ? 0:value + 2) + '0');
 					res.push_back(')');
 				}
 			}
@@ -106,30 +108,30 @@ struct Group
 				if (state % 10 == 3|| state % 10 == 7)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 1) ? value : 0) + '0');
+					res.push_back(((akadora & 1) ? 0:value) + '0');
 					res.push_back(')');
 				}
-				res.push_back(((akadora & 2) ? value : 0) + '0');
+				res.push_back(((akadora & 2) ? 0:value) + '0');
 				if (state % 10 == 2||state % 10 == 6)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 1) ? value : 0) + '0');
+					res.push_back(((akadora & 1) ? 0:value) + '0');
 					res.push_back(')');
 				}
-				res.push_back(((akadora & 4) ? value : 0) + '0');
+				res.push_back(((akadora & 4) ? 0:value) + '0');
 				if (state % 10 == 1||state % 10 == 5)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 1) ? value : 0) + '0');
+					res.push_back(((akadora & 1) ? 0:value) + '0');
 					res.push_back(')');
 				}
 				if (state % 10 > 4)
 				{
 					res.push_back('(');
-					res.push_back(((akadora & 8) ? value : 0) + '0');
+					res.push_back(((akadora & 8) ? 0:value) + '0');
 					res.push_back(')');
 				}
-				else res.push_back(((akadora & 8) ? value : 0) + '0');
+				else res.push_back(((akadora & 8) ? 0:value) + '0');
 			}
 		}
 		else if (type==GroupType::Kezi)
@@ -137,21 +139,21 @@ struct Group
 			if (state % 10 == 3)
 			{
 				res.push_back('(');
-				res.push_back(((akadora & 1) ? value : 0) + '0');
+				res.push_back(((akadora & 1) ? 0:value) + '0');
 				res.push_back(')');
 			}
-			res.push_back(((akadora & 2) ? value : 0) + '0');
+			res.push_back(((akadora & 2) ? 0:value) + '0');
 			if (state % 10 == 2)
 			{
 				res.push_back('(');
-				res.push_back(((akadora & 1) ? value : 0) + '0');
+				res.push_back(((akadora & 1) ? 0:value) + '0');
 				res.push_back(')');
 			}
-			res.push_back(((akadora & 4) ? value : 0) + '0');
+			res.push_back(((akadora & 4) ? 0:value) + '0');
 			if (state % 10 == 1)
 			{
 				res.push_back('(');
-				res.push_back(((akadora & 1) ? value : 0) + '0');
+				res.push_back(((akadora & 1) ? 0:value) + '0');
 				res.push_back(')');
 			}
 		}
@@ -167,4 +169,33 @@ struct Group
 		if (value < rhs.value)return true;
 		return false;
 	}
+	bool operator !=(const Group& rhs)const
+	{
+		return !(*this == rhs);
+	}
+	bool operator ==(const Group& rhs)const
+	{
+		if (type != rhs.type)return false;
+		if (color != rhs.color)return false;
+		if (value != rhs.value)return false;
+		if (akadora != rhs.akadora)return false;
+		if (state != rhs.state)return false;
+		return true;
+	}
 };
+Group Group_Null = { 255,(char)('z' + 1),GroupType::Gang,255,255 };
+Group Group::createKezi(Single a, Single b, Single target, int source)
+{
+	if (!a.valueEqual(b) || !b.valueEqual(target) || !target.valueEqual(a))return Group_Null;
+	Group res;
+	res.type = GroupType::Kezi;
+	res.color = target.color();
+	res.value = target.value();
+	res.state = source;
+	res.akadora = 0;
+	if (a > b)std::swap(a, b);//统一一赤一普通牌的情况，避免它们因顺序不同而被当成两种不同刻子
+	res.akadora |= target.isAkadora();
+	res.akadora |= a.isAkadora() << 1;
+	res.akadora |= b.isAkadora() << 2;
+	return res;
+}

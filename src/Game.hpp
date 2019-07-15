@@ -49,7 +49,7 @@ private:
 		mTurn = who;
 		for (int i = 0; i < 4; ++i)
 		{
-			mPlayer[i].setNowTile(mMountain.nextHand(), false);
+			mPlayer[i].setNowTile(Null, false);
 		}
 		//mLastTurn = -1;
 		if (mMountain.zimo != Null)
@@ -182,11 +182,15 @@ public:
 		else//不连庄，进入下一局
 		{
 			mEast=(mEast+1)%4;//东家换成其下家
-			if (mRound = 4)//4局的话换场风,局数重置
+			if (mRound == 4)//4局的话换场风,局数重置
 			{
 				
 				mPrevailingWind = (WindType)((mPrevailingWind + 1) % 4);
 				mRound = 1;
+			}
+			else
+			{
+				mRound++;
 			}
 		}
 		startNewRound();
@@ -269,7 +273,7 @@ ActionResult Game::doAction(int index, Action act)
 				mMingpaiAction[index] = act;
 				break;
 			case ActionType::Chi:
-				if (!mPlayer[index].canChi(target, act.group, ((int)mPlayer[mTurn].selfWind + 4 - index) % 4))
+				if (!mPlayer[index].canChi(target, act.group, ((int)mPlayer[mTurn].selfWind + 4 - mPlayer[index].selfWind) % 4))
 				{
 					res.success = false;
 					res.type = ErrorType::ActionRejected;
@@ -279,8 +283,9 @@ ActionResult Game::doAction(int index, Action act)
 				mMingpaiAction[index] = act;
 				break;
 			case ActionType::Peng:
-				if (!mPlayer[index].canPeng(target, act.group, ((int)mPlayer[mTurn].selfWind + 4 - index) % 4))
+				if (!mPlayer[index].canPeng(target, act.group, ((int)mPlayer[mTurn].selfWind + 4 - mPlayer[index].selfWind) % 4))
 				{
+					//std::cout<<"*********"<< std::endl;
 					res.success = false;
 					res.type = ErrorType::ActionRejected;
 					return res;
@@ -289,7 +294,7 @@ ActionResult Game::doAction(int index, Action act)
 				mMingpaiAction[index] = act;
 				break;
 			case ActionType::Gang:
-				if (!mPlayer[index].canGang(target, act.group, ((int)mPlayer[mTurn].selfWind + 4 - index) % 4))
+				if (!mPlayer[index].canGang(target, act.group, ((int)mPlayer[mTurn].selfWind + 4 - mPlayer[index].selfWind) % 4))
 				{
 					res.success = false;
 					res.type = ErrorType::ActionRejected;
