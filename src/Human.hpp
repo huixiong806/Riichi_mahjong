@@ -1,18 +1,22 @@
 #pragma once
 #include"MovementGenerator.hpp"
+#include"Player.hpp"
 #include<string>
 #include<cassert>
 #include<set>
 #include<iostream>
 const std::string windName[4] = { "东","南","西","北" };
-const std::string actionName[11] = { "error","跳过","吃","碰","杠","和","error","自摸","立直","流局","拔北" };
+const std::string actionName[11] = { "error","跳过","吃","碰","杠","和","error","立直","自摸","流局","拔北" };
 class Human:public ActionGenerator
 {
 private:
 	void printActions(std::vector<Action>actions);
+	std::vector<Action> getRongGangActions(const GameInfo& info);
 	std::vector<Action> getPengActions(const GameInfo& info);
 	std::vector<Action> getChiActions(const GameInfo& info);
+	std::vector<Action> getZimoAction(const GameInfo& info);
 	std::vector<Action>getAllActionsMingpai(const GameInfo& info);
+	std::vector<Action>getAllActionsNormal(const GameInfo& info);
 public:
 	Human() { name = "No Name"; }
 	Human(std::string name_)
@@ -27,23 +31,82 @@ std::vector<Action> Human::getAllActionsMingpai(const GameInfo& info)
 	res.push_back(ActionType::Skip);
 	std::vector<Action> temp = getPengActions(info);
 	res.insert(res.end(), temp.begin(), temp.end());
+	temp = getRongGangActions(info);
+	res.insert(res.end(), temp.begin(), temp.end());
+	return res;
+}
+std::vector<Action> Human::getAllActionsNormal(const GameInfo& info)
+{
+	std::vector<Action> res;
+	std::vector<Action> temp = getZimoAction(info);
+	if (info.nowTile != Null)
+		res.push_back(Action(ActionType::Dapai,info.nowTile));
+	for (int i = 0; i < info.handTile.size(); ++i)
+		res.push_back(Action(ActionType::Dapai, info.handTile[i]));
+	res.insert(res.end(), temp.begin(), temp.end());
 	return res;
 }
 void Human::printActions(std::vector<Action>actions)
 {
 	int num = 0;
-	for (auto item : actions)
+	for (int i=0;i<actions.size();++i)
 	{
-		if (item.type == ActionType::Chi || item.type == ActionType::Peng || item.type == ActionType::Gang)
-			std::cout << num << "." << actionName[(int)item.type] << " " << item.group.getString() << std::endl;
-		else std::cout << num << "." << actionName[(int)item.type] << std::endl;
+		if (actions[i].type == ActionType::Dapai)
+			std::cout << num <<" ";
+		else
+		{
+			if (i>0 && actions[i - 1].type== ActionType::Dapai)
+			{
+				std::cout << "为打出对应的牌(0为摸切)" << std::endl;
+			}
+			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Peng || actions[i].type == ActionType::Gang)
+				std::cout << num << "." << actionName[(int)actions[i].type] << " " << actions[i].group.getString() << std::endl;
+			else std::cout << num << "." << actionName[(int)actions[i].type] << std::endl;
+		}
 		num++;
 	}
+	if (actions[actions.size() - 1].type == ActionType::Dapai)
+	{
+		std::cout << "为打出对应的牌(0为摸切)" << std::endl;
+	}
+}
+std::vector<Action> Human::getZimoAction(const GameInfo& info)
+{
+	std::vector<Action> res;
+	Player player;
+	player.groupTile = info.playerInfo[(int)info.selfWind].groupTile;
+	player.lizhi = info.playerInfo[(int)info.selfWind].lizhi;
+	player.yifa = info.playerInfo[(int)info.selfWind].yifa;
+	player.lingshang = info.lingshang;
+	player.handTile = info.handTile;
+	player.nowTile = info.nowTile;
+	int state=0;
+	if (info.w)state = 1;
+	else if (info.remainTiles == 0)state = 2;
+	auto result=player.zimo(state,std::vector<Single>(), std::vector<Single>());
+	if (result.success)
+	{
+		res.push_back(Action(ActionType::Zimo));
+	}
+	return res;
 }
 std::vector<Action> Human::getChiActions(const GameInfo& info)
 {
 	//只能吃上家牌
 	if (info.nowWind != (info.selfWind + 3) % 4)return std::vector<Action>();
+}
+std::vector<Action> Human::getRongGangActions(const GameInfo& info)
+{
+	std::vector<Action>res;
+	Single target = info.nowTile;
+	std::vector<Single>candidate;
+	for (auto& item : info.handTile)
+		if (item.valueEqual(target))
+			candidate.push_back(target);
+	if (candidate.size() < 3)return res;
+	assert(candidate.size() == 3);
+	res.push_back(Action(ActionType::Gang, Group::createGangzi(candidate[0], candidate[1], candidate[2], target, (info.nowWind - info.selfWind + 4) % 4)));
+	return res;
 }
 std::vector<Action> Human::getPengActions(const GameInfo& info)
 {
@@ -138,21 +201,30 @@ Action Human::generateAction(const GameInfo& info)
 	std::cout << std::endl;
 	if (info.mingpai == false)
 	{
+		std::vector<Action>actions;
 		if (info.nowTile != Null)
 		{
 			std::cout << "摸到的牌为" << info.nowTile.getString() << std::endl;
-			std::cout << "打第几张牌?(摸切选0)" << std::endl;
+			actions = getAllActionsNormal(info);
+			std::cout << "请选择一种操作:" << std::endl;
+			printActions(actions);
+			int index;
+			std::cin >> index;
+			res = actions[index];
 		}
 		else
 		{
-			std::cout << "打第几张牌?" << std::endl;
+			std::cout << "打第几张牌?(0为摸切)" << std::endl;
+			int index;
+			std::cin >> index;
+			if (index <= info.handTile.size())
+			{
+				res.type = ActionType::Dapai;
+				if (index == 0)
+					res.target = info.nowTile;
+				else res.target = info.handTile[index - 1];
+			}
 		}
-		int index;
-		std::cin >> index;
-		res.type = ActionType::Dapai;
-		if (index == 0)
-			res.target = info.nowTile;
-		else res.target = info.handTile[index - 1];
 		std::cout << std::endl;
 	}
 	else

@@ -44,6 +44,10 @@ struct Action
 		target = target_;
 		group = group_;
 	}
+	Action(ActionType type_, Single target_) {
+		type = type_;
+		target = target_;
+	}
 	Action(ActionType type_,Group group_) {
 		type = type_;
 		target = Null;
@@ -55,6 +59,8 @@ struct PlayerInfo
 	std::vector<Group> groupTile;//副露牌组
 	std::vector<Single>discardTile;//牌河
 	int lizhi;//立直宣言牌是牌河中的第几张，-1为未立直
+	int lizhiXunmu;//立直的巡目
+	int yifa;//是否处于一发巡
 };
 struct GameInfo
 {
@@ -80,6 +86,7 @@ struct GameInfo
 	int subround; //巡数
 	int remainTiles;//剩余牌数
 	int round;//局数(如东2局就是2)
+	bool w;//是否处于w立,天和,地和可成立的状态
 };
 class ActionGenerator
 {
@@ -87,4 +94,8 @@ protected:
 	std::string name;
 public:
 	virtual Action generateAction(const GameInfo& info)=0;
+	virtual std::string getName()
+	{
+		return name;
+	}
 };

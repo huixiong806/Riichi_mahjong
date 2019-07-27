@@ -10,7 +10,7 @@ struct RoundResult
 {
 	bool liuju;//是否流局
 	bool lianzhuang;//庄家是否连庄
-	std::vector<AgariResult> agariResult;
+	std::vector<std::pair<int,AgariResult>> agariResult;
 };
 struct ActionResult
 {
@@ -40,6 +40,7 @@ private:
 	bool mWaitMingpai;//是否等待鸣牌
 	bool mHaveMingpai[4];//4人是否已经发出了关于鸣牌的抉择
 	Action mMingpaiAction[4];//鸣牌的操作暂存
+	bool mW;//是否处于w立,天和,地和可成立的状态
 	//开始新局
 	void startNewRound();
 	//开始下一人摸牌
@@ -72,6 +73,8 @@ private:
 		//std::cout << "***********" << std::endl;
 		//巡数+1
 		mPlayer[who].subround++;
+		if (mPlayer[who].subround > 0)
+			mW = false;
 	}
 	//鸣牌后打牌
 	void newTurnAfterMingpai(int who)
@@ -85,10 +88,17 @@ private:
 		//巡数+1
 		mPlayer[who].subround++;
 	}
-	void endThisRound(std::vector<AgariResult> res)
+	void endThisRound(std::vector<std::pair<int, AgariResult>> res)
 	{
-		//TODO:检查是否听牌
+		mResult = RoundResult();
 		mRoundover = true;
+		if (res.size())
+		{
+			mResult.liuju = false;
+			mResult.agariResult = res;
+			return;
+		}
+		//TODO:检查是否听牌
 		mResult.liuju = true;
 		mResult.lianzhuang = false;
 		//游戏结束判断
@@ -100,14 +110,14 @@ private:
 	//处理鸣牌
 	void processMingpai()
 	{
-		std::vector<AgariResult> result;
+		std::vector<std::pair<int,AgariResult>> result;
 		bool overflag = false;
 		//荣
 		for (int i = 0; i < 4; ++i)
 		{
 			if (mMingpaiAction[i].type == ActionType::Rong)
 			{
-				result.push_back(mPlayer[i].rong(*mPlayer[mTurn].discardTile.rbegin()));
+				result.push_back(std::make_pair(i,mPlayer[i].rong(*mPlayer[mTurn].discardTile.rbegin())));
 				overflag = true;
 			}
 		}
@@ -121,8 +131,9 @@ private:
 		{
 			if (mMingpaiAction[i].type == ActionType::Gang)
 			{
-				mPlayer[i].gang(mMingpaiAction[i].group);
+				mPlayer[i].ronggang(mMingpaiAction[i].group);
 				mPlayer[mTurn].discardTile.pop_back();
+				mW = false;
 				newTurn(i, true);
 				return;
 			}
@@ -130,6 +141,7 @@ private:
 			{
 				mPlayer[i].peng(mMingpaiAction[i].group);
 				mPlayer[mTurn].discardTile.pop_back();
+				mW = false;
 				newTurnAfterMingpai(i);
 				return;
 			}
@@ -141,6 +153,7 @@ private:
 			{
 				mPlayer[i].chi(mMingpaiAction[i].group);
 				mPlayer[mTurn].discardTile.pop_back();
+				mW = false;
 				newTurnAfterMingpai(i);
 				return;
 			}
@@ -148,7 +161,7 @@ private:
 		//全部放弃鸣牌或者没法鸣牌
 		if (mMountain.remainCount() == 0)
 		{
-			endThisRound(std::vector<AgariResult>());
+			endThisRound(std::vector<std::pair<int,AgariResult>>());
 		}
 		else
 		{
@@ -156,7 +169,6 @@ private:
 		}
 	}
 public:
-	
 	//新游戏
 	void startNewGame(Rule rule = DefualtRule)
 	{
@@ -174,7 +186,6 @@ public:
 	void startNextRound()
 	{
 		//连庄，本场数+1，局数不变
-		mGameover = false;
 		if (mResult.lianzhuang)
 		{
 			mBenchang++;
@@ -216,6 +227,9 @@ public:
 //开始新局
 void Game::startNewRound()
 {
+	mW = true;
+	mGameover = false;
+	mRoundover = false;
 	mTurn = mEast;//东家起手
 	mMountain.reset(mRule);//牌山重置
 	for (int i = mEast, j = 0; j < 4; i = (i + 1) % 4, j++)
@@ -227,6 +241,7 @@ void Game::startNewRound()
 		std::sort(mPlayer[i].handTile.begin(), mPlayer[i].handTile.end());
 		mPlayer[i].selfWind = (WindType)j;
 		mPlayer[i].lizhi = -1;
+		mPlayer[i].lizhiXunmu = -1;
 		mPlayer[i].setNowTile(Null,false);
 		mPlayer[i].subround = -1;
 	}
@@ -334,6 +349,7 @@ ActionResult Game::doAction(int index, Action act)
 			res.type = ErrorType::NotYourTurn;
 			return res;
 		}
+		
 		switch (act.type)
 		{
 		case ActionType::Dapai:
@@ -359,6 +375,32 @@ ActionResult Game::doAction(int index, Action act)
 			return res;
 			//std::cout << "***********" << std::endl;
 			break;
+		case ActionType::Zimo:
+		{
+			std::vector<Single>allDora;
+			std::vector<Single>allUra;
+			TryToAgariResult result;
+			for (int i = 0; i < mDoraIndicatorCount; ++i)
+			{
+				allDora.push_back(mMountain.getDora(i));
+				allUra.push_back(mMountain.getUra(i));
+			}
+			result = mPlayer[index].zimo(0, allDora, allUra);
+			if (result.success)
+			{
+				endThisRound(std::vector<std::pair<int, AgariResult>>({ std::make_pair(index,result.result)}));
+			}
+			else
+			{
+				res.success = false;
+				res.type = ErrorType::ActionRejected;
+				//std::cout << "***********" << std::endl;
+				return res;
+			}
+			break;
+		}
+		case ActionType::Lizhi:
+			break;
 		default:
 			res.success = false;
 			res.type = ErrorType::ActionRejected;
@@ -370,7 +412,7 @@ ActionResult Game::doAction(int index, Action act)
 		//std::cout << "***********" << std::endl;
 		if (mMountain.remainCount() == 0)
 		{
-			endThisRound(std::vector<AgariResult>());
+			endThisRound(std::vector<std::pair<int,AgariResult>>());
 		}
 		else
 		{
@@ -393,6 +435,8 @@ GameInfo Game::getGameInfo(int index)
 		info.discardTile = mPlayer[j].discardTile;
 		info.groupTile = mPlayer[j].groupTile;
 		info.lizhi = mPlayer[j].lizhi;
+		info.lizhiXunmu = mPlayer[j].lizhiXunmu;
+		info.yifa = mPlayer[j].yifa;
 		res.playerInfo.push_back(info);
 	}
 	//手牌
@@ -424,5 +468,6 @@ GameInfo Game::getGameInfo(int index)
 	res.benchang = mBenchang;//本场
 	res.mingpai = mWaitMingpai;
 	res.round = mRound;
+	res.w = mW;
 	return res;
 }

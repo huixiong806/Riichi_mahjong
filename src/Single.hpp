@@ -12,11 +12,11 @@ public:
 	Single();
 	Single(uint8_t value_, char color_,bool akadora_) :mColor(color_), mValue(value_),mAkadora(akadora_) {}
 	//获取颜色
-	char color();
+	char color()const;
 	//获取值
-	uint8_t value();
+	uint8_t value()const;
 	//是否为红宝牌
-	bool isAkadora();
+	bool isAkadora()const;
 	//获取顺序上的下一张牌(默认为非红宝牌)
 	Single next();
 	//判断两张牌是否相等，不考虑是否为红宝牌
@@ -58,15 +58,15 @@ Single Single::next()
 	if (mValue == 9)return Single(1, mColor, false);
 	return Single(mValue + 1, mColor, false);
 }
-char Single::color()
+char Single::color()const
 {
 	return mColor;
 }
-uint8_t Single::value()
+uint8_t Single::value()const
 {
 	return mValue;
 }
-bool Single::isAkadora()
+bool Single::isAkadora()const
 {
 	return mAkadora;
 }
