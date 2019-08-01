@@ -15,6 +15,8 @@ private:
 	std::vector<Action> getPengActions(const GameInfo& info);
 	std::vector<Action> getChiActions(const GameInfo& info);
 	std::vector<Action> getZimoAction(const GameInfo& info);
+	std::vector<Action> getLizhiAction(const GameInfo& info);
+	std::vector<Action> getRongAction(const GameInfo& info);
 	std::vector<Action>getAllActionsMingpai(const GameInfo& info);
 	std::vector<Action>getAllActionsNormal(const GameInfo& info);
 public:
@@ -33,6 +35,8 @@ std::vector<Action> Human::getAllActionsMingpai(const GameInfo& info)
 	res.insert(res.end(), temp.begin(), temp.end());
 	temp = getRongGangActions(info);
 	res.insert(res.end(), temp.begin(), temp.end());
+	temp = getRongAction(info);
+	res.insert(res.end(), temp.begin(), temp.end());
 	return res;
 }
 std::vector<Action> Human::getAllActionsNormal(const GameInfo& info)
@@ -41,8 +45,11 @@ std::vector<Action> Human::getAllActionsNormal(const GameInfo& info)
 	std::vector<Action> temp = getZimoAction(info);
 	if (info.nowTile != Null)
 		res.push_back(Action(ActionType::Dapai,info.nowTile));
-	for (int i = 0; i < info.handTile.size(); ++i)
-		res.push_back(Action(ActionType::Dapai, info.handTile[i]));
+	if (info.playerInfo[(int)info.selfWind].lizhiXunmu == -1)
+		for (int i = 0; i < info.handTile.size(); ++i)
+			res.push_back(Action(ActionType::Dapai, info.handTile[i]));
+	res.insert(res.end(), temp.begin(), temp.end());
+	temp = getLizhiAction(info);
 	res.insert(res.end(), temp.begin(), temp.end());
 	return res;
 }
@@ -61,7 +68,12 @@ void Human::printActions(std::vector<Action>actions)
 			}
 			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Peng || actions[i].type == ActionType::Gang)
 				std::cout << num << "." << actionName[(int)actions[i].type] << " " << actions[i].group.getString() << std::endl;
-			else std::cout << num << "." << actionName[(int)actions[i].type] << std::endl;
+			else if (actions[i].type == ActionType::Lizhi)
+			{
+				std::cout << num << ".切"<<actions[i].target.getString()<<"立直"<< std::endl;
+			}
+			else
+				std::cout << num << "." << actionName[(int)actions[i].type] << std::endl;
 		}
 		num++;
 	}
@@ -69,6 +81,25 @@ void Human::printActions(std::vector<Action>actions)
 	{
 		std::cout << "为打出对应的牌(0为摸切)" << std::endl;
 	}
+}
+std::vector<Action> Human::getRongAction(const GameInfo& info)
+{
+	std::vector<Action> res;
+	Player player;
+	player.groupTile = info.playerInfo[(int)info.selfWind].groupTile;
+	player.lizhi = info.playerInfo[(int)info.selfWind].lizhi;
+	player.yifa = info.playerInfo[(int)info.selfWind].yifa;
+	player.lingshang = info.lingshang;
+	player.handTile = info.handTile;
+	int state = 0;
+	if (info.w)state = 1;
+	else if (info.remainTiles == 0)state = 2;
+	bool result = player.canRong(info.nowTile,info.prevailingWind, 1, state, std::vector<Single>(), std::vector<Single>());
+	if (result)
+	{
+		res.push_back(Action(ActionType::Rong));
+	}
+	return res;
 }
 std::vector<Action> Human::getZimoAction(const GameInfo& info)
 {
@@ -83,10 +114,35 @@ std::vector<Action> Human::getZimoAction(const GameInfo& info)
 	int state=0;
 	if (info.w)state = 1;
 	else if (info.remainTiles == 0)state = 2;
-	auto result=player.zimo(state,std::vector<Single>(), std::vector<Single>());
+	auto result=player.zimo(info.prevailingWind,state,std::vector<Single>(), std::vector<Single>());
 	if (result.success)
 	{
 		res.push_back(Action(ActionType::Zimo));
+	}
+	return res;
+}
+std::vector<Action> Human::getLizhiAction(const GameInfo& info)
+{
+	std::vector<Action> res;
+	if (info.playerInfo[(int)info.selfWind].lizhiXunmu != -1)
+		return res;
+	auto allTiles = info.handTile;
+	allTiles.push_back(info.nowTile);
+	for (auto& target : allTiles)
+	{
+		Player player;
+		player.score = info.playerInfo[(int)info.selfWind].score;
+		player.groupTile = info.playerInfo[(int)info.selfWind].groupTile;
+		player.lizhi = info.playerInfo[(int)info.selfWind].lizhi;
+		player.yifa = info.playerInfo[(int)info.selfWind].yifa;
+		player.lingshang = info.lingshang;
+		player.handTile = info.handTile;
+		player.nowTile = info.nowTile;
+		int state = 0;
+		if (info.w)state = 1;
+		else if (info.remainTiles == 0)state = 2;
+		if (player.doLizhi(state, target))
+			res.push_back(Action(ActionType::Lizhi, target));
 	}
 	return res;
 }
@@ -94,10 +150,14 @@ std::vector<Action> Human::getChiActions(const GameInfo& info)
 {
 	//只能吃上家牌
 	if (info.nowWind != (info.selfWind + 3) % 4)return std::vector<Action>();
+	if (info.playerInfo[(int)info.selfWind].lizhiXunmu != -1)
+		return std::vector<Action>();
 }
 std::vector<Action> Human::getRongGangActions(const GameInfo& info)
 {
 	std::vector<Action>res;
+	if (info.playerInfo[(int)info.selfWind].lizhiXunmu!=-1)
+		return res;
 	Single target = info.nowTile;
 	std::vector<Single>candidate;
 	for (auto& item : info.handTile)
@@ -111,6 +171,8 @@ std::vector<Action> Human::getRongGangActions(const GameInfo& info)
 std::vector<Action> Human::getPengActions(const GameInfo& info)
 {
 	std::vector<Action>res;
+	if (info.playerInfo[(int)info.selfWind].lizhiXunmu != -1)
+		return res;
 	Single target = info.nowTile;
 	std::vector<Single>candidate;
 	for (auto& item : info.handTile)
@@ -198,6 +260,12 @@ Action Human::generateAction(const GameInfo& info)
 		}
 		std::cout << std::endl;
 	}
+	std::cout << "ID ";
+	for (int j = 0; j < (13 - info.playerInfo[info.selfWind].groupTile.size() * 3); ++j)
+	{
+		if (j < 9)std::cout << " ";
+		std::cout << j+1<<" ";
+	}
 	std::cout << std::endl;
 	if (info.mingpai == false)
 	{
@@ -211,6 +279,7 @@ Action Human::generateAction(const GameInfo& info)
 			int index;
 			std::cin >> index;
 			res = actions[index];
+
 		}
 		else
 		{

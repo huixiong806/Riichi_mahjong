@@ -107,6 +107,13 @@ private:
 			mGameover = true;
 		}
 	}
+	//消去w立,一发,地和
+	void resetBounusYaku()
+	{
+		mW = false;
+		for (int i = 0; i < 4; ++i)
+			mPlayer[i].yifa = false;
+	}
 	//处理鸣牌
 	void processMingpai()
 	{
@@ -115,11 +122,21 @@ private:
 		//荣
 		for (int i = 0; i < 4; ++i)
 		{
+			
 			if (mMingpaiAction[i].type == ActionType::Rong)
 			{
-				result.push_back(std::make_pair(i,mPlayer[i].rong(*mPlayer[mTurn].discardTile.rbegin())));
+				std::vector<Single>allDora;
+				std::vector<Single>allUra;
+				for (int i = 0; i < mDoraIndicatorCount; ++i)
+				{
+					allDora.push_back(mMountain.getDora(i));
+					allUra.push_back(mMountain.getUra(i));
+				}
+				result.push_back(std::make_pair(i,mPlayer[i].rong(*mPlayer[mTurn].discardTile.rbegin(), mPrevailingWind,1, mW, allDora, allUra)));
 				overflag = true;
+				std::cout << "*" << std::endl;
 			}
+			
 		}
 		if (overflag)
 		{
@@ -133,7 +150,8 @@ private:
 			{
 				mPlayer[i].ronggang(mMingpaiAction[i].group);
 				mPlayer[mTurn].discardTile.pop_back();
-				mW = false;
+				
+				resetBounusYaku();
 				newTurn(i, true);
 				return;
 			}
@@ -141,7 +159,7 @@ private:
 			{
 				mPlayer[i].peng(mMingpaiAction[i].group);
 				mPlayer[mTurn].discardTile.pop_back();
-				mW = false;
+				resetBounusYaku();
 				newTurnAfterMingpai(i);
 				return;
 			}
@@ -153,7 +171,7 @@ private:
 			{
 				mPlayer[i].chi(mMingpaiAction[i].group);
 				mPlayer[mTurn].discardTile.pop_back();
-				mW = false;
+				resetBounusYaku();
 				newTurnAfterMingpai(i);
 				return;
 			}
@@ -278,7 +296,16 @@ ActionResult Game::doAction(int index, Action act)
 				mMingpaiAction[index] = act;
 				break;
 			case ActionType::Rong:
-				if (!mPlayer[index].canRong(target))
+			{
+				std::vector<Single>allDora;
+				std::vector<Single>allUra;
+				TryToAgariResult result;
+				for (int i = 0; i < mDoraIndicatorCount; ++i)
+				{
+					allDora.push_back(mMountain.getDora(i));
+					allUra.push_back(mMountain.getUra(i));
+				}
+				if (!mPlayer[index].canRong(target, mPrevailingWind, 1, mW, allDora, allUra))
 				{
 					res.success = false;
 					res.type = ErrorType::ActionRejected;
@@ -287,8 +314,16 @@ ActionResult Game::doAction(int index, Action act)
 				mHaveMingpai[index] = true;
 				mMingpaiAction[index] = act;
 				break;
+			}
 			case ActionType::Chi:
 				if (!mPlayer[index].canChi(target, act.group, ((int)mPlayer[mTurn].selfWind + 4 - mPlayer[index].selfWind) % 4))
+				{
+					res.success = false;
+					res.type = ErrorType::ActionRejected;
+					return res;
+				}
+				//立直后不能鸣牌
+				if (mPlayer[index].lizhiXunmu != -1)
 				{
 					res.success = false;
 					res.type = ErrorType::ActionRejected;
@@ -305,11 +340,25 @@ ActionResult Game::doAction(int index, Action act)
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
+				//立直后不能鸣牌
+				if (mPlayer[index].lizhiXunmu != -1)
+				{
+					res.success = false;
+					res.type = ErrorType::ActionRejected;
+					return res;
+				}
 				mHaveMingpai[index] = true;
 				mMingpaiAction[index] = act;
 				break;
 			case ActionType::Gang:
 				if (!mPlayer[index].canGang(target, act.group, ((int)mPlayer[mTurn].selfWind + 4 - mPlayer[index].selfWind) % 4))
+				{
+					res.success = false;
+					res.type = ErrorType::ActionRejected;
+					return res;
+				}
+				//立直后不能鸣牌
+				if (mPlayer[index].lizhiXunmu != -1)
 				{
 					res.success = false;
 					res.type = ErrorType::ActionRejected;
@@ -353,12 +402,36 @@ ActionResult Game::doAction(int index, Action act)
 		switch (act.type)
 		{
 		case ActionType::Dapai:
-			if (!mPlayer[index].dapai(act.target))
+		case ActionType::Lizhi:
+		{
+			if (act.type == ActionType::Lizhi&&mMountain.remainCount() < 4)
+			{
+				res.success = false;
+				res.type = ErrorType::ActionRejected;
+			}
+			if (act.type == ActionType::Lizhi)
+			{
+				if (!mPlayer[index].doLizhi(mW,act.target))
+				{
+					res.success = false;
+					res.type = ErrorType::ActionRejected;
+					return res;
+				}
+				else
+				{
+					mLizhibangCount++;
+				}
+			}
+			else if (!mPlayer[index].dapai(act.target))
 			{
 				res.success = false;
 				res.type = ErrorType::TileNotExist;
 				//std::cout << "***********" << std::endl;
 				return res;
+			}
+			if (act.type == ActionType::Dapai)
+			{
+				mPlayer[index].yifa = false;
 			}
 			if (mPlayer[index].lingshang == true)
 			{
@@ -373,8 +446,8 @@ ActionResult Game::doAction(int index, Action act)
 				mMingpaiAction[i] = Action();
 			}
 			return res;
-			//std::cout << "***********" << std::endl;
 			break;
+		}
 		case ActionType::Zimo:
 		{
 			std::vector<Single>allDora;
@@ -385,7 +458,7 @@ ActionResult Game::doAction(int index, Action act)
 				allDora.push_back(mMountain.getDora(i));
 				allUra.push_back(mMountain.getUra(i));
 			}
-			result = mPlayer[index].zimo(0, allDora, allUra);
+			result = mPlayer[index].zimo(mPrevailingWind,mW, allDora, allUra);
 			if (result.success)
 			{
 				endThisRound(std::vector<std::pair<int, AgariResult>>({ std::make_pair(index,result.result)}));
@@ -399,8 +472,6 @@ ActionResult Game::doAction(int index, Action act)
 			}
 			break;
 		}
-		case ActionType::Lizhi:
-			break;
 		default:
 			res.success = false;
 			res.type = ErrorType::ActionRejected;
@@ -437,6 +508,7 @@ GameInfo Game::getGameInfo(int index)
 		info.lizhi = mPlayer[j].lizhi;
 		info.lizhiXunmu = mPlayer[j].lizhiXunmu;
 		info.yifa = mPlayer[j].yifa;
+		info.score= mPlayer[j].score;
 		res.playerInfo.push_back(info);
 	}
 	//手牌

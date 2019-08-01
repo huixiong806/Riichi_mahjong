@@ -19,6 +19,13 @@ struct Group
 	static Group createShunzi(Single a, Single b, Single target, int source);
 	static Group createGangzi(Single a, Single b,Single c, Single target, int source);
 	static Group createQuetou(Single a, Single b);
+	//ÊÇ·ñÎªçÛ¾Å
+	bool isyaojiu()
+	{
+		if (color == 'z')return true;
+		if (value == 1 || value == 9)return true;
+		return false;
+	}
 	const std::string getString()const
 	{
 		std::string res;

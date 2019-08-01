@@ -1,6 +1,7 @@
 #include<iostream>
 #include<map>
 #include<ctime>
+#include<vector>
 #include<unordered_map>
 #include"Game.hpp"
 #include"Human.hpp"
@@ -64,14 +65,54 @@ void init()
 	yaku[0xf12] = "纯正九莲宝灯";
 	yaku[0xf00] = "大四喜";
 }
+void test()
+{
+	auto human = make_shared<Human>("测试人");
+	GameInfo res;
+	res.rule = Rule();//规则
+					 //每个玩家的牌河，是否立直，以及副露牌组
+	for (int i = 0;i<=3;++i)
+	{
+		PlayerInfo info;
+		info.lizhi = false;
+		info.lizhiXunmu = -1;
+		info.score = 99999;
+		res.playerInfo.push_back(info);
+	}
+	//手牌
+	res.handTile.push_back(Single(1,'m',0));
+	res.handTile.push_back(Single(2, 'm', 0));
+	res.handTile.push_back(Single(3, 'm', 0));
+	res.handTile.push_back(Single(4, 'm', 0));
+	res.handTile.push_back(Single(5, 'm', 1));
+	res.handTile.push_back(Single(6, 'm', 0));
+	res.handTile.push_back(Single(1, 'p', 0));
+	res.handTile.push_back(Single(2, 'p', 0));
+	res.handTile.push_back(Single(3, 'p', 0));
+	res.handTile.push_back(Single(2, 's', 0));
+	res.handTile.push_back(Single(3, 's', 0));
+	res.handTile.push_back(Single(3, 's', 0));
+	res.handTile.push_back(Single(3, 's', 0));
+	res.nowTile = Single(3, 'z', 0);
+	res.prevailingWind = WindType::EAST;   //场风
+	res.selfWind =WindType::EAST;  //门风
+	res.nowWind = WindType::EAST;
+	res.mingpai = false;
+	res.w = false;
+	human->generateAction(res);
+}
 int main()
 {
+	//test();
 	/*
 	种子收集
 	3 杠3z
 	233 7对子自摸，留1m和3p
 	*/
-	srand(233);
+	int seed;
+	cout << "输入种子:" << endl;
+	cin >> seed;
+	srand(seed);
 	init();
 	player[0] = make_shared<AutoFurikomu>("放铳人A");
 	player[1] = make_shared<AutoFurikomu>("放铳人B");
@@ -82,7 +123,7 @@ int main()
 	do
 	{
 		if(first)
-		game.startNewGame();
+			game.startNewGame();
 		else game.startNextRound();
 		first = false;
 		cout << "新的一局开始了" << endl;
@@ -92,6 +133,14 @@ int main()
 			{
 				auto action = player[i]->generateAction(game.getGameInfo(i));
 				ActionResult res=game.doAction(i, action);
+				if (res.success == false)
+				{
+					cout<<"出现错误,输入任意内容退出"<<endl;
+					int a;
+					cin >> a;
+					return 0;
+				}
+				if (game.roundOver())break;
 				//cout << (int)(res.type)<<endl;
 			}
 		} while (!game.roundOver());

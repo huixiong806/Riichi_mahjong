@@ -51,6 +51,12 @@ public:
 		res.push_back(mColor);
 		return res;
 	}
+	bool isyaojiu()
+	{
+		if (mColor == 'z')return true;
+		if (mValue == 1 || mValue == 9)return true;
+		return false;
+	}
 };
 Single Single::next()
 {
