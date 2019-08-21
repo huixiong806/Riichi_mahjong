@@ -7,6 +7,7 @@
 #include<map>
 #include<set>
 #include<cassert>
+#include"Algorithms.h"
 //三位16进制数，第一位为番数(役满记d,两倍役满记f)，第二位:0=非食下役/食下役的门清版，1=门清限定，2=食下役的非门清版,第三位为编号
 enum class Yaku
 {
@@ -137,36 +138,7 @@ struct TryToAgariResult
 		result = result_;
 	}
 };
-//0~8 万字,9~17 饼子,18~26 索子,27~33 东南西北白发中
-std::vector<int> getPool(const std::vector<Single>& tiles)
-{
-	std::vector<int> res;
-	res.resize(34);
-	for (auto& item : tiles)
-	{
-		if (item.color() == 'm')
-		{
-			res[item.value() - 1]++;
-		}
-		else if (item.color() == 'p')
-		{
-			res[item.value() + 8]++;
-		}
-		else if (item.color() == 's')
-		{
-			res[item.value() + 17]++;
-		}
-		else if (item.color() == 'z')
-		{
-			res[item.value() + 26]++;
-		}
-		else
-		{
-			assert(0);
-		}
-	}
-	return res;
-}
+
 class Player
 {
 private:
@@ -508,19 +480,7 @@ public:
 	}
 	bool tingpai()
 	{
-		bool res = false;
-		for (int i = 1; i <= 9; ++i)
-		{
-			if (agari((WindType)0,0, 2, Single(i, 'm', 0), std::vector<Single>(), std::vector<Single>()).success)
-				res = true;
-			if (agari((WindType)0, 0, 2, Single(i, 'p', 0), std::vector<Single>(), std::vector<Single>()).success)
-				res = true;
-			if (agari((WindType)0, 0, 2, Single(i, 's', 0), std::vector<Single>(), std::vector<Single>()).success)
-				res = true;
-			if (i <= 7 && agari((WindType)0, 0, 2, Single(i, 'z', 0), std::vector<Single>(), std::vector<Single>()).success)
-				res = true;
-		}
-		return res;
+		return !Algorithms::tingpai(handTile).empty();
 	}
 	//返回false时不应变动私有变量
 	bool doLizhi(int state, Single target)
@@ -785,7 +745,7 @@ TryToAgariResult Player::agariSearch(WindType prevailingWind, int state, int typ
 		}
 		return res;
 	}
-	std::vector<int> pool = getPool(remainTiles);
+	std::vector<int> pool = Algorithms::getPool(remainTiles);
 	//判断顺子和刻子
 	for (int i = 0; i <= 33; ++i)
 	{

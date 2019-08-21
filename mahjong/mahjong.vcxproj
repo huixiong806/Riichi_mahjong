@@ -115,6 +115,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\Algorithms.h" />
     <ClInclude Include="..\src\AutoFurikomu.hpp" />
     <ClInclude Include="..\src\Game.hpp" />
     <ClInclude Include="..\src\Group.hpp" />
