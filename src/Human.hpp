@@ -5,6 +5,7 @@
 #include<cassert>
 #include<set>
 #include<iostream>
+#include<iomanip>
 const std::string windName[4] = { "东","南","西","北" };
 const std::string actionName[11] = { "error","跳过","吃","碰","杠","和","error","立直","自摸","流局","拔北" };
 class Human:public ActionGenerator
@@ -19,6 +20,7 @@ private:
 	std::vector<Action> getRongAction(const GameInfo& info);
 	std::vector<Action>getAllActionsMingpai(const GameInfo& info);
 	std::vector<Action>getAllActionsNormal(const GameInfo& info);
+	void printInfo(const GameInfo& info);
 public:
 	Human() { name = "No Name"; }
 	Human(std::string name_)
@@ -64,13 +66,13 @@ void Human::printActions(std::vector<Action>actions)
 		{
 			if (i>0 && actions[i - 1].type== ActionType::Dapai)
 			{
-				std::cout << "为打出对应的牌(0为摸切)" << std::endl;
+				std::cout << "打牌(0摸切)" << std::endl;
 			}
 			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Peng || actions[i].type == ActionType::Gang)
 				std::cout << num << "." << actionName[(int)actions[i].type] << " " << actions[i].group.getString() << std::endl;
 			else if (actions[i].type == ActionType::Lizhi)
 			{
-				std::cout << num << ".切"<<actions[i].target.getString()<<"立直"<< std::endl;
+				std::cout << num << ".切"<<actions[i].target.getDisplay()<<"立直"<< std::endl;
 			}
 			else
 				std::cout << num << "." << actionName[(int)actions[i].type] << std::endl;
@@ -79,72 +81,56 @@ void Human::printActions(std::vector<Action>actions)
 	}
 	if (actions[actions.size() - 1].type == ActionType::Dapai)
 	{
-		std::cout << "为打出对应的牌(0为摸切)" << std::endl;
+		std::cout << "打牌(0摸切)" << std::endl;
 	}
 }
 std::vector<Action> Human::getRongAction(const GameInfo& info)
 {
 	std::vector<Action> res;
-	Player player;
-	player.groupTile = info.playerInfo[(int)info.selfWind].groupTile;
-	player.lizhi = info.playerInfo[(int)info.selfWind].lizhi;
-	player.yifa = info.playerInfo[(int)info.selfWind].yifa;
-	player.lingshang = info.lingshang;
-	player.handTile = info.handTile;
 	int state = 0;
 	if (info.w)state = 1;
 	else if (info.remainTiles == 0)state = 2;
-	bool result = player.canRong(info.nowTile,info.prevailingWind, 1, state, std::vector<Single>(), std::vector<Single>());
+	bool result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind, info.playerInfo[info.selfWind].lizhiXunmu, info.playerInfo[info.selfWind].yifa, state, 1, info.nowTile, info.handTile, info.playerInfo[info.selfWind].groupTile, std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
-	{
 		res.push_back(Action(ActionType::Rong));
-	}
 	return res;
 }
 std::vector<Action> Human::getZimoAction(const GameInfo& info)
 {
 	std::vector<Action> res;
-	Player player;
-	player.groupTile = info.playerInfo[(int)info.selfWind].groupTile;
-	player.lizhi = info.playerInfo[(int)info.selfWind].lizhi;
-	player.yifa = info.playerInfo[(int)info.selfWind].yifa;
-	player.lingshang = info.lingshang;
-	player.handTile = info.handTile;
-	player.nowTile = info.nowTile;
 	int state=0;
 	if (info.w)state = 1;
 	else if (info.remainTiles == 0)state = 2;
-	auto result=player.zimo(info.prevailingWind,state,std::vector<Single>(), std::vector<Single>());
-	if (result.success)
-	{
+	bool result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind, info.playerInfo[info.selfWind].lizhiXunmu, info.playerInfo[info.selfWind].yifa, state, 0, info.nowTile, info.handTile, info.playerInfo[info.selfWind].groupTile, std::vector<Single>(), std::vector<Single>())).success;
+	if (result)
 		res.push_back(Action(ActionType::Zimo));
-	}
 	return res;
 }
 std::vector<Action> Human::getLizhiAction(const GameInfo& info)
 {
-	std::vector<Action> res;
+	std::set<Action> res;
 	if (info.playerInfo[(int)info.selfWind].lizhiXunmu != -1)
-		return res;
+		return std::vector<Action>();
 	auto allTiles = info.handTile;
 	allTiles.push_back(info.nowTile);
 	for (auto& target : allTiles)
 	{
 		Player player;
-		player.score = info.playerInfo[(int)info.selfWind].score;
-		player.groupTile = info.playerInfo[(int)info.selfWind].groupTile;
-		player.lizhi = info.playerInfo[(int)info.selfWind].lizhi;
-		player.yifa = info.playerInfo[(int)info.selfWind].yifa;
-		player.lingshang = info.lingshang;
-		player.handTile = info.handTile;
-		player.nowTile = info.nowTile;
+		player.setInfo(0, info.playerInfo[(int)info.selfWind].score, info.selfWind, info.handTile,
+			{}, info.playerInfo[(int)info.selfWind].groupTile, info.nowTile, {}, info.lingshang, 0, info.playerInfo[(int)info.selfWind].lizhi,
+			info.playerInfo[(int)info.selfWind].lizhiXunmu, info.playerInfo[(int)info.selfWind].yifa);
 		int state = 0;
 		if (info.w)state = 1;
 		else if (info.remainTiles == 0)state = 2;
 		if (player.doLizhi(state, target))
-			res.push_back(Action(ActionType::Lizhi, target));
+		{
+			res.insert(Action(ActionType::Lizhi, target));
+		}
 	}
-	return res;
+	std::vector<Action> ret;
+	for (auto& item : res)
+		ret.push_back(item);
+	return ret;
 }
 std::vector<Action> Human::getChiActions(const GameInfo& info)
 {
@@ -195,86 +181,63 @@ std::vector<Action> Human::getPengActions(const GameInfo& info)
 	}
 	return res;
 }
-Action Human::generateAction(const GameInfo& info)
+void Human::printInfo(const GameInfo& info)
 {
-	Action res;
-	res.type = ActionType::Null;
-	if (info.nowWind != info.selfWind&&info.mingpai == false)return res;
-	if (info.nowWind == info.selfWind&&info.mingpai == true)return res;
-	std::cout << "昵称:" << name << std::endl;
+	std::cout << std::endl;
+	std::cout << name << std::endl;
 	std::cout << windName[(int)info.prevailingWind] << info.round << "局 " << info.benchang << "本场 剩余" << info.remainTiles << "张" << std::endl;
-	std::cout << "自风为" << windName[(int)info.selfWind] << "  场风役牌:" << Single((int)info.prevailingWind + 1, 'z', false).getString() << "  自风役牌:" << Single((int)info.selfWind + 1, 'z', false).getString() << std::endl;
+	std::cout << "自风为" << windName[(int)info.selfWind] << std::endl;
+	//<< "  场风役牌:" << Single((int)info.prevailingWind + 1, 'z', false).getString() << "  自风役牌:" << Single((int)info.selfWind + 1, 'z', false).getString() << std::endl;
 	std::cout << "宝牌指示牌 ";
 	for (auto& item : info.doraIndicator)
 	{
 		std::cout << item.getString() << " ";
 	}
 	std::cout << std::endl;
-	std::cout << "牌河:" << std::endl;
-	std::cout << "东家 " << std::endl;
-	for (auto& item : info.playerInfo[0].discardTile)
+	std::cout << "信息:" << std::endl;
+	for (int wind = 0; wind <= 3; ++wind)
 	{
-		std::cout << item.getString() << " ";
-	}
-	std::cout << std::endl;
-	std::cout << "南家 " << std::endl;
-	for (auto& item : info.playerInfo[1].discardTile)
-	{
-		std::cout << item.getString() << " ";
-	}
-	std::cout << std::endl;
-	std::cout << "西家 " << std::endl;
-	for (auto& item : info.playerInfo[2].discardTile)
-	{
-		std::cout << item.getString() << " ";
-	}
-	std::cout << std::endl;
-	std::cout << "北家 " << std::endl;
-	for (auto& item : info.playerInfo[3].discardTile)
-	{
-		std::cout << item.getString() << " ";
-	}
-	std::cout << std::endl;
-	std::cout << "手牌:" << std::endl;
-	for (int i = 0; i < 4; ++i)
-	{
-		std::cout<<windName[i]<<" ";
-		if (i == info.selfWind)
-		{
-			auto hand = info.handTile;
-			for (auto& item : info.handTile)
-			{
-				std::cout << item.getString() << " ";
-			}
-		}
-		else
-		{
-			for (int j = 0; j < (13 - info.playerInfo[i].groupTile.size() * 3); ++j)
-			{
-				std::cout << "??" << " ";
-			}
-		}
-		for (auto& item : info.playerInfo[i].groupTile)
+		std::cout << windName[wind] << "家  " << std::setw(7) << std::left << info.playerInfo[wind].score << std::setw(0) << "|";
+		for (auto& item : info.playerInfo[wind].groupTile)
 		{
 			std::cout << item.getString() << " ";
 		}
 		std::cout << std::endl;
+		for (auto& item : info.playerInfo[wind].discardTile)
+		{
+			std::cout << item.getDisplay() << " ";
+		}
+		std::cout << std::endl << std::endl;
 	}
-	std::cout << "ID ";
+	std::cout << windName[info.selfWind] << "| ";
+	auto hand = info.handTile;
+	for (auto& item : info.handTile)
+		std::cout << item.getDisplay() << " ";
+	std::cout << std::endl;
+	std::cout << "ID| ";
 	for (int j = 0; j < (13 - info.playerInfo[info.selfWind].groupTile.size() * 3); ++j)
 	{
 		if (j < 9)std::cout << " ";
-		std::cout << j+1<<" ";
+		std::cout << j + 1 << " ";
 	}
 	std::cout << std::endl;
+}
+Action Human::generateAction(const GameInfo& info)
+{
+	Action res;
+	res.type = ActionType::Null;
+	if (info.nowWind != info.selfWind&&info.mingpai == false)return res;
+	if (info.nowWind == info.selfWind&&info.mingpai == true)return res;
+	if (info.mingpai == false && info.selfWind == info.nowWind)
+		printInfo(info);
 	if (info.mingpai == false)
 	{
 		std::vector<Action>actions;
 		if (info.nowTile != Null)
 		{
-			std::cout << "摸到的牌为" << info.nowTile.getString() << std::endl;
+			std::cout << "摸 " << info.nowTile.getDisplay() << std::endl << std::endl;
 			actions = getAllActionsNormal(info);
-			std::cout << "请选择一种操作:" << std::endl;
+			std::cout << "请选择:" << std::endl;
 			printActions(actions);
 			int index;
 			std::cin >> index;
@@ -298,12 +261,13 @@ Action Human::generateAction(const GameInfo& info)
 	}
 	else
 	{
-		std::cout << windName[(int)info.nowWind] << "家打出了" << info.nowTile.getString() << std::endl;	
+		
 		std::vector<Action>actions = getAllActionsMingpai(info);
+		if (actions.size() != 1)
+			printInfo(info);
+		std::cout << windName[(int)info.nowWind] << "家打出了" << info.nowTile.getDisplay() << std::endl;
 		if (actions.size() == 1)
-		{
 			res = actions[0];
-		}
 		else
 		{
 			std::cout << "请选择一种操作:" << std::endl;

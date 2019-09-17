@@ -43,6 +43,21 @@ public:
 	{
 		return (int)mColor * 1000 + mValue * 10 + (int)mAkadora > (int)rhs.mColor * 1000 + rhs.mValue * 10 + (int)rhs.mAkadora;
 	}
+	std::string getDisplay()const
+	{
+		std::string res;
+		if (mColor != 'z')
+		{
+			res.push_back((mAkadora ?0:mValue) + '0');
+			res.push_back(mColor);
+		}
+		else
+		{
+			const std::string zi[8] = {"??","东","南","西","北","白","发","中" };
+			res=zi[mValue];
+		}
+		return res;
+	}
 	std::string getString()const
 	{
 		std::string res;

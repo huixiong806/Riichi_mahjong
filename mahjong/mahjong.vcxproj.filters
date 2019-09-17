@@ -41,7 +41,7 @@
     <ClInclude Include="..\src\AutoFurikomu.hpp">
       <Filter>src\AI</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Algorithms.h">
+    <ClInclude Include="..\src\Algorithms.hpp">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

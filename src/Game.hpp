@@ -10,7 +10,7 @@ struct RoundResult
 {
 	bool liuju;//是否流局
 	bool lianzhuang;//庄家是否连庄
-	std::vector<std::pair<int,AgariResult>> agariResult;
+	std::vector<AgariResult> agariResult;
 };
 struct ActionResult
 {
@@ -19,6 +19,7 @@ struct ActionResult
 };
 class Game
 {
+	
 private:
 	//int mIndex;//表示本局的编号
 	Rule mRule;//规则
@@ -26,7 +27,7 @@ private:
 	WindType mPrevailingWind;     //场风
 	std::vector<Player> mPlayer;      //0,1,2,3分别对应四个玩家。
 	int mEast;//表示庄家的编号,庄家为1则东南西北玩家编号分别为1,2,3,0,以此类推。
-	int mLizhibang;    //额外立直棒数量
+	int mLizhibang;    //额外立直棒的点数价值 
 	int mRound;  //局数(1~4)
 	int mBenchang;    //本场
 	int mTurn;//表示正常顺序该谁摸牌了。
@@ -89,7 +90,7 @@ private:
 		mPlayer[who].subround++;
 	}
 	//途中流局连庄
-	void endThisRound(std::vector<std::pair<int, AgariResult>> res,bool tuzhongLiuju)
+	void endThisRound(std::vector<AgariResult> res,bool tuzhongLiuju)
 	{
 		mResult = RoundResult();
 		mRoundover = true;
@@ -101,18 +102,72 @@ private:
 				top = i;
 		}
 		//有人和牌
-		//TODO:分数计算
+		//TODO:分数计算 
 		if (!res.empty())
 		{
 			mResult.liuju = false;
+			mResult.lianzhuang=false;
 			mResult.agariResult = res;
-			//游戏结束判断
+			//立直棒和本场费计算，按照头跳规则
+			int targetPlayer;//获取点棒的人 
+			if(res.size()==1)
+				targetPlayer=res[0].hupaiID;
+			else
+			{
+				targetPlayer=res[0].fangchongID;
+				int minSpace=4;//最小间距先调整为4
+				int a=mPlayer[res[0].fangchongID].selfWind;
+				for (auto&item : res)
+				{
+					int b=mPlayer[item.hupaiID].selfWind;
+					if(b<a)b+=4;
+					int space=b-a;
+					if(space<minSpace)
+					{
+						minSpace=space;
+						targetPlayer=item.hupaiID;
+					}
+				}
+			}
+			mPlayer[targetPlayer].score+=mLizhibang;
+			mPlayer[targetPlayer].score+=mBenchang*300;
+			//荣和的本场费计算 
+			if(!res[0].zimo) 
+				mPlayer[res[0].fangchongID].score-=mBenchang*300;
+			else //自摸的本场费计算 
+			{
+				for(int i=0;i<4;++i)
+					if(targetPlayer!=i)
+						mPlayer[i].score-=mBenchang*100;
+			}
+			//分数计算 
+			for (auto&item : res)
+			{
+				//和牌得失点 
+				mPlayer[item.hupaiID].score+=item.scoreAdd;
+				if(mPlayer[item.hupaiID].selfWind==WindType::EAST)
+					mResult.lianzhuang=true;
+				if(item.zimo)
+				{
+					for(int i=0;i<4;++i)
+					{
+						if(item.hupaiID!=i)
+						{
+							//std::cout<<item.scoreDecXian<<std::endl;
+							if(mPlayer[i].selfWind==WindType::EAST)
+								mPlayer[i].score-=item.scoreDecZhuang;
+							else
+								mPlayer[i].score-=item.scoreDecXian;
+						}
+					}
+				}else mPlayer[item.fangchongID].score-=item.scoreDecFangchong;
+			}
 			if (mPrevailingWind == mRule.gameType&&mRound == 4)
 			{	
 				//庄家没和牌或者和牌后是1位,游戏结束
 				bool zhuangjiaHupai = false;
 				for (auto&item : res)
-					if (mPlayer[item.first].selfWind == WindType::EAST)
+					if (mPlayer[item.hupaiID].selfWind == WindType::EAST)
 						zhuangjiaHupai = true;
 				if (!zhuangjiaHupai||(zhuangjiaHupai&&top==mEast))
 					mGameover = true;
@@ -129,7 +184,8 @@ private:
 			}
 			return;
 		}
-		//流局
+		//*****以下为流局****** 
+		//TODO：流局满贯结算 
 		mResult.liuju = true;
 		if (tuzhongLiuju)
 		{
@@ -181,7 +237,7 @@ private:
 	//处理鸣牌
 	void processMingpai()
 	{
-		std::vector<std::pair<int,AgariResult>> result;
+		std::vector<AgariResult> result;
 		bool overflag = false;
 		//荣
 		for (int i = 0; i < 4; ++i)
@@ -196,7 +252,10 @@ private:
 					allDora.push_back(mMountain.getDora(i));
 					allUra.push_back(mMountain.getUra(i));
 				}
-				result.push_back(std::make_pair(i,mPlayer[i].rong(*mPlayer[mTurn].discardTile.rbegin(), mPrevailingWind,1, mW, allDora, allUra)));
+				AgariResult tmp=mPlayer[i].rong(*mPlayer[mTurn].discardTile.rbegin(), mPrevailingWind,1, mW, allDora, allUra);
+				tmp.hupaiID=i;
+				tmp.fangchongID=mTurn;
+				result.push_back(tmp);
 				overflag = true;
 				//std::cout << "*" << std::endl;
 			}
@@ -243,7 +302,7 @@ private:
 		//全部放弃鸣牌或者没法鸣牌
 		if (mMountain.remainCount() == 0)
 		{
-			endThisRound(std::vector<std::pair<int,AgariResult>>(), false);
+			endThisRound(std::vector<AgariResult>(), false);
 		}
 		else
 		{
@@ -262,6 +321,8 @@ public:
 		mBenchang = 0;//0本场
 		mDoraIndicatorCount = 0;
 		mGameover = false;
+		for(int i=0;i<4;++i)
+			mPlayer[i].score=mRule.startPoint;
 		startNewRound();
 	}
 	//开始下一局
@@ -318,7 +379,7 @@ void Game::startNewRound()
 	{
 		mPlayer[i].groupTile.clear();
 		mPlayer[i].discardTile.clear();
-		mPlayer[i].score = mRule.startPoint;
+		//mPlayer[i].score = mRule.startPoint;
 		mPlayer[i].handTile = mMountain.hand[j];
 		std::sort(mPlayer[i].handTile.begin(), mPlayer[i].handTile.end());
 		mPlayer[i].selfWind = (WindType)j;
@@ -525,7 +586,9 @@ ActionResult Game::doAction(int index, Action act)
 			result = mPlayer[index].zimo(mPrevailingWind,mW, allDora, allUra);
 			if (result.success)
 			{
-				endThisRound(std::vector<std::pair<int, AgariResult>>({ std::make_pair(index,result.result)}),false);
+				result.result.fangchongID=-1;
+				result.result.hupaiID=index;
+				endThisRound(std::vector<AgariResult>({result.result}),false);
 			}
 			else
 			{
@@ -547,7 +610,7 @@ ActionResult Game::doAction(int index, Action act)
 		//std::cout << "***********" << std::endl;
 		if (mMountain.remainCount() == 0)
 		{
-			endThisRound(std::vector<std::pair<int,AgariResult>>(),false);
+			endThisRound(std::vector<AgariResult>(),false);
 		}
 		else
 		{

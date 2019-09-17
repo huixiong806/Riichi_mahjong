@@ -12,7 +12,7 @@ Game game;
 unordered_map<int,string> yaku;
 void init()
 {
-	yaku[0x110]="立直";
+	yaku[0x110] = "立直";
 	yaku[0x111] = "一发";
 	yaku[0x112] = "门前清自摸和";
 	yaku[0x100] = "断幺九";
@@ -81,29 +81,56 @@ void test()
 	}
 	//手牌
 	res.handTile.push_back(Single(1,'m',0));
-	res.handTile.push_back(Single(2, 'm', 0));
-	res.handTile.push_back(Single(3, 'm', 0));
-	res.handTile.push_back(Single(4, 'm', 0));
-	res.handTile.push_back(Single(5, 'm', 1));
-	res.handTile.push_back(Single(6, 'm', 0));
+	res.handTile.push_back(Single(9, 'm', 0));
 	res.handTile.push_back(Single(1, 'p', 0));
-	res.handTile.push_back(Single(2, 'p', 0));
-	res.handTile.push_back(Single(3, 'p', 0));
-	res.handTile.push_back(Single(2, 's', 0));
-	res.handTile.push_back(Single(3, 's', 0));
-	res.handTile.push_back(Single(3, 's', 0));
-	res.handTile.push_back(Single(3, 's', 0));
-	res.nowTile = Single(3, 'z', 0);
+	res.handTile.push_back(Single(9, 'p', 0));
+	res.handTile.push_back(Single(1, 's', 0));
+	res.handTile.push_back(Single(9, 's', 0));
+	res.handTile.push_back(Single(1, 'z', 0));
+	res.handTile.push_back(Single(2, 'z', 0));
+	res.handTile.push_back(Single(3, 'z', 0));
+	res.handTile.push_back(Single(4, 'z', 0));
+	res.handTile.push_back(Single(5, 'z', 0));
+	res.handTile.push_back(Single(6, 'z', 0));
+	res.handTile.push_back(Single(7, 'z', 0));
+	res.nowTile = Single(6, 'z', 0);
 	res.prevailingWind = WindType::EAST;   //场风
-	res.selfWind =WindType::EAST;  //门风
-	res.nowWind = WindType::EAST;
+	res.selfWind =WindType::WEST;  //门风
+	res.nowWind = WindType::WEST;
 	res.mingpai = false;
 	res.w = false;
 	human->generateAction(res);
+	Player p;
+	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, 0);
+	auto r=p.zimo(res.prevailingWind,1, {}, {});
+	auto re = r.result;
+	cout << "Test " << (re.zimo ? "自摸" : "荣和") << endl;
+	cout << endl;
+	for (auto& yk : re.yaku)
+	{
+		cout << yaku[(int)yk] << " ";
+		cout << endl;
+	}
+	cout << "宝牌" << re.dora << "   红宝牌" << re.akadora << "   里宝牌" << re.uradora << endl;
+	if (re.fan < 0)
+	{
+		if (re.fan == -1)
+			cout << "役满 " << re.scoreAdd << "点" << endl;
+		const string ykman[7] = { "","一","两","三","四","五","六" };
+		cout << ykman[-re.fan] << "倍役满 "<<re.scoreAdd << "点" << endl;
+		cout << "庄家失点" << re.scoreDecZhuang << "  闲家失点" << re.scoreDecXian << endl;
+	}
+	else
+	{
+		cout << re.fan << "番" << re.fu << "符   " << re.scoreAdd << "点" << endl;
+		cout << "庄家失点" << re.scoreDecZhuang << "  闲家失点" << re.scoreDecXian << endl;
+	}
+	
 }
 int main()
 {
-	//test();
+	init();
+	test();
 	/*
 	种子收集
 	3 杠3z
@@ -114,18 +141,18 @@ int main()
 	cin >> seed;
 	srand(seed);
 	init();
-	player[0] = make_shared<AutoFurikomu>("放铳人A");
+	player[0] = make_shared<AutoFurikomu>("放铳人A");                                 
 	player[1] = make_shared<AutoFurikomu>("放铳人B");
 	player[2] = make_shared<AutoFurikomu>("放铳人C");
-	player[3] = make_shared<Human>("测试人");
+	player[3] = make_shared<Human>("实战测试人");
 	cout << "游戏开始！" << endl;
 	bool first = true;
 	do
 	{
 		if(first)
-			game.startNewGame();
+			game.startNewGame();                          
 		else game.startNextRound();
-		first = false;
+		first = false;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
 		cout << "新的一局开始了" << endl;
 		do
 		{
@@ -154,16 +181,25 @@ int main()
 		{
 			for (auto& res : result.agariResult)
 			{
-				cout<<player[res.first]->getName()<<" "<<(res.second.zimo?"自摸":"荣和")<<endl;
+				cout<<player[res.hupaiID]->getName()<<" "<<(res.zimo?"自摸":"荣和")<<endl;
 				cout << "役种:" << endl;
-				for (auto& yk : res.second.yaku)
+				for (auto& yk : res.yaku)
 				{
 					cout << yaku[(int)yk] << " ";
 					cout << endl;
 				}
-				cout << "宝牌" << res.second.dora << "   红宝牌" << res.second.akadora << "   里宝牌" << res.second.uradora << endl;
-				cout << res.second.fan << "番" << res.second.fu << "符   "<<res.second.scoreAdd<<"点" << endl;
-
+				cout << "宝牌" << res.dora << "   红宝牌" << res.akadora << "   里宝牌" << res.uradora << endl;
+				if (res.fan < 0)
+				{
+					if (res.fan == -1)
+						cout << "役满 " << res.scoreAdd << "点" << endl;
+					const string ykman[7] = { "","一","两","三","四","五","六" };
+					cout << ykman[-res.fan] << "倍役满 " << res.scoreAdd << "点" << endl;
+				}
+				else
+				{
+					cout << res.fan << "番" << res.fu << "符   " << res.scoreAdd << "点" << endl;
+				}
 			}
 		}
 	} while (!game.gameOver());

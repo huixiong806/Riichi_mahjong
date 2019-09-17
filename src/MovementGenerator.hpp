@@ -6,11 +6,11 @@ enum class ActionType
 {
 	Null,  //空指令
 	Skip,
+	Dapai, //正常打牌
 	Chi,
 	Peng,
 	Gang,  //杠
 	Rong,
-	Dapai, //正常打牌
 	Lizhi,
 	Zimo,
 	Liuju,
@@ -30,6 +30,14 @@ struct Action
 	ActionType type;
 	Single target;//表示打哪张牌,仅打牌时有效
 	Group group;//仅吃碰杠有效
+	bool operator<(const Action& rhs)const
+	{
+		if ((int)type < (int)rhs.type)
+			return true;
+		if (target < rhs.target)return true;
+		if (group < rhs.group)return true;
+		return false;
+	}
 	Action() {
 		type = ActionType::Null;
 		target = Null;
