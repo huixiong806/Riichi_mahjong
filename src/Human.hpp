@@ -7,7 +7,7 @@
 #include<iostream>
 #include<iomanip>
 const std::string windName[4] = { "东","南","西","北" };
-const std::string actionName[11] = { "error","跳过","吃","碰","杠","和","error","立直","自摸","流局","拔北" };
+const std::string actionName[11] = { "error","跳过","error","吃","碰","杠","和","立直","自摸","流局","拔北" };
 class Human:public ActionGenerator
 {
 private:

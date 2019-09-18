@@ -67,6 +67,7 @@ void init()
 }
 void test()
 {
+	init();
 	auto human = make_shared<Human>("测试人");
 	GameInfo res;
 	res.rule = Rule();//规则
@@ -129,8 +130,7 @@ void test()
 }
 int main()
 {
-	init();
-	test();
+	//test();
 	/*
 	种子收集
 	3 杠3z

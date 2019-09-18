@@ -995,12 +995,14 @@ TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par)
 	{
 		if (par.selfWind == WindType::EAST)
 		{
-			guoshi = 2;
+			if(guoshi != 0)
+				guoshi = 2;
 			res.yaku.push_back(Yaku::Tianhu);
 		}
 		else
 			res.yaku.push_back(Yaku::Dihu);
-		res.fan -= 1;
+		if(guoshi>0)
+			res.fan -= 1;
 	}
 	if (guoshi == 1)
 	{
