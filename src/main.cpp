@@ -81,28 +81,31 @@ void test()
 		res.playerInfo.push_back(info);
 	}
 	//手牌
-	res.handTile.push_back(Single(1,'s',0));
-	res.handTile.push_back(Single(1, 's', 0));
-	res.handTile.push_back(Single(1, 's', 0));
+	res.handTile.push_back(Single(3, 'm', 0));
+	res.handTile.push_back(Single(4, 'm', 0));
+	res.handTile.push_back(Single(5, 'm', 0));
+	res.handTile.push_back(Single(5, 'p', 0));
+	res.handTile.push_back(Single(6, 'p', 0));
+	res.handTile.push_back(Single(7, 'p', 0));
 	res.handTile.push_back(Single(2, 's', 0));
 	res.handTile.push_back(Single(3, 's', 0));
-	res.handTile.push_back(Single(4, 's', 0));
-	res.handTile.push_back(Single(5, 's', 0));
-	res.handTile.push_back(Single(6, 's', 0));
-	res.handTile.push_back(Single(7, 's', 0));
-	res.handTile.push_back(Single(8, 's', 0));
-	res.handTile.push_back(Single(9, 's', 0));
-	res.handTile.push_back(Single(9, 's', 0));
-	res.handTile.push_back(Single(9, 's', 0));
-	res.nowTile = Single(2, 's', 0);
+	res.handTile.push_back(Single(3, 's', 0));
+	res.handTile.push_back(Single(4, 'm', 0));
+	res.handTile.push_back(Single(5, 'm', 0));
+	res.handTile.push_back(Single(1, 'z', 0));
+	res.handTile.push_back(Single(1, 'z', 0));
+	res.nowTile = Single(2, 'z', 0);
 	res.prevailingWind = WindType::EAST;   //场风
 	res.selfWind =WindType::WEST;  //门风
 	res.nowWind = WindType::WEST;
 	res.mingpai = false;
 	res.w = false;
+	auto item = res.handTile;
+	item.push_back(res.nowTile);
 	human->generateAction(res);
 	Player p;
 	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, 0);
+	
 	auto r=p.zimo(res.prevailingWind,0, {}, {});
 	auto re = r.result;
 	cout << "Test " << (re.zimo ? "自摸" : "荣和") << endl;
@@ -135,22 +138,25 @@ void test2()
 	cout << "预处理结束" << endl;
 	while (1)
 	{
-		long long pai;
-		int mianzi, quetou;
-		cin >> pai >>mianzi>>quetou;
-		int shape = 0;
-		while (pai)
-		{
-			Algorithms::setNumberCount(shape, pai % 10, Algorithms::getNumberCount(shape, pai % 10) + 1);
-			pai = pai / 10;
-		}
-		int target = quetou * 5 + mianzi;
-		cout << (int)Algorithms::distanceToTarget[shape][target]<<endl;
+		int a[5];
+		int mianzi=0, quetou=0;
+		cin >> a[0]>> a[1] >> a[2]>>a[3]>>a[4]>>mianzi>>quetou;
+		int shape = a[0]+(a[1]<<4)+(a[2]<<8)+(a[3]<<12)+(a[4]<<16);
+		//while (pai)
+		//{
+		//	Algorithms::addNumberCount(shape, pai % 10, 1);
+		//	pai = pai / 10;
+		//}
+		//int target = quetou * 5 + mianzi;
+		cout << Algorithms::getDistanceSingle(shape,mianzi,quetou,1)<<endl;
 	}
 }
 int main()
 {
-	test2();
+	cout << "预处理中..." << endl;
+	Algorithms::preprocessDistance();
+	cout << "预处理结束" << endl;
+	//test();
 
 	/*
 	种子收集

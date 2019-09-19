@@ -209,10 +209,10 @@ private:
 	static void constructTarget(int quetou, int mianzi, std::queue<int>& q,int shape,int target);
 	//5的幂
 	static const int pow5[10];
-	
-public:
 	//到给定目标的距离，参数分别为原形状、目标雀头数*5+目标面子数(雀头最多只能有一个) 原形状为9位5进制数，从低到高表示手牌中数字1~9有几个
 	static uint8_t distanceToTarget[1953125][10];
+public:
+	
 	//试图和牌，返回点数最大的结果
 	static TryToAgariResult agari(const AgariParameters par);
 	/*type
@@ -230,8 +230,15 @@ public:
 	//shape为压缩后的牌型参数，value为要获取个数的数字。函数对单花色牌的压缩型进行操作。
 	static int getNumberCount(int shape, int value);
 	static void setNumberCount(int& shape, int value, int count);
+	static void addNumberCount(int& shape, int value, int count);
 	//预处理，计算单花色离目标的距离(仅允许插入和删除两个操作)
 	static void preprocessDistance();
+	//计算14张手牌的标准型向听数(0为一向听，-1为和牌)
+	static int getDistance14Standard(std::vector<Single>& handTile);
+	//计算14张手牌的七对型向听数(0为一向听，-1为和牌)
+	static int getDistance14Qidui(std::vector<Single>& handTile);
+	//获得单花色向听数
+	static int getDistanceSingle(int shape,int mianzi,int quetou,bool z);
 }; 
 uint8_t Algorithms::distanceToTarget[1953125][10];
 const int Algorithms::pow5[10] = { 1,5,25,125,625,3125,15625,78125,390625,1953125 };
@@ -244,6 +251,10 @@ int Algorithms::getNumberCount(int shape, int value)
 void Algorithms::setNumberCount(int& shape, int value, int count)
 {
 	shape = (shape / pow5[value]) * pow5[value]+ count* pow5[value - 1]+shape % pow5[value-1];
+}
+void Algorithms::addNumberCount(int& shape, int value, int count)
+{
+	shape += pow5[value - 1];
 }
 std::vector<Single> Algorithms::tingpai(std::vector<Single> handTile)
 {
@@ -1137,4 +1148,125 @@ void Algorithms::preprocessDistance()
 			}
 		}
 	}
+}
+//获得单花色向听数
+int Algorithms::getDistanceSingle(int shape,int mianzi,int quetou, bool z)
+{
+	if (!z)return distanceToTarget[shape][mianzi+quetou*5];
+	//处理字牌向听数
+	int count[5] = { shape & 0xF,(shape >> 4) & 0xF,(shape >> 8) & 0xF, (shape >> 12) & 0xF, (shape >> 16) & 0xF };
+	int spill = 7 - (mianzi + quetou),add=0;
+	int d =std::min(spill, count[0]); count[0] -= d; spill -= d;
+	d = std::min(spill, count[1]); count[1] -= d; spill -= d; add += d;
+	d = std::min(spill, count[4]); count[4] -= d; spill -= d; add += d << 2;
+	return count[0] * 3 + count[1] * 2 + count[2] + count[4]+ quetou*(count[0]+count[1]+count[2]>0?-1:(count[4]>0?1:0))+add;
+}
+//计算14张手牌的向听数(0为一向听，-1为和牌)
+int Algorithms::getDistance14Standard(std::vector<Single>& handTile)
+{	
+	int shape[5] = { 0,0,0,0,0 };//1~4分别表示mpsz，其中z的格式为5位16进制数,从低到高分别为出现了0,1,2,3,4张的牌共有几种,高位无意义
+	int count[8];//字牌个数统计
+	memset(count, 0, sizeof(count));
+	for (auto& item:handTile)
+	{
+		if (item.color() == 'm')
+			addNumberCount(shape[1], item.value(),1);
+		if (item.color() == 'p')
+			addNumberCount(shape[2], item.value(), 1);
+		if (item.color() == 's')
+			addNumberCount(shape[3], item.value(), 1);
+		if (item.color() == 'z')
+			count[item.value()]++;
+	}
+	for (int i = 1; i <= 7; ++i)
+		shape[4]+=1<<(count[i]<<2);
+	//计算标准型向听数
+	int dp[5][5][2];//a当前已经完成的花色数，b当前已经完成的面子数，c当前已经完成的雀头数,dp表示最小距离
+	//int pre[5][5][2];
+	for (int i = 0; i < 5; ++i)
+		for (int j = 0; j < 5; ++j)
+			for (int k = 0; k < 2; ++k)
+			{
+				dp[i][j][k] = 18;//此距离最大为18，表示8向听
+				//pre[i][j][k] = -1;
+			}
+	dp[0][0][0] = 0;//设定边界值，0花色0面子0雀头距离为0
+	for (int a = 1; a < 5; ++a)
+		for (int b = 0; b < 5; ++b)
+			for (int k = 0; k < 5&&b-k>=0; ++k)//枚举这一种花色要达成的面子数
+			{
+				dp[a][b][0] = std::min(dp[a][b][0], dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 0, a == 4));
+				dp[a][b][1] = std::min(dp[a][b][1], dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 1, a == 4));
+				dp[a][b][1] = std::min(dp[a][b][1], dp[a - 1][b - k][1] + getDistanceSingle(shape[a], k, 0, a == 4));
+				/*
+				if (dp[a][b][0] > dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 0, a == 4))
+				{
+					dp[a][b][0] = dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 0, a == 4);
+					pre[a][b][0] = (b - k);
+				}
+				if (dp[a][b][1]> dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 1, a == 4))
+				{
+					dp[a][b][1] = dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 1, a == 4);
+					pre[a][b][1] = (b - k);
+				}
+				if (dp[a][b][1]> dp[a - 1][b - k][1] + getDistanceSingle(shape[a], k, 0, a == 4))
+				{
+					dp[a][b][1]= dp[a - 1][b - k][1] + getDistanceSingle(shape[a], k, 0, a == 4);
+					pre[a][b][1] = (b - k)+5;
+				}*/
+			}
+	/*
+	int a = 4, b = 4, c = 1;
+	std::cout << a << " " << b << " " << c << " " << dp[a][b][c] << std::endl;
+	while (1)
+	{
+		int pa = a, pb = b, pc = c;
+		a--;
+		b = pre[pa][pb][pc] % 5;
+		c = pre[pa][pb][pc] / 5;
+		if (a >= 0 && b >= 0 && c >= 0)
+			std::cout << a << " " << b << " " << c << " " << dp[a][b][c] << std::endl;
+		else break;
+	}
+	*/
+	/*
+	for (int k = 0; k < 2; ++k)
+	{
+		for (int i = 0; i < 5; ++i)
+		{
+			for (int j = 0; j < 5; ++j)
+				std::cout << dp[i][j][k] << " ";
+			std::cout << std::endl;
+		}
+		std::cout << std::endl;
+	}*/
+	return dp[4][4][1]/2-1;
+}
+//计算14张手牌的向听数(0为一向听，-1为和牌)
+int Algorithms::getDistance14Qidui(std::vector<Single>& handTile)
+{
+	int shape[5] = { 0,0,0,0,0 };//1~4分别表示mpsz，其中z的格式为5位16进制数,从低到高分别为出现了0,1,2,3,4张的牌共有几种,高位无意义
+	int count[8];//字牌个数统计
+	memset(count, 0, sizeof(count));
+	for (auto& item : handTile)
+	{
+		if (item.color() == 'm')
+			addNumberCount(shape[1], item.value(), 1);
+		if (item.color() == 'p')
+			addNumberCount(shape[2], item.value(), 1);
+		if (item.color() == 's')
+			addNumberCount(shape[3], item.value(), 1);
+		if (item.color() == 'z')
+			count[item.value()]++;
+	}
+	for (int i = 1; i <= 7; ++i)
+		shape[4] += 1 << (count[i] << 2);
+	//计算七对子向听数
+	int duiziCount = 0;
+	for (int i = 1; i <= 3; ++i)
+		for (int j = 1; j <= 9; ++j)
+			if (getNumberCount(shape[i], j) >= 2)
+				duiziCount++;
+	duiziCount += (shape[4] >> 8) % 0xF;
+	return 6 - duiziCount;
 }

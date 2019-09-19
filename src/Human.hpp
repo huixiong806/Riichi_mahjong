@@ -209,10 +209,14 @@ void Human::printInfo(const GameInfo& info)
 		}
 		std::cout << std::endl << std::endl;
 	}
-	std::cout << windName[info.selfWind] << "| ";
 	auto hand = info.handTile;
+	hand.push_back(info.nowTile);
+	std::cout << "当前标准型" << Algorithms::getDistance14Standard(hand) << "向听，七对" << Algorithms::getDistance14Qidui(hand) << "向听"<<std::endl;
+	std::cout << windName[info.selfWind] << "| ";
+	
 	for (auto& item : info.handTile)
 		std::cout << item.getDisplay() << " ";
+	
 	std::cout << std::endl;
 	std::cout << "ID| ";
 	for (int j = 0; j < (13 - info.playerInfo[info.selfWind].groupTile.size() * 3); ++j)
