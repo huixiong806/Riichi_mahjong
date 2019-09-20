@@ -5,11 +5,11 @@
 #include<vector>
 #include<memory>
 #include<iostream>
-//·µ»ØÒ»¾ÖµÄ½á¹û
+//è¿”å›ä¸€å±€çš„ç»“æœ
 struct RoundResult
 {
-	bool liuju;//ÊÇ·ñÁ÷¾Ö
-	bool lianzhuang;//×¯¼ÒÊÇ·ñÁ¬×¯
+	bool liuju;//æ˜¯å¦æµå±€
+	bool lianzhuang;//åº„å®¶æ˜¯å¦è¿åº„
 	std::vector<AgariResult> agariResult;
 };
 struct ActionResult
@@ -21,30 +21,30 @@ class Game
 {
 	
 private:
-	//int mIndex;//±íÊ¾±¾¾ÖµÄ±àºÅ
-	Rule rule;//¹æÔò
-	Mountain mountain;     //ÅÆÉ½
-	WindType prevailingWind;     //³¡·ç
-	std::vector<Player> player;      //0,1,2,3·Ö±ğ¶ÔÓ¦ËÄ¸öÍæ¼Ò¡£
-	int east;//±íÊ¾×¯¼ÒµÄ±àºÅ,×¯¼ÒÎª1Ôò¶«ÄÏÎ÷±±Íæ¼Ò±àºÅ·Ö±ğÎª1,2,3,0,ÒÔ´ËÀàÍÆ¡£
-	int lizhibang;    //¶îÍâÁ¢Ö±°ôµÄµãÊı¼ÛÖµ 
-	int round;  //¾ÖÊı(1~4)
-	int benchang;    //±¾³¡
-	int turn;//±íÊ¾Õı³£Ë³Ğò¸ÃË­ÃşÅÆÁË¡£
-	//int mIndex;//±íÊ¾¸ÃË­¾ö²ßÁË(³ÔÅöÇé¿öÏÂmTurnºÍmIndex»á²»Í¬)¡£
-	RoundResult result;//Ò»¾ÖµÄ½á¹û,µ÷ÓÃnextº¯ÊıÊ±Èç¹û±¾¾Ö½áÊøÔò¸üĞÂ
-	bool roundIsOver;//±¾¾ÖÊÇ·ñ½áÊø
-	bool gameIsOver;//Õû¸öÓÎÏ·ÊÇ·ñ½áÊø
-	//Single mLast=Null;//×îºó´ò³öµÄÅÆ
-	//int mLastTurn;//×îºó´ò³öµÄÅÆÊÇË­´òµÄ¡£
-	int doraIndicatorCount;//ÒÑ·­¿ªµÄ±¦ÅÆÖ¸Ê¾ÅÆÊıÁ¿
-	bool waitMingpai;//ÊÇ·ñµÈ´ıÃùÅÆ
-	bool haveMingpai[4];//4ÈËÊÇ·ñÒÑ¾­·¢³öÁË¹ØÓÚÃùÅÆµÄ¾ñÔñ
-	Action mingpaiAction[4];//ÃùÅÆµÄ²Ù×÷Ôİ´æ
-	bool w;//ÊÇ·ñ´¦ÓÚwÁ¢,ÌìºÍ,µØºÍ¿É³ÉÁ¢µÄ×´Ì¬
-	//¿ªÊ¼ĞÂ¾Ö
+	//int mIndex;//è¡¨ç¤ºæœ¬å±€çš„ç¼–å·
+	Rule rule;//è§„åˆ™
+	Mountain mountain;     //ç‰Œå±±
+	WindType prevailingWind;     //åœºé£
+	std::vector<Player> player;      //0,1,2,3åˆ†åˆ«å¯¹åº”å››ä¸ªç©å®¶ã€‚
+	int east;//è¡¨ç¤ºåº„å®¶çš„ç¼–å·,åº„å®¶ä¸º1åˆ™ä¸œå—è¥¿åŒ—ç©å®¶ç¼–å·åˆ†åˆ«ä¸º1,2,3,0,ä»¥æ­¤ç±»æ¨ã€‚
+	int lizhibang;    //é¢å¤–ç«‹ç›´æ£’çš„ç‚¹æ•°ä»·å€¼ 
+	int round;  //å±€æ•°(1~4)
+	int benchang;    //æœ¬åœº
+	int turn;//è¡¨ç¤ºæ­£å¸¸é¡ºåºè¯¥è°æ‘¸ç‰Œäº†ã€‚
+	//int mIndex;//è¡¨ç¤ºè¯¥è°å†³ç­–äº†(åƒç¢°æƒ…å†µä¸‹mTurnå’ŒmIndexä¼šä¸åŒ)ã€‚
+	RoundResult result;//ä¸€å±€çš„ç»“æœ,è°ƒç”¨nextå‡½æ•°æ—¶å¦‚æœæœ¬å±€ç»“æŸåˆ™æ›´æ–°
+	bool roundIsOver;//æœ¬å±€æ˜¯å¦ç»“æŸ
+	bool gameIsOver;//æ•´ä¸ªæ¸¸æˆæ˜¯å¦ç»“æŸ
+	//Single mLast=Null;//æœ€åæ‰“å‡ºçš„ç‰Œ
+	//int mLastTurn;//æœ€åæ‰“å‡ºçš„ç‰Œæ˜¯è°æ‰“çš„ã€‚
+	int doraIndicatorCount;//å·²ç¿»å¼€çš„å®ç‰ŒæŒ‡ç¤ºç‰Œæ•°é‡
+	bool waitMingpai;//æ˜¯å¦ç­‰å¾…é¸£ç‰Œ
+	bool haveMingpai[4];//4äººæ˜¯å¦å·²ç»å‘å‡ºäº†å…³äºé¸£ç‰Œçš„æŠ‰æ‹©
+	Action mingpaiAction[4];//é¸£ç‰Œçš„æ“ä½œæš‚å­˜
+	bool w;//æ˜¯å¦å¤„äºwç«‹,å¤©å’Œ,åœ°å’Œå¯æˆç«‹çš„çŠ¶æ€
+	//å¼€å§‹æ–°å±€
 	void startNewRound();
-	//¿ªÊ¼ÏÂÒ»ÈËÃşÅÆ
+	//å¼€å§‹ä¸‹ä¸€äººæ‘¸ç‰Œ
 	void newTurn(int who,bool lingShang)
 	{
 		waitMingpai = false;
@@ -56,12 +56,12 @@ private:
 		//mLastTurn = -1;
 		if (mountain.zimo != Null)
 		{
-			player[who].setNowTile(mountain.zimo, false);//¿ª¾Ö¸ø¶«¼ÒÉèÖÃ×ÔÃşÅÆ
+			player[who].setNowTile(mountain.zimo, false);//å¼€å±€ç»™ä¸œå®¶è®¾ç½®è‡ªæ‘¸ç‰Œ
 			mountain.zimo = Null;
 		}
 		else
 		{
-			//Õı³£ÃşÅÆ
+			//æ­£å¸¸æ‘¸ç‰Œ
 			if (lingShang)
 			{
 				player[who].setNowTile(mountain.nextLingshang(),true);
@@ -72,12 +72,12 @@ private:
 			}
 		}
 		//std::cout << "***********" << std::endl;
-		//Ñ²Êı+1
+		//å·¡æ•°+1
 		player[who].subround++;
 		if (player[who].subround > 0)
 			w = false;
 	}
-	//ÃùÅÆºó´òÅÆ
+	//é¸£ç‰Œåæ‰“ç‰Œ
 	void newTurnAfterMingpai(int who)
 	{
 		waitMingpai = false;
@@ -86,10 +86,10 @@ private:
 		{
 			player[i].setNowTile(Null,false);
 		}
-		//Ñ²Êı+1
+		//å·¡æ•°+1
 		player[who].subround++;
 	}
-	//Í¾ÖĞÁ÷¾ÖÁ¬×¯
+	//é€”ä¸­æµå±€è¿åº„
 	void endThisRound(std::vector<AgariResult> res,bool tuzhongLiuju)
 	{
 		result = RoundResult();
@@ -101,21 +101,21 @@ private:
 			if (player[top].score < player[i].score || (player[top].score == player[i].score && ((player[top].selfWind + 4 - 1) % 4>(player[i].selfWind + 4 - 1) % 4)))
 				top = i;
 		}
-		//ÓĞÈËºÍÅÆ
-		//TODO:·ÖÊı¼ÆËã 
+		//æœ‰äººå’Œç‰Œ
+		//TODO:åˆ†æ•°è®¡ç®— 
 		if (!res.empty())
 		{
 			result.liuju = false;
 			result.lianzhuang=false;
 			result.agariResult = res;
-			//Á¢Ö±°ôºÍ±¾³¡·Ñ¼ÆËã£¬°´ÕÕÍ·Ìø¹æÔò
-			int targetPlayer;//»ñÈ¡µã°ôµÄÈË 
+			//ç«‹ç›´æ£’å’Œæœ¬åœºè´¹è®¡ç®—ï¼ŒæŒ‰ç…§å¤´è·³è§„åˆ™
+			int targetPlayer;//è·å–ç‚¹æ£’çš„äºº 
 			if(res.size()==1)
 				targetPlayer=res[0].hupaiID;
 			else
 			{
 				targetPlayer=res[0].fangchongID;
-				int minSpace=4;//×îĞ¡¼ä¾àÏÈµ÷ÕûÎª4
+				int minSpace=4;//æœ€å°é—´è·å…ˆè°ƒæ•´ä¸º4
 				int a=player[res[0].fangchongID].selfWind;
 				for (auto&item : res)
 				{
@@ -131,19 +131,19 @@ private:
 			}
 			player[targetPlayer].score+=lizhibang;
 			player[targetPlayer].score+=benchang*300;
-			//ÈÙºÍµÄ±¾³¡·Ñ¼ÆËã 
+			//è£å’Œçš„æœ¬åœºè´¹è®¡ç®— 
 			if(!res[0].zimo) 
 				player[res[0].fangchongID].score-=benchang*300;
-			else //×ÔÃşµÄ±¾³¡·Ñ¼ÆËã 
+			else //è‡ªæ‘¸çš„æœ¬åœºè´¹è®¡ç®— 
 			{
 				for(int i=0;i<4;++i)
 					if(targetPlayer!=i)
 						player[i].score-=benchang*100;
 			}
-			//·ÖÊı¼ÆËã 
+			//åˆ†æ•°è®¡ç®— 
 			for (auto&item : res)
 			{
-				//ºÍÅÆµÃÊ§µã 
+				//å’Œç‰Œå¾—å¤±ç‚¹ 
 				player[item.hupaiID].score+=item.scoreAdd;
 				if(player[item.hupaiID].selfWind==WindType::EAST)
 					result.lianzhuang=true;
@@ -164,28 +164,28 @@ private:
 			}
 			if (prevailingWind == rule.gameType&&round == 4)
 			{	
-				//×¯¼ÒÃ»ºÍÅÆ»òÕßºÍÅÆºóÊÇ1Î»,ÓÎÏ·½áÊø
+				//åº„å®¶æ²¡å’Œç‰Œæˆ–è€…å’Œç‰Œåæ˜¯1ä½,æ¸¸æˆç»“æŸ
 				bool zhuangjiaHupai = false;
 				for (auto&item : res)
 					if (player[item.hupaiID].selfWind == WindType::EAST)
 						zhuangjiaHupai = true;
 				if (!zhuangjiaHupai||(zhuangjiaHupai&&top==east))
 					gameIsOver = true;
-				//µ«Èç¹ûtopµÄµãÊı²»×ã¾ÍÒª¼ÌĞø
+				//ä½†å¦‚æœtopçš„ç‚¹æ•°ä¸è¶³å°±è¦ç»§ç»­
 				if (player[top].score < rule.endPoint)
 					gameIsOver = false;
 			}
-			else if (prevailingWind == rule.gameType + 1)//±±4¾Ö²»¿¼ÂÇ¶«Èë
+			else if (prevailingWind == rule.gameType + 1)//åŒ—4å±€ä¸è€ƒè™‘ä¸œå…¥
 			{
-				//4¾ÖÇ¿ÖÆ½áÊø£¬·ÖÊı³¬¹ı·µµãÒ²Ç¿ÖÆ½áÊø
+				//4å±€å¼ºåˆ¶ç»“æŸï¼Œåˆ†æ•°è¶…è¿‡è¿”ç‚¹ä¹Ÿå¼ºåˆ¶ç»“æŸ
 				if (round == 4)gameIsOver = true;
 				if (player[top].score >= rule.endPoint)
 					gameIsOver = true;
 			}
 			return;
 		}
-		//*****ÒÔÏÂÎªÁ÷¾Ö****** 
-		//TODO£ºÁ÷¾ÖÂú¹á½áËã 
+		//*****ä»¥ä¸‹ä¸ºæµå±€****** 
+		//TODOï¼šæµå±€æ»¡è´¯ç»“ç®— 
 		result.liuju = true;
 		if (tuzhongLiuju)
 		{
@@ -206,20 +206,20 @@ private:
 			if (player[i].tingpai())player[i].score += bonus;
 			else player[i].score += deBonus;
 		}
-		//ÓÎÏ·½áÊøÅĞ¶Ï
+		//æ¸¸æˆç»“æŸåˆ¤æ–­
 		if (prevailingWind == rule.gameType&&round == 4)
 		{
-			//×¯¼ÒÃ»ÌıÅÆ»òÕßÊÕ·£·ûºóÊÇ1Î»,ÓÎÏ·½áÊø
+			//åº„å®¶æ²¡å¬ç‰Œæˆ–è€…æ”¶ç½šç¬¦åæ˜¯1ä½,æ¸¸æˆç»“æŸ
 			bool zhuangjiaTingpai = result.lianzhuang;
 			if (!zhuangjiaTingpai || (zhuangjiaTingpai&&top == east))
 				gameIsOver = true;
-			//µ«Èç¹ûtopµÄµãÊı²»×ã¾ÍÒª¼ÌĞø
+			//ä½†å¦‚æœtopçš„ç‚¹æ•°ä¸è¶³å°±è¦ç»§ç»­
 			if (player[top].score < rule.endPoint)
 				gameIsOver = false;
 		}
-		else if (prevailingWind == rule.gameType + 1)//±±4¾Ö²»¿¼ÂÇ¶«Èë
+		else if (prevailingWind == rule.gameType + 1)//åŒ—4å±€ä¸è€ƒè™‘ä¸œå…¥
 		{
-			//4¾ÖÇ¿ÖÆ½áÊø£¬·ÖÊı³¬¹ı·µµãÒ²Ç¿ÖÆ½áÊø
+			//4å±€å¼ºåˆ¶ç»“æŸï¼Œåˆ†æ•°è¶…è¿‡è¿”ç‚¹ä¹Ÿå¼ºåˆ¶ç»“æŸ
 			if (round == 4)gameIsOver = true;
 			if (player[top].score >= rule.endPoint)
 				gameIsOver = true;
@@ -227,19 +227,19 @@ private:
 		if (gameIsOver)
 			player[top].score += lizhibang;
 	}
-	//ÏûÈ¥wÁ¢,Ò»·¢,µØºÍ
+	//æ¶ˆå»wç«‹,ä¸€å‘,åœ°å’Œ
 	void resetBounusYaku()
 	{
 		w = false;
 		for (int i = 0; i < 4; ++i)
 			player[i].yifa = false;
 	}
-	//´¦ÀíÃùÅÆ
+	//å¤„ç†é¸£ç‰Œ
 	void processMingpai()
 	{
 		std::vector<AgariResult> result;
 		bool overflag = false;
-		//ÈÙ
+		//è£
 		for (int i = 0; i < 4; ++i)
 		{
 			
@@ -266,7 +266,7 @@ private:
 			endThisRound(result,false);
 			return;
 		}
-		//¸ÜºÍÅö
+		//æ å’Œç¢°
 		for (int i = 0; i < 4; ++i)
 		{
 			if (mingpaiAction[i].type == ActionType::Gang)
@@ -287,7 +287,7 @@ private:
 				return;
 			}
 		}
-		//³Ô
+		//åƒ
 		for (int i = (turn + 1) % 4, j = 0; j < 3; ++j, i = (i + 1) % 4)
 		{
 			if (mingpaiAction[i].type == ActionType::Chi)
@@ -299,7 +299,7 @@ private:
 				return;
 			}
 		}
-		//È«²¿·ÅÆúÃùÅÆ»òÕßÃ»·¨ÃùÅÆ
+		//å…¨éƒ¨æ”¾å¼ƒé¸£ç‰Œæˆ–è€…æ²¡æ³•é¸£ç‰Œ
 		if (mountain.remainCount() == 0)
 		{
 			endThisRound(std::vector<AgariResult>(), false);
@@ -310,33 +310,33 @@ private:
 		}
 	}
 public:
-	//ĞÂÓÎÏ·
+	//æ–°æ¸¸æˆ
 	void startNewGame(Rule rule_ = DefualtRule)
 	{
 		player.resize(4);
-		rule = rule_;//ÉèÖÃ¹æÔò
-		prevailingWind = WindType::EAST;//¶«³¡
-		round = 1;//1¾Ö
-		east = rand() % 4;//Ëæ»ú×¯¼Ò
-		benchang = 0;//0±¾³¡
+		rule = rule_;//è®¾ç½®è§„åˆ™
+		prevailingWind = WindType::EAST;//ä¸œåœº
+		round = 1;//1å±€
+		east = rand() % 4;//éšæœºåº„å®¶
+		benchang = 0;//0æœ¬åœº
 		doraIndicatorCount = 0;
 		gameIsOver = false;
 		for(int i=0;i<4;++i)
 			player[i].score=rule.startPoint;
 		startNewRound();
 	}
-	//¿ªÊ¼ÏÂÒ»¾Ö
+	//å¼€å§‹ä¸‹ä¸€å±€
 	void startNextRound()
 	{
-		//Á¬×¯£¬±¾³¡Êı+1£¬¾ÖÊı²»±ä
+		//è¿åº„ï¼Œæœ¬åœºæ•°+1ï¼Œå±€æ•°ä¸å˜
 		if (result.lianzhuang)
 		{
 			benchang++;
 		}
-		else//²»Á¬×¯£¬½øÈëÏÂÒ»¾Ö
+		else//ä¸è¿åº„ï¼Œè¿›å…¥ä¸‹ä¸€å±€
 		{
-			east=(east+1)%4;//¶«¼Ò»»³ÉÆäÏÂ¼Ò
-			if (round == 4)//4¾ÖµÄ»°»»³¡·ç,¾ÖÊıÖØÖÃ
+			east=(east+1)%4;//ä¸œå®¶æ¢æˆå…¶ä¸‹å®¶
+			if (round == 4)//4å±€çš„è¯æ¢åœºé£,å±€æ•°é‡ç½®
 			{
 				
 				prevailingWind = (WindType)((prevailingWind + 1) % 4);
@@ -349,7 +349,7 @@ public:
 		}
 		startNewRound();
 	}
-	//Íæ¼Ò»ñÈ¡ÓÎÏ·ĞÅÏ¢
+	//ç©å®¶è·å–æ¸¸æˆä¿¡æ¯
 	GameInfo getGameInfo(int index);
 	bool roundOver()
 	{
@@ -363,18 +363,18 @@ public:
 	{
 		return result;
 	}
-	//ÏÂÒ»²½(·µ»Ø²Ù×÷µÄ×´Ì¬)(TODO)
-	//×¢Òâ:¸ÄmTurn,mLast,playerµÄdisabledHandTileµÈ
+	//ä¸‹ä¸€æ­¥(è¿”å›æ“ä½œçš„çŠ¶æ€)(TODO)
+	//æ³¨æ„:æ”¹mTurn,mLast,playerçš„disabledHandTileç­‰
 	ActionResult doAction(int index, Action act);
 };
-//¿ªÊ¼ĞÂ¾Ö
+//å¼€å§‹æ–°å±€
 void Game::startNewRound()
 {
 	w = true;
 	gameIsOver = false;
 	roundIsOver = false;
-	turn = east;//¶«¼ÒÆğÊÖ
-	mountain.reset(rule);//ÅÆÉ½ÖØÖÃ
+	turn = east;//ä¸œå®¶èµ·æ‰‹
+	mountain.reset(rule);//ç‰Œå±±é‡ç½®
 	for (int i = east, j = 0; j < 4; i = (i + 1) % 4, j++)
 	{
 		player[i].groupTile.clear();
@@ -447,7 +447,7 @@ ActionResult Game::doAction(int index, Action act)
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				//Á¢Ö±ºó²»ÄÜÃùÅÆ
+				//ç«‹ç›´åä¸èƒ½é¸£ç‰Œ
 				if (player[index].lizhiXunmu != -1)
 				{
 					res.success = false;
@@ -465,7 +465,7 @@ ActionResult Game::doAction(int index, Action act)
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				//Á¢Ö±ºó²»ÄÜÃùÅÆ
+				//ç«‹ç›´åä¸èƒ½é¸£ç‰Œ
 				if (player[index].lizhiXunmu != -1)
 				{
 					res.success = false;
@@ -482,7 +482,7 @@ ActionResult Game::doAction(int index, Action act)
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				//Á¢Ö±ºó²»ÄÜÃùÅÆ
+				//ç«‹ç›´åä¸èƒ½é¸£ç‰Œ
 				if (player[index].lizhiXunmu != -1)
 				{
 					res.success = false;
@@ -562,7 +562,7 @@ ActionResult Game::doAction(int index, Action act)
 			{
 				doraIndicatorCount++;
 				player[index].lingshang = false;
-				//todo:ÅĞ¶ÏËÄ¸ÜÉ¢ÁË
+				//todo:åˆ¤æ–­å››æ æ•£äº†
 			}
 			waitMingpai = true;
 			for (int i = 0; i < 4; ++i)
@@ -605,8 +605,8 @@ ActionResult Game::doAction(int index, Action act)
 			return res;
 			break;
 		}
-		//ÔİÊ±²»¿¼ÂÇÃùÅÆ
-		//Ò»¾Ö½áÊøÅĞ¶Ï
+		//æš‚æ—¶ä¸è€ƒè™‘é¸£ç‰Œ
+		//ä¸€å±€ç»“æŸåˆ¤æ–­
 		//std::cout << "***********" << std::endl;
 		if (mountain.remainCount() == 0)
 		{
@@ -621,12 +621,12 @@ ActionResult Game::doAction(int index, Action act)
 	}
 	return res;
 }
-//Íæ¼Ò»ñÈ¡ÓÎÏ·ĞÅÏ¢
+//ç©å®¶è·å–æ¸¸æˆä¿¡æ¯
 GameInfo Game::getGameInfo(int index)
 {
 	GameInfo res;
-	res.rule = rule;//¹æÔò
-					 //Ã¿¸öÍæ¼ÒµÄÅÆºÓ£¬ÊÇ·ñÁ¢Ö±£¬ÒÔ¼°¸±Â¶ÅÆ×é
+	res.rule = rule;//è§„åˆ™
+					 //æ¯ä¸ªç©å®¶çš„ç‰Œæ²³ï¼Œæ˜¯å¦ç«‹ç›´ï¼Œä»¥åŠå‰¯éœ²ç‰Œç»„
 	for (int i = 0, j = east; i <= 3; ++i, j = (j + 1) % 4)
 	{
 		PlayerInfo info;
@@ -638,17 +638,17 @@ GameInfo Game::getGameInfo(int index)
 		info.score= player[j].score;
 		res.playerInfo.push_back(info);
 	}
-	//ÊÖÅÆ
+	//æ‰‹ç‰Œ
 	res.handTile = player[index].handTile;
-	//Ê£ÓàÅÆÊı
+	//å‰©ä½™ç‰Œæ•°
 	res.remainTiles = mountain.remainCount();
-	//±¦ÅÆÖ¸Ê¾ÅÆ
+	//å®ç‰ŒæŒ‡ç¤ºç‰Œ
 	for (int i = 0; i < doraIndicatorCount; i++)
 	{
 		res.doraIndicator.push_back(mountain.getDoraIndicator(i));
 	}
-	res.prevailingWind = prevailingWind;   //³¡·ç
-	res.selfWind = player[index].selfWind;  //ÃÅ·ç
+	res.prevailingWind = prevailingWind;   //åœºé£
+	res.selfWind = player[index].selfWind;  //é—¨é£
 	if (waitMingpai)
 	{
 		res.nowWind = player[turn].selfWind;
@@ -663,8 +663,8 @@ GameInfo Game::getGameInfo(int index)
 			res.nowTile = Null;
 	}
 	res.remainTiles = mountain.remainCount();
-	res.lizhibangCount = lizhibang;  //¶îÍâÁ¢Ö±°ôÊıÁ¿
-	res.benchang = benchang;//±¾³¡
+	res.lizhibangCount = lizhibang;  //é¢å¤–ç«‹ç›´æ£’æ•°é‡
+	res.benchang = benchang;//æœ¬åœº
 	res.mingpai = waitMingpai;
 	res.round = round;
 	res.w = w;

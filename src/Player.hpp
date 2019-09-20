@@ -14,75 +14,75 @@ class Player
 {
 	friend class Game;
 private:
-	int subround; //Ñ²Êı
+	int subround; //å·¡æ•°
 	int score;
-	WindType selfWind;   //ÃÅ·ç
-	std::vector<Single> handTile;//ÊÖÅÆ
-	std::vector<bool> disabledHandTile;//½û´òÊÖÅÆ
-	std::vector<Group> groupTile;//¸±Â¶ÅÆ×é
-	Single nowTile;//×ÔÃşÅÆ
-	std::vector<Single>discardTile;//ÅÆºÓ
-	bool lingshang;//Íæ¼Òµ±Ç°µÄ×ÔÃşÅÆÊÇÁëÉÏÅÆ
-	bool moqie = false;//±íÊ¾ÅÆºÓÀï×îºóÒ»ÕÅÅÆÊÇ·ñÎªÃşÇĞ
-	int lizhi = -1;//Á¢Ö±ĞûÑÔÅÆÊÇÅÆºÓÖĞµÄµÚ¼¸ÕÅ£¬-1ÎªÎ´Á¢Ö±
-	int lizhiXunmu = -1;//Á¢Ö±µÄÑ²Ä¿,´Ó0¿ªÊ¼,-1ÎªÎ´Á¢Ö±,-2ÎªwÁ¢
-	bool yifa;//µ±Ç°ÊÇ·ñÎªÒ»·¢Ñ²
+	WindType selfWind;   //é—¨é£
+	std::vector<Single> handTile;//æ‰‹ç‰Œ
+	std::vector<bool> disabledHandTile;//ç¦æ‰“æ‰‹ç‰Œ
+	std::vector<Group> groupTile;//å‰¯éœ²ç‰Œç»„
+	Single nowTile;//è‡ªæ‘¸ç‰Œ
+	std::vector<Single>discardTile;//ç‰Œæ²³
+	bool lingshang;//ç©å®¶å½“å‰çš„è‡ªæ‘¸ç‰Œæ˜¯å²­ä¸Šç‰Œ
+	bool moqie = false;//è¡¨ç¤ºç‰Œæ²³é‡Œæœ€åä¸€å¼ ç‰Œæ˜¯å¦ä¸ºæ‘¸åˆ‡
+	int lizhi = -1;//ç«‹ç›´å®£è¨€ç‰Œæ˜¯ç‰Œæ²³ä¸­çš„ç¬¬å‡ å¼ ï¼Œ-1ä¸ºæœªç«‹ç›´
+	int lizhiXunmu = -1;//ç«‹ç›´çš„å·¡ç›®,ä»0å¼€å§‹,-1ä¸ºæœªç«‹ç›´,-2ä¸ºwç«‹
+	bool yifa;//å½“å‰æ˜¯å¦ä¸ºä¸€å‘å·¡
 public:
 	void setInfo(
-	int subround_, //Ñ²Êı
+	int subround_, //å·¡æ•°
 	int score_,
-	WindType selfWind_,   //ÃÅ·ç
-	const std::vector<Single>& handTile_,//ÊÖÅÆ
-	const std::vector<bool>& disabledHandTile_,//½û´òÊÖÅÆ
-	const std::vector<Group>& groupTile_,//¸±Â¶ÅÆ×é
-	const Single& nowTile_,//×ÔÃşÅÆ
-	const std::vector<Single>&discardTile_,//ÅÆºÓ
-	bool lingshang_,//Íæ¼Òµ±Ç°µÄ×ÔÃşÅÆÊÇÁëÉÏÅÆ
-	bool moqie_,//±íÊ¾ÅÆºÓÀï×îºóÒ»ÕÅÅÆÊÇ·ñÎªÃşÇĞ
-	int lizhi_,//Á¢Ö±ĞûÑÔÅÆÊÇÅÆºÓÖĞµÄµÚ¼¸ÕÅ£¬-1ÎªÎ´Á¢Ö±
-	int lizhiXunmu_,//Á¢Ö±µÄÑ²Ä¿,´Ó0¿ªÊ¼,-1ÎªÎ´Á¢Ö±,-2ÎªwÁ¢
-	bool yifa_//µ±Ç°ÊÇ·ñÎªÒ»·¢Ñ²
+	WindType selfWind_,   //é—¨é£
+	const std::vector<Single>& handTile_,//æ‰‹ç‰Œ
+	const std::vector<bool>& disabledHandTile_,//ç¦æ‰“æ‰‹ç‰Œ
+	const std::vector<Group>& groupTile_,//å‰¯éœ²ç‰Œç»„
+	const Single& nowTile_,//è‡ªæ‘¸ç‰Œ
+	const std::vector<Single>&discardTile_,//ç‰Œæ²³
+	bool lingshang_,//ç©å®¶å½“å‰çš„è‡ªæ‘¸ç‰Œæ˜¯å²­ä¸Šç‰Œ
+	bool moqie_,//è¡¨ç¤ºç‰Œæ²³é‡Œæœ€åä¸€å¼ ç‰Œæ˜¯å¦ä¸ºæ‘¸åˆ‡
+	int lizhi_,//ç«‹ç›´å®£è¨€ç‰Œæ˜¯ç‰Œæ²³ä¸­çš„ç¬¬å‡ å¼ ï¼Œ-1ä¸ºæœªç«‹ç›´
+	int lizhiXunmu_,//ç«‹ç›´çš„å·¡ç›®,ä»0å¼€å§‹,-1ä¸ºæœªç«‹ç›´,-2ä¸ºwç«‹
+	bool yifa_//å½“å‰æ˜¯å¦ä¸ºä¸€å‘å·¡
 	)
 	{
-		subround = subround_;//Ñ²Êı
+		subround = subround_;//å·¡æ•°
 		score = score_;
-		selfWind = selfWind_;   //ÃÅ·ç
-		handTile = handTile_;//ÊÖÅÆ
-		disabledHandTile = disabledHandTile_;//½û´òÊÖÅÆ
-		groupTile = groupTile_;//¸±Â¶ÅÆ×é
-		nowTile = nowTile_;//×ÔÃşÅÆ
-		discardTile = discardTile_;//ÅÆºÓ
-		lingshang = lingshang_;//Íæ¼Òµ±Ç°µÄ×ÔÃşÅÆÊÇÁëÉÏÅÆ
-		moqie = moqie_;//±íÊ¾ÅÆºÓÀï×îºóÒ»ÕÅÅÆÊÇ·ñÎªÃşÇĞ
-		lizhi = lizhi_;//Á¢Ö±ĞûÑÔÅÆÊÇÅÆºÓÖĞµÄµÚ¼¸ÕÅ£¬-1ÎªÎ´Á¢Ö±
-		lizhiXunmu = lizhiXunmu_;//Á¢Ö±µÄÑ²Ä¿,´Ó0¿ªÊ¼,-1ÎªÎ´Á¢Ö±,-2ÎªwÁ¢
-		yifa = yifa;//µ±Ç°ÊÇ·ñÎªÒ»·¢Ñ²
+		selfWind = selfWind_;   //é—¨é£
+		handTile = handTile_;//æ‰‹ç‰Œ
+		disabledHandTile = disabledHandTile_;//ç¦æ‰“æ‰‹ç‰Œ
+		groupTile = groupTile_;//å‰¯éœ²ç‰Œç»„
+		nowTile = nowTile_;//è‡ªæ‘¸ç‰Œ
+		discardTile = discardTile_;//ç‰Œæ²³
+		lingshang = lingshang_;//ç©å®¶å½“å‰çš„è‡ªæ‘¸ç‰Œæ˜¯å²­ä¸Šç‰Œ
+		moqie = moqie_;//è¡¨ç¤ºç‰Œæ²³é‡Œæœ€åä¸€å¼ ç‰Œæ˜¯å¦ä¸ºæ‘¸åˆ‡
+		lizhi = lizhi_;//ç«‹ç›´å®£è¨€ç‰Œæ˜¯ç‰Œæ²³ä¸­çš„ç¬¬å‡ å¼ ï¼Œ-1ä¸ºæœªç«‹ç›´
+		lizhiXunmu = lizhiXunmu_;//ç«‹ç›´çš„å·¡ç›®,ä»0å¼€å§‹,-1ä¸ºæœªç«‹ç›´,-2ä¸ºwç«‹
+		yifa = yifa;//å½“å‰æ˜¯å¦ä¸ºä¸€å‘å·¡
 	}
 	void setNowTile(Single target,bool isLingshang)
 	{
 		lingshang = isLingshang;
 		nowTile = target;
 	}
-	//relativePosition 0,1,2,3·Ö±ğ±íÊ¾ÏÂ¶ÔÉÏ×Ô
+	//relativePosition 0,1,2,3åˆ†åˆ«è¡¨ç¤ºä¸‹å¯¹ä¸Šè‡ª
 	bool canChi(Single target, Group result, int relativePosition)
 	{
 		return false;
 	}
 	bool canPeng(Single target, Group result,int relativePosition)
 	{
-		//¼ì²éÀàĞÍ
+		//æ£€æŸ¥ç±»å‹
 		if (result.type != GroupType::Kezi)
 			return false;
-		//¼ì²éÑÕÉ«
+		//æ£€æŸ¥é¢œè‰²
 		if (target.color() != result.color)
 			return false;
-		//¼ì²éÊıÖµ
+		//æ£€æŸ¥æ•°å€¼
 		if (target.value() != result.value)
 			return false;
-		//¼ì²éÎ»ÖÃ
+		//æ£€æŸ¥ä½ç½®
 		if (relativePosition != result.state)
 			return false;
-		//¼ì²éºì±¦ÅÆÊÇ·ñÕıÈ·
+		//æ£€æŸ¥çº¢å®ç‰Œæ˜¯å¦æ­£ç¡®
 		if ((result.akadora & 1) != target.isAkadora())
 			return false;
 		int akadoraCount = (result.akadora&2)+(result.akadora&4);
@@ -97,32 +97,32 @@ public:
 					realAkadoraCount++;
 			}
 		}
-		//ÅÆÊı²»¹»
+		//ç‰Œæ•°ä¸å¤Ÿ
 		if (tileCount < 2)return false;
-		//ºì±¦ÅÆ²»¹»
+		//çº¢å®ç‰Œä¸å¤Ÿ
 		if (realAkadoraCount < akadoraCount)
 			return false;
-		//·Çºì±¦ÅÆ²»¹»
+		//éçº¢å®ç‰Œä¸å¤Ÿ
 		if ((tileCount - realAkadoraCount) < (2 - akadoraCount))
 			return false;
 		return true;
 	}
-	//½öÏŞÈÙ¸Ü
+	//ä»…é™è£æ 
 	bool canGang(Single target,Group result, int relativePosition)
 	{
-		//¼ì²éÀàĞÍ
+		//æ£€æŸ¥ç±»å‹
 		if (result.type != GroupType::Gang)
 			return false;
-		//¼ì²éÑÕÉ«
+		//æ£€æŸ¥é¢œè‰²
 		if (target.color() != result.color)
 			return false;
-		//¼ì²éÊıÖµ
+		//æ£€æŸ¥æ•°å€¼
 		if (target.value() != result.value)
 			return false;
-		//¼ì²éÎ»ÖÃ
+		//æ£€æŸ¥ä½ç½®
 		if (relativePosition != result.state)
 			return false;
-		//¼ì²éºì±¦ÅÆÊÇ·ñÕıÈ·
+		//æ£€æŸ¥çº¢å®ç‰Œæ˜¯å¦æ­£ç¡®
 		if ((result.akadora & 1) != target.isAkadora())
 			return false;
 		int akadoraCount = (result.akadora & 2) + (result.akadora & 4) + (result.akadora & 8);
@@ -137,12 +137,12 @@ public:
 					realAkadoraCount++;
 			}
 		}
-		//ÅÆÊı²»¹»
+		//ç‰Œæ•°ä¸å¤Ÿ
 		if (tileCount < 3)return false;
-		//ºì±¦ÅÆ²»¹»
+		//çº¢å®ç‰Œä¸å¤Ÿ
 		if (realAkadoraCount < akadoraCount)
 			return false;
-		//·Çºì±¦ÅÆ²»¹»
+		//éçº¢å®ç‰Œä¸å¤Ÿ
 		if ((tileCount - realAkadoraCount) < (3 - akadoraCount))
 			return false;
 		return true;
@@ -201,8 +201,8 @@ public:
 	{
 
 	}
-	//·µ»ØfalseÊ±²»Ó¦±ä¶¯Ë½ÓĞ±äÁ¿
-	bool dapai(Single target)//´òÅÆ
+	//è¿”å›falseæ—¶ä¸åº”å˜åŠ¨ç§æœ‰å˜é‡
+	bool dapai(Single target)//æ‰“ç‰Œ
 	{
 		if (target == Null)return false;
 		if (nowTile == target)
@@ -212,7 +212,7 @@ public:
 			nowTile = Null;
 			return true;
 		}
-		//Á¢Ö±±ØĞëÃşÇĞ
+		//ç«‹ç›´å¿…é¡»æ‘¸åˆ‡
 		if (lizhiXunmu != -1)return false;
 		for (int i=0;i<handTile.size();++i)
 		{
@@ -220,7 +220,7 @@ public:
 			{
 				discardTile.push_back(target);
 				handTile[i] = nowTile;
-				std::sort(handTile.begin(),handTile.end());//´ÓĞ¡µ½´óÅÅĞò
+				std::sort(handTile.begin(),handTile.end());//ä»å°åˆ°å¤§æ’åº
 				if (nowTile == Null)
 					handTile.pop_back();
 				nowTile = Null;
@@ -230,12 +230,12 @@ public:
 		}
 		return false;
 	}
-	//·µ»ØfalseÊ±²»Ó¦±ä¶¯Ë½ÓĞ±äÁ¿
+	//è¿”å›falseæ—¶ä¸åº”å˜åŠ¨ç§æœ‰å˜é‡
 	/*
 	state
-	Õı³£=0
-	ÌìµØºÍ,wÁ¢=1
-	ºÓµ×/º£µ×=2
+	æ­£å¸¸=0
+	å¤©åœ°å’Œ,wç«‹=1
+	æ²³åº•/æµ·åº•=2
 	*/
 	TryToAgariResult zimo(WindType prevailingWind,int state, const std::vector<Single>&dora, const std::vector<Single>&ura)
 	{
@@ -249,7 +249,7 @@ public:
 	{
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, lizhiXunmu, yifa, state, type, target, handTile, groupTile, dora, ura)).success;
 	}
-	//·µ»ØfalseÊ±²»Ó¦±ä¶¯Ë½ÓĞ±äÁ¿
+	//è¿”å›falseæ—¶ä¸åº”å˜åŠ¨ç§æœ‰å˜é‡
 	bool liuju()
 	{
 		return false;
@@ -258,10 +258,10 @@ public:
 	{
 		return !Algorithms::tingpai(handTile).empty();
 	}
-	//·µ»ØfalseÊ±²»Ó¦±ä¶¯Ë½ÓĞ±äÁ¿
+	//è¿”å›falseæ—¶ä¸åº”å˜åŠ¨ç§æœ‰å˜é‡
 	bool doLizhi(int state, Single target)
 	{
-		//Òª´òµÄÅÆÊÇ·ñ´æÔÚ?
+		//è¦æ‰“çš„ç‰Œæ˜¯å¦å­˜åœ¨?
 		if (target == Null)return false;
 		std::vector<Single> myTile = handTile;
 		myTile.push_back(nowTile);
@@ -271,30 +271,30 @@ public:
 			if (target == myTile[i])
 			{
 				myTile[i] = Null;
-				std::sort(myTile.begin(), myTile.end());//´ÓĞ¡µ½´óÅÅĞò,NullÒ»¶¨±»ÅÅµ½×î´óÒ»¸ö
+				std::sort(myTile.begin(), myTile.end());//ä»å°åˆ°å¤§æ’åº,Nullä¸€å®šè¢«æ’åˆ°æœ€å¤§ä¸€ä¸ª
 				myTile.pop_back();
 				success = true;
 				break;
 			}
 		}
 		if (!success)return false;
-		//ÊÇ·ñ·Ç°µ¸Ü¸±Â¶£¿
+		//æ˜¯å¦éæš—æ å‰¯éœ²ï¼Ÿ
 		if (!groupTile.empty())
 		{
 			for (auto& item : groupTile)
 			{
-				//°µ¸Ü±ØĞëÂú×ãtype=GangÇÒstate=0
+				//æš—æ å¿…é¡»æ»¡è¶³type=Gangä¸”state=0
 				if (item.type != GroupType::Gang|| item.state != 0)
 					return false;
 			}
 		}
-		//ÊÇ·ñÒÑ¾­Á¢Ö±¹ıÁË£¿
+		//æ˜¯å¦å·²ç»ç«‹ç›´è¿‡äº†ï¼Ÿ
 		if (lizhiXunmu != -1)
 			return false;
-		//µã°ô¹»²»¹»?
+		//ç‚¹æ£’å¤Ÿä¸å¤Ÿ?
 		if (score < 1000)
 			return false;
-		//ÊÇ·ñÌıÅÆ?
+		//æ˜¯å¦å¬ç‰Œ?
 		auto backup = handTile;
 		handTile = myTile;
 		bool isTingpai = tingpai();

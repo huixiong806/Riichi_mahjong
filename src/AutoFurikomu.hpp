@@ -7,7 +7,7 @@ class AutoFurikomu:public ActionGenerator
 private:
 
 public:
-	AutoFurikomu() { name = "·Åï¥ÈË"; }
+	AutoFurikomu() { name = "æ”¾é“³äºº"; }
 	AutoFurikomu(std::string name_)
 	{
 		name = name_;

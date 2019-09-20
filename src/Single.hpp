@@ -7,24 +7,24 @@ class Single
 private:
 	char mColor; //'m','p','s','z'
 	uint8_t mValue;
-	bool mAkadora; //ÊÇ·ñÎªºì±¦ÅÆ
+	bool mAkadora; //æ˜¯å¦ä¸ºçº¢å®ç‰Œ
 public:
 	Single();
 	Single(uint8_t value_, char color_,bool akadora_) :mColor(color_), mValue(value_),mAkadora(akadora_) {}
-	//»ñÈ¡ÑÕÉ«
+	//è·å–é¢œè‰²
 	char color()const;
-	//»ñÈ¡Öµ
+	//è·å–å€¼
 	uint8_t value()const;
-	//ÊÇ·ñÎªºì±¦ÅÆ
+	//æ˜¯å¦ä¸ºçº¢å®ç‰Œ
 	bool isAkadora()const;
-	//»ñÈ¡Ë³ĞòÉÏµÄÏÂÒ»ÕÅÅÆ(Ä¬ÈÏÎª·Çºì±¦ÅÆ)
+	//è·å–é¡ºåºä¸Šçš„ä¸‹ä¸€å¼ ç‰Œ(é»˜è®¤ä¸ºéçº¢å®ç‰Œ)
 	Single next();
-	//ÅĞ¶ÏÁ½ÕÅÅÆÊÇ·ñÏàµÈ£¬²»¿¼ÂÇÊÇ·ñÎªºì±¦ÅÆ
+	//åˆ¤æ–­ä¸¤å¼ ç‰Œæ˜¯å¦ç›¸ç­‰ï¼Œä¸è€ƒè™‘æ˜¯å¦ä¸ºçº¢å®ç‰Œ
 	bool valueEqual(const Single& rhs)const
 	{
 		return mColor == rhs.mColor&&mValue == rhs.mValue;
 	}
-	//ÅĞ¶ÏÁ½ÕÅÅÆÊÇ·ñÏàµÈ£¬¿¼ÂÇÊÇ·ñÎªºì±¦ÅÆ
+	//åˆ¤æ–­ä¸¤å¼ ç‰Œæ˜¯å¦ç›¸ç­‰ï¼Œè€ƒè™‘æ˜¯å¦ä¸ºçº¢å®ç‰Œ
 	bool operator ==(const Single& rhs)const
 	{
 		return (mColor == rhs.mColor&&mValue == rhs.mValue&&rhs.mAkadora==mAkadora);
@@ -33,12 +33,12 @@ public:
 	{
 		return !(*this == rhs);
 	}
-	//ÅĞ¶ÏÁ½ÕÅÅÆµÄ´óĞ¡£¬¿¼ÂÇÊÇ·ñÎªºì±¦ÅÆ£¬Íò<±ı<Ë÷<×Ö<Null,Êı×ÖÏàÍ¬µÄÇé¿öÏÂºì±¦ÅÆ¸ü´ó
+	//åˆ¤æ–­ä¸¤å¼ ç‰Œçš„å¤§å°ï¼Œè€ƒè™‘æ˜¯å¦ä¸ºçº¢å®ç‰Œï¼Œä¸‡<é¥¼<ç´¢<å­—<Null,æ•°å­—ç›¸åŒçš„æƒ…å†µä¸‹çº¢å®ç‰Œæ›´å¤§
 	bool operator <(const Single& rhs)const
 	{
 		return (int)mColor * 1000 + mValue*10+ (int)mAkadora < (int)rhs.mColor * 1000 + rhs.mValue*10+ (int)rhs.mAkadora;
 	}
-	//ÅĞ¶ÏÁ½ÕÅÅÆµÄ´óĞ¡£¬¿¼ÂÇÊÇ·ñÎªºì±¦ÅÆ£¬Íò<±ı<Ë÷<×Ö<Null,Êı×ÖÏàÍ¬µÄÇé¿öÏÂºì±¦ÅÆ¸ü´ó
+	//åˆ¤æ–­ä¸¤å¼ ç‰Œçš„å¤§å°ï¼Œè€ƒè™‘æ˜¯å¦ä¸ºçº¢å®ç‰Œï¼Œä¸‡<é¥¼<ç´¢<å­—<Null,æ•°å­—ç›¸åŒçš„æƒ…å†µä¸‹çº¢å®ç‰Œæ›´å¤§
 	bool operator >(const Single& rhs)const
 	{
 		return (int)mColor * 1000 + mValue * 10 + (int)mAkadora > (int)rhs.mColor * 1000 + rhs.mValue * 10 + (int)rhs.mAkadora;
@@ -53,7 +53,7 @@ public:
 		}
 		else
 		{
-			const std::string zi[8] = {"??","¶«","ÄÏ","Î÷","±±","°×","·¢","ÖĞ" };
+			const std::string zi[8] = {"??","ä¸œ","å—","è¥¿","åŒ—","ç™½","å‘","ä¸­" };
 			res=zi[mValue];
 		}
 		return res;
@@ -91,7 +91,7 @@ bool Single::isAkadora()const
 {
 	return mAkadora;
 }
-//NullÓÀÔ¶ÊÇ×î´óµÄ
+//Nullæ°¸è¿œæ˜¯æœ€å¤§çš„
 const Single Null = { 1,'z'+1,true };
 Single::Single()
 {
