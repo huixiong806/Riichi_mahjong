@@ -2,24 +2,24 @@
 #include<vector>
 enum class GroupType
 {
-	Quetou,//é›€å¤´
-	Shunzi, //é¡ºå­
-	Kezi,  //åˆ»å­
-	Gang,  //æ 
+	Quetou,//È¸Í·
+	Shunzi, //Ë³×Ó
+	Kezi,  //¿Ì×Ó
+	Gang,  //¸Ü
 };
 struct Group
 {
 	GroupType type;
 	char color;//'m','p','s','z'
-	uint8_t value;//é¡ºå­çš„è¯valueç­‰äºæœ€å°çš„é‚£ä¸ª
-	uint8_t akadora;//ä»ä½åˆ°é«˜åˆ†åˆ«è¡¨ç¤ºä¸‰å¼ ç‰Œ(ä»å°åˆ°å¤§)æ˜¯å¦ä¸ºçº¢å®ç‰Œ
-	uint8_t state;//ä½ä½è¡¨ç¤ºåƒ/ç¢°/æ çš„é‚£å¼ ç‰Œçš„æ¥æº(0,1,2,3å¯¹åº”åƒã€ç¢°ã€è£æ ã€æš—æ çš„è‡ªä¸‹å¯¹ä¸Š,4,5,6,7å¯¹åº”åŠ æ çš„è‡ªä¸‹å¯¹ä¸Š(4æ— æ•ˆ))ï¼Œé«˜ä½0ï¼Œ10ï¼Œ20åˆ†åˆ«è¡¨ç¤ºç¬¬ä¸€å¼ ï¼Œç¬¬äºŒå¼ ï¼Œç¬¬ä¸‰å¼ ã€‚(åˆ»å­ï¼Œæ å­é»˜è®¤ä¸º0)
-	//sourceè¡¨ç¤ºç¢°çš„é‚£å¼ ç‰Œçš„æ¥æº(0,1,2,3å¯¹åº”è‡ªä¸‹å¯¹ä¸Š,4,5,6,7ä¹Ÿå¯¹åº”è‡ªä¸‹å¯¹ä¸Šï¼Œå¹¶ä¸”ä¸ºåŠ æ (4æ— æ•ˆ))
+	uint8_t value;//Ë³×ÓµÄ»°valueµÈÓÚ×îĞ¡µÄÄÇ¸ö
+	uint8_t akadora;//´ÓµÍµ½¸ß·Ö±ğ±íÊ¾ÈıÕÅÅÆ(´ÓĞ¡µ½´ó)ÊÇ·ñÎªºì±¦ÅÆ
+	uint8_t state;//µÍÎ»±íÊ¾³Ô/Åö/¸ÜµÄÄÇÕÅÅÆµÄÀ´Ô´(0,1,2,3¶ÔÓ¦³Ô¡¢Åö¡¢ÈÙ¸Ü¡¢°µ¸ÜµÄ×ÔÏÂ¶ÔÉÏ,4,5,6,7¶ÔÓ¦¼Ó¸ÜµÄ×ÔÏÂ¶ÔÉÏ(4ÎŞĞ§))£¬¸ßÎ»0£¬10£¬20·Ö±ğ±íÊ¾µÚÒ»ÕÅ£¬µÚ¶şÕÅ£¬µÚÈıÕÅ¡£(¿Ì×Ó£¬¸Ü×ÓÄ¬ÈÏÎª0)
+	//source±íÊ¾ÅöµÄÄÇÕÅÅÆµÄÀ´Ô´(0,1,2,3¶ÔÓ¦×ÔÏÂ¶ÔÉÏ,4,5,6,7Ò²¶ÔÓ¦×ÔÏÂ¶ÔÉÏ£¬²¢ÇÒÎª¼Ó¸Ü(4ÎŞĞ§))
 	static Group createKezi(Single a, Single b, Single target, int source);
 	static Group createShunzi(Single a, Single b, Single target, int source);
 	static Group createGangzi(Single a, Single b,Single c, Single target, int source);
 	static Group createQuetou(Single a, Single b);
-	//æ˜¯å¦ä¸ºå¹ºä¹
+	//ÊÇ·ñÎªçÛ¾Å
 	bool isyaojiu()
 	{
 		if (color == 'z')return true;
@@ -105,7 +105,7 @@ struct Group
 		}
 		else if (type == GroupType::Gang)
 		{
-			//æš—æ 
+			//°µ¸Ü
 			if (state % 10 == 0)
 			{
 				res.push_back('O');
@@ -115,7 +115,7 @@ struct Group
 			}
 			else
 			{
-				//æ˜æ (ç¬¬å››å¼ ä¸å¸¦æ‹¬å·)åŠ æ (ç¬¬å››å¼ å¸¦æ‹¬å·ï¼Œstate/10==3)
+				//Ã÷¸Ü(µÚËÄÕÅ²»´øÀ¨ºÅ)¼Ó¸Ü(µÚËÄÕÅ´øÀ¨ºÅ£¬state/10==3)
 				if (state % 10 == 3|| state % 10 == 7)
 				{
 					res.push_back('(');
@@ -208,7 +208,7 @@ Group Group::createGangzi(Single a, Single b, Single c, Single target, int sourc
 	temp.push_back(a);
 	temp.push_back(b);
 	temp.push_back(c);
-	//ç»Ÿä¸€èµ¤æ™®å…±å­˜çš„æƒ…å†µï¼Œé¿å…å®ƒä»¬å› é¡ºåºä¸åŒè€Œè¢«å½“æˆä¸¤ç§ä¸åŒæ å­(æ ¹æœ¬æ²¡ç”¨ï¼Œå› ä¸ºæ åªå¯èƒ½æœ‰ä¸€ç§é€‰æ‹©)
+	//Í³Ò»³àÆÕ¹²´æµÄÇé¿ö£¬±ÜÃâËüÃÇÒòË³Ğò²»Í¬¶ø±»µ±³ÉÁ½ÖÖ²»Í¬¸Ü×Ó(¸ù±¾Ã»ÓÃ£¬ÒòÎª¸ÜÖ»¿ÉÄÜÓĞÒ»ÖÖÑ¡Ôñ)
 	std::sort(temp.begin(), temp.end());
 	res.akadora |= target.isAkadora();
 	res.akadora |= temp[0].isAkadora() << 1;
@@ -225,7 +225,7 @@ Group Group::createKezi(Single a, Single b, Single target, int source)
 	res.value = target.value();
 	res.state = source;
 	res.akadora = 0;
-	if (a > b)std::swap(a, b);//ç»Ÿä¸€èµ¤æ™®å…±å­˜çš„æƒ…å†µï¼Œé¿å…å®ƒä»¬å› é¡ºåºä¸åŒè€Œè¢«å½“æˆä¸¤ç§ä¸åŒåˆ»å­
+	if (a > b)std::swap(a, b);//Í³Ò»³àÆÕ¹²´æµÄÇé¿ö£¬±ÜÃâËüÃÇÒòË³Ğò²»Í¬¶ø±»µ±³ÉÁ½ÖÖ²»Í¬¿Ì×Ó
 	res.akadora |= target.isAkadora();
 	res.akadora |= a.isAkadora() << 1;
 	res.akadora |= b.isAkadora() << 2;

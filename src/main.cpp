@@ -12,66 +12,66 @@ Game game;
 unordered_map<int,string> yaku;
 void init()
 {
-	yaku[0x110] = "ç«‹ç›´";
-	yaku[0x111] = "ä¸€å‘";
-	yaku[0x112] = "é—¨å‰æ¸…è‡ªæ‘¸å’Œ";
-	yaku[0x100] = "æ–­å¹ºä¹";
-	yaku[0x101] = "å½¹ç‰Œï¼šè‡ªé£ç‰Œ";
-	yaku[0x102] = "å½¹ç‰Œï¼šåœºé£ç‰Œ";
-	yaku[0x103] = "å½¹ç‰Œï¼šç™½";
-	yaku[0x104] = "å½¹ç‰Œï¼šå‘";
-	yaku[0x105] = "å½¹ç‰Œï¼šä¸­";
-	yaku[0x113] = "å¹³å’Œ";
-	yaku[0x114] = "ä¸€æ¯å£";
-	yaku[0x106] = "æªæ ";
-	yaku[0x107] = "å²­ä¸Šå¼€èŠ±";
-	yaku[0x108] = "æµ·åº•ææœˆ";
-	yaku[0x109] = "æ²³åº•æé±¼";
-	yaku[0x210] = "ä¸¤ç«‹ç›´";
-	yaku[0x200] = "ä¸‰è‰²åŒåˆ»";
-	yaku[0x201] = "ä¸‰æ å­";
-	yaku[0x202] = "å¯¹å¯¹å’Œ";
-	yaku[0x203] = "ä¸‰æš—åˆ»";
-	yaku[0x204] = "å°ä¸‰å…ƒ";
-	yaku[0x205] = "æ··è€å¤´";
-	yaku[0x211] = "ä¸ƒå¯¹å­";
-	yaku[0x206] = "æ··å…¨å¸¦å¹ºä¹";
-	yaku[0x226] = "æ··å…¨å¸¦å¹ºä¹";
-	yaku[0x207] = "ä¸€æ°”é€šè´¯";
-	yaku[0x227] = "ä¸€æ°”é€šè´¯";
-	yaku[0x208] = "ä¸‰è‰²åŒé¡º";
-	yaku[0x228] = "ä¸‰è‰²åŒé¡º";
-	yaku[0x310] = "äºŒæ¯å£";
-	yaku[0x300] = "çº¯å…¨å¸¦å¹ºä¹";
-	yaku[0x320] = "çº¯å…¨å¸¦å¹ºä¹";
-	yaku[0x301] = "æ··ä¸€è‰²";
-	yaku[0x321] = "æ··ä¸€è‰²";
-	yaku[0x500] = "æµå±€æ»¡è´¯";
-	yaku[0x600] = "æ¸…ä¸€è‰²";
-	yaku[0x620] = "æ¸…ä¸€è‰²";
-	yaku[0xd00] = "å¤©å’Œ";
-	yaku[0xd01] = "åœ°å’Œ";
-	yaku[0xd02] = "å¤§ä¸‰å…ƒ";
-	yaku[0xd10] = "å››æš—åˆ»";
-	yaku[0xd03] = "å­—ä¸€è‰²";
-	yaku[0xd04] = "ç»¿ä¸€è‰²";
-	yaku[0xd05] = "æ¸…è€å¤´";
-	yaku[0xd11] = "å›½å£«æ— åŒ";
-	yaku[0xd06] = "å°å››å–œ";
-	yaku[0xd07] = "å››æ å­";
-	yaku[0xd12] = "ä¹è²å®ç¯";
-	yaku[0xf10] = "å››æš—åˆ»å•éª‘";
-	yaku[0xf11] = "å›½å£«æ— åŒåä¸‰é¢";
-	yaku[0xf12] = "çº¯æ­£ä¹è²å®ç¯";
-	yaku[0xf00] = "å¤§å››å–œ";
+	yaku[0x110] = "Á¢Ö±";
+	yaku[0x111] = "Ò»·¢";
+	yaku[0x112] = "ÃÅÇ°Çå×ÔÃşºÍ";
+	yaku[0x100] = "¶ÏçÛ¾Å";
+	yaku[0x101] = "ÒÛÅÆ£º×Ô·çÅÆ";
+	yaku[0x102] = "ÒÛÅÆ£º³¡·çÅÆ";
+	yaku[0x103] = "ÒÛÅÆ£º°×";
+	yaku[0x104] = "ÒÛÅÆ£º·¢";
+	yaku[0x105] = "ÒÛÅÆ£ºÖĞ";
+	yaku[0x113] = "Æ½ºÍ";
+	yaku[0x114] = "Ò»±­¿Ú";
+	yaku[0x106] = "Ç¹¸Ü";
+	yaku[0x107] = "ÁëÉÏ¿ª»¨";
+	yaku[0x108] = "º£µ×ÀÌÔÂ";
+	yaku[0x109] = "ºÓµ×ÀÌÓã";
+	yaku[0x210] = "Á½Á¢Ö±";
+	yaku[0x200] = "ÈıÉ«Í¬¿Ì";
+	yaku[0x201] = "Èı¸Ü×Ó";
+	yaku[0x202] = "¶Ô¶ÔºÍ";
+	yaku[0x203] = "Èı°µ¿Ì";
+	yaku[0x204] = "Ğ¡ÈıÔª";
+	yaku[0x205] = "»ìÀÏÍ·";
+	yaku[0x211] = "Æß¶Ô×Ó";
+	yaku[0x206] = "»ìÈ«´øçÛ¾Å";
+	yaku[0x226] = "»ìÈ«´øçÛ¾Å";
+	yaku[0x207] = "Ò»ÆøÍ¨¹á";
+	yaku[0x227] = "Ò»ÆøÍ¨¹á";
+	yaku[0x208] = "ÈıÉ«Í¬Ë³";
+	yaku[0x228] = "ÈıÉ«Í¬Ë³";
+	yaku[0x310] = "¶ş±­¿Ú";
+	yaku[0x300] = "´¿È«´øçÛ¾Å";
+	yaku[0x320] = "´¿È«´øçÛ¾Å";
+	yaku[0x301] = "»ìÒ»É«";
+	yaku[0x321] = "»ìÒ»É«";
+	yaku[0x500] = "Á÷¾ÖÂú¹á";
+	yaku[0x600] = "ÇåÒ»É«";
+	yaku[0x620] = "ÇåÒ»É«";
+	yaku[0xd00] = "ÌìºÍ";
+	yaku[0xd01] = "µØºÍ";
+	yaku[0xd02] = "´óÈıÔª";
+	yaku[0xd10] = "ËÄ°µ¿Ì";
+	yaku[0xd03] = "×ÖÒ»É«";
+	yaku[0xd04] = "ÂÌÒ»É«";
+	yaku[0xd05] = "ÇåÀÏÍ·";
+	yaku[0xd11] = "¹úÊ¿ÎŞË«";
+	yaku[0xd06] = "Ğ¡ËÄÏ²";
+	yaku[0xd07] = "ËÄ¸Ü×Ó";
+	yaku[0xd12] = "¾ÅÁ«±¦µÆ";
+	yaku[0xf10] = "ËÄ°µ¿Ìµ¥Æï";
+	yaku[0xf11] = "¹úÊ¿ÎŞË«Ê®ÈıÃæ";
+	yaku[0xf12] = "´¿Õı¾ÅÁ«±¦µÆ";
+	yaku[0xf00] = "´óËÄÏ²";
 }
 void test()
 {
 	init();
-	auto human = make_shared<Human>("æµ‹è¯•äºº");
+	auto human = make_shared<Human>("²âÊÔÈË");
 	GameInfo res;
-	res.rule = Rule();//è§„åˆ™
-					 //æ¯ä¸ªç©å®¶çš„ç‰Œæ²³ï¼Œæ˜¯å¦ç«‹ç›´ï¼Œä»¥åŠå‰¯éœ²ç‰Œç»„
+	res.rule = Rule();//¹æÔò
+					 //Ã¿¸öÍæ¼ÒµÄÅÆºÓ£¬ÊÇ·ñÁ¢Ö±£¬ÒÔ¼°¸±Â¶ÅÆ×é
 	for (int i = 0;i<=3;++i)
 	{
 		PlayerInfo info;
@@ -80,7 +80,7 @@ void test()
 		info.score = 99999;
 		res.playerInfo.push_back(info);
 	}
-	//æ‰‹ç‰Œ
+	//ÊÖÅÆ
 	res.handTile.push_back(Single(1, 'z', 0));
 	res.handTile.push_back(Single(1, 'z', 0));
 	res.handTile.push_back(Single(2, 'z', 0));
@@ -95,8 +95,8 @@ void test()
 	res.handTile.push_back(Single(6, 'z', 0));
 	res.handTile.push_back(Single(7, 'z', 0));
 	res.nowTile = Single(7, 'z', 0);
-	res.prevailingWind = WindType::EAST;   //åœºé£
-	res.selfWind =WindType::WEST;  //é—¨é£
+	res.prevailingWind = WindType::EAST;   //³¡·ç
+	res.selfWind =WindType::WEST;  //ÃÅ·ç
 	res.nowWind = WindType::WEST;
 	res.mingpai = false;
 	res.w = false;
@@ -105,28 +105,28 @@ void test()
 	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, 0);
 	auto r=p.zimo(res.prevailingWind,0, {}, {});
 	auto re = r.result;
-	cout << "Test " << (re.zimo ? "è‡ªæ‘¸" : "è£å’Œ") << endl;
+	cout << "Test " << (re.zimo ? "×ÔÃş" : "ÈÙºÍ") << endl;
 	cout << endl;
 	for (auto& yk : re.yaku)
 	{
 		cout << yaku[(int)yk] << " ";
 		cout << endl;
 	}
-	cout << "å®ç‰Œ" << re.dora << "   çº¢å®ç‰Œ" << re.akadora << "   é‡Œå®ç‰Œ" << re.uradora << endl;
+	cout << "±¦ÅÆ" << re.dora << "   ºì±¦ÅÆ" << re.akadora << "   Àï±¦ÅÆ" << re.uradora << endl;
 	if (re.fan < 0)
 	{
 		
-		const string ykman[7] = { "","ä¸€","ä¸¤","ä¸‰","å››","äº”","å…­" };
+		const string ykman[7] = { "","Ò»","Á½","Èı","ËÄ","Îå","Áù" };
 		if (re.fan == -1)
-			cout << "å½¹æ»¡ " << re.scoreAdd << "ç‚¹" << endl;
+			cout << "ÒÛÂú " << re.scoreAdd << "µã" << endl;
 		else 
-			cout << ykman[-re.fan] << "å€å½¹æ»¡ "<<re.scoreAdd << "ç‚¹" << endl;
-		cout << "åº„å®¶å¤±ç‚¹" << re.scoreDecZhuang << "  é—²å®¶å¤±ç‚¹" << re.scoreDecXian << endl;
+			cout << ykman[-re.fan] << "±¶ÒÛÂú "<<re.scoreAdd << "µã" << endl;
+		cout << "×¯¼ÒÊ§µã" << re.scoreDecZhuang << "  ÏĞ¼ÒÊ§µã" << re.scoreDecXian << endl;
 	}
 	else
 	{
-		cout << re.fan << "ç•ª" << re.fu << "ç¬¦   " << re.scoreAdd << "ç‚¹" << endl;
-		cout << "åº„å®¶å¤±ç‚¹" << re.scoreDecZhuang << "  é—²å®¶å¤±ç‚¹" << re.scoreDecXian << endl;
+		cout << re.fan << "·¬" << re.fu << "·û   " << re.scoreAdd << "µã" << endl;
+		cout << "×¯¼ÒÊ§µã" << re.scoreDecZhuang << "  ÏĞ¼ÒÊ§µã" << re.scoreDecXian << endl;
 	}
 	
 }
@@ -150,26 +150,26 @@ void test2()
 int main()
 {
 	
-	cout << "é¢„å¤„ç†ä¸­..." << endl;
+	cout << "Ô¤´¦ÀíÖĞ..." << endl;
 	Algorithms::preprocessDistance();
-	cout << "é¢„å¤„ç†ç»“æŸ" << endl;
+	cout << "Ô¤´¦Àí½áÊø" << endl;
 	test();
 	//test2();
 	/*
-	ç§å­æ”¶é›†
-	3 æ 3z
-	233 7å¯¹å­è‡ªæ‘¸ï¼Œç•™1må’Œ3p
+	ÖÖ×ÓÊÕ¼¯
+	3 ¸Ü3z
+	233 7¶Ô×Ó×ÔÃş£¬Áô1mºÍ3p
 	*/
 	int seed;
-	cout << "è¾“å…¥ç§å­:" << endl;
+	cout << "ÊäÈëÖÖ×Ó:" << endl;
 	cin >> seed;
 	srand(seed);
 	init();
-	player[0] = make_shared<AutoFurikomu>("æ”¾é“³äººA");                                 
-	player[1] = make_shared<AutoFurikomu>("æ”¾é“³äººB");
-	player[2] = make_shared<AutoFurikomu>("æ”¾é“³äººC");
-	player[3] = make_shared<Human>("å®æˆ˜æµ‹è¯•äºº");
-	cout << "æ¸¸æˆå¼€å§‹ï¼" << endl;
+	player[0] = make_shared<AutoFurikomu>("·Åï¥ÈËA");                                 
+	player[1] = make_shared<AutoFurikomu>("·Åï¥ÈËB");
+	player[2] = make_shared<AutoFurikomu>("·Åï¥ÈËC");
+	player[3] = make_shared<Human>("ÊµÕ½²âÊÔÈË");
+	cout << "ÓÎÏ·¿ªÊ¼£¡" << endl;
 	bool first = true;
 	do
 	{
@@ -177,7 +177,7 @@ int main()
 			game.startNewGame();                          
 		else game.startNextRound();
 		first = false;                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                
-		cout << "æ–°çš„ä¸€å±€å¼€å§‹äº†" << endl;
+		cout << "ĞÂµÄÒ»¾Ö¿ªÊ¼ÁË" << endl;
 		do
 		{
 			for (int i = 0; i < 4; ++i)
@@ -186,7 +186,7 @@ int main()
 				ActionResult res=game.doAction(i, action);
 				if (res.success == false)
 				{
-					cout<<"å‡ºç°é”™è¯¯,è¾“å…¥ä»»æ„å†…å®¹é€€å‡º"<<endl;
+					cout<<"³öÏÖ´íÎó,ÊäÈëÈÎÒâÄÚÈİÍË³ö"<<endl;
 					int a;
 					cin >> a;
 					return 0;
@@ -196,38 +196,38 @@ int main()
 			}
 		} while (!game.roundOver());
 		RoundResult result=game.getRoundResult();
-		cout << "æœ¬å±€ç»“æŸ" << endl;
+		cout << "±¾¾Ö½áÊø" << endl;
 		if (result.liuju)
 		{
-			cout << "æµå±€" << endl;
+			cout << "Á÷¾Ö" << endl;
 		}
 		else if(!result.agariResult.empty())
 		{
 			for (auto& res : result.agariResult)
 			{
-				cout<<player[res.hupaiID]->getName()<<" "<<(res.zimo?"è‡ªæ‘¸":"è£å’Œ")<<endl;
-				cout << "å½¹ç§:" << endl;
+				cout<<player[res.hupaiID]->getName()<<" "<<(res.zimo?"×ÔÃş":"ÈÙºÍ")<<endl;
+				cout << "ÒÛÖÖ:" << endl;
 				for (auto& yk : res.yaku)
 				{
 					cout << yaku[(int)yk] << " ";
 					cout << endl;
 				}
-				cout << "å®ç‰Œ" << res.dora << "   çº¢å®ç‰Œ" << res.akadora << "   é‡Œå®ç‰Œ" << res.uradora << endl;
+				cout << "±¦ÅÆ" << res.dora << "   ºì±¦ÅÆ" << res.akadora << "   Àï±¦ÅÆ" << res.uradora << endl;
 				if (res.fan < 0)
 				{
 					if (res.fan == -1)
-						cout << "å½¹æ»¡ " << res.scoreAdd << "ç‚¹" << endl;
-					const string ykman[7] = { "","ä¸€","ä¸¤","ä¸‰","å››","äº”","å…­" };
-					cout << ykman[-res.fan] << "å€å½¹æ»¡ " << res.scoreAdd << "ç‚¹" << endl;
+						cout << "ÒÛÂú " << res.scoreAdd << "µã" << endl;
+					const string ykman[7] = { "","Ò»","Á½","Èı","ËÄ","Îå","Áù" };
+					cout << ykman[-res.fan] << "±¶ÒÛÂú " << res.scoreAdd << "µã" << endl;
 				}
 				else
 				{
-					cout << res.fan << "ç•ª" << res.fu << "ç¬¦   " << res.scoreAdd << "ç‚¹" << endl;
+					cout << res.fan << "·¬" << res.fu << "·û   " << res.scoreAdd << "µã" << endl;
 				}
 			}
 		}
 	} while (!game.gameOver());
-	cout << "æ¸¸æˆç»“æŸï¼" << endl;
+	cout << "ÓÎÏ·½áÊø£¡" << endl;
 	while (1);
 	return 0;
 }

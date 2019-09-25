@@ -7,30 +7,30 @@
 class Mountain
 {
 protected:
-	std::vector<Single>mA;        //å››å®¶æ‘¸ç‰Œ
-	std::vector<Single>mB;        //å²­ä¸Šï¼ŒdoraæŒ‡ç¤ºç‰Œ
-	std::vector<Single>mMountain;  //ç‰Œå±±åºåˆ—
-	int mHandPtr;  //æ‰‹ç‰ŒæŒ‡é’ˆ
-	int mLingshangPtr;  //å²­ä¸Šç‰ŒæŒ‡é’ˆ
+	std::vector<Single>mA;        //ËÄ¼ÒÃşÅÆ
+	std::vector<Single>mB;        //ÁëÉÏ£¬doraÖ¸Ê¾ÅÆ
+	std::vector<Single>mMountain;  //ÅÆÉ½ĞòÁĞ
+	int mHandPtr;  //ÊÖÅÆÖ¸Õë
+	int mLingshangPtr;  //ÁëÉÏÅÆÖ¸Õë
 public:
-	std::vector<Single>hand[4];  //å››å®¶åˆå§‹æ‰‹ç‰Œ
-	Single zimo;//åº„å®¶0å·¡çš„è‡ªæ‘¸ç‰Œ
-	Mountain();//æ„é€ å‡½æ•°
-	virtual void reset(const Rule& rule);  //äº§ç”Ÿæ–°ç‰Œå±±
-	Single getDora(int index); //è·å–å®ç‰Œ
-	Single getUra(int index); //è·å–é‡Œå®ç‰Œ
-	Single getDoraIndicator(int index); //è·å–å®ç‰ŒæŒ‡ç¤ºç‰Œ,ä¸‹æ ‡èŒƒå›´0~4
-	Single getUraIndicator(int index); //è·å–é‡Œå®ç‰ŒæŒ‡ç¤ºç‰Œ,ä¸‹æ ‡èŒƒå›´0~4
-	Single nextLingshang();//è·å–ä¸‹ä¸€å¼ å²­ä¸Šç‰Œ(è‡ªåŠ¨ç§»æµ·åº•ç‰Œ)
-	Single nextHand();//è·å–ä¸‹ä¸€å¼ æ‰‹ç‰Œ
-	int remainCount(); //è·å–å‰©ä½™ç‰Œæ•°
-	std::string getMountainString();//è·å¾—ç‰Œå±±åºåˆ—
+	std::vector<Single>hand[4];  //ËÄ¼Ò³õÊ¼ÊÖÅÆ
+	Single zimo;//×¯¼Ò0Ñ²µÄ×ÔÃşÅÆ
+	Mountain();//¹¹Ôìº¯Êı
+	virtual void reset(const Rule& rule);  //²úÉúĞÂÅÆÉ½
+	Single getDora(int index); //»ñÈ¡±¦ÅÆ
+	Single getUra(int index); //»ñÈ¡Àï±¦ÅÆ
+	Single getDoraIndicator(int index); //»ñÈ¡±¦ÅÆÖ¸Ê¾ÅÆ,ÏÂ±ê·¶Î§0~4
+	Single getUraIndicator(int index); //»ñÈ¡Àï±¦ÅÆÖ¸Ê¾ÅÆ,ÏÂ±ê·¶Î§0~4
+	Single nextLingshang();//»ñÈ¡ÏÂÒ»ÕÅÁëÉÏÅÆ(×Ô¶¯ÒÆº£µ×ÅÆ)
+	Single nextHand();//»ñÈ¡ÏÂÒ»ÕÅÊÖÅÆ
+	int remainCount(); //»ñÈ¡Ê£ÓàÅÆÊı
+	std::string getMountainString();//»ñµÃÅÆÉ½ĞòÁĞ
 };
 Mountain::Mountain()
 {
 	mHandPtr = mLingshangPtr = 0;
 }
-std::string Mountain::getMountainString()//è·å¾—ç‰Œå±±åºåˆ—
+std::string Mountain::getMountainString()//»ñµÃÅÆÉ½ĞòÁĞ
 {
 	std::string res;
 	for (auto& item : mMountain)
@@ -42,34 +42,34 @@ std::string Mountain::getMountainString()//è·å¾—ç‰Œå±±åºåˆ—
 	}
 	return res;
 }
-Single Mountain::nextLingshang()//è·å–ä¸‹ä¸€å¼ å²­ä¸Šç‰Œ(è‡ªåŠ¨ç§»æµ·åº•ç‰Œ)
+Single Mountain::nextLingshang()//»ñÈ¡ÏÂÒ»ÕÅÁëÉÏÅÆ(×Ô¶¯ÒÆº£µ×ÅÆ)
 {
 	Single res=mB[mLingshangPtr++];
 	mB.push_back(mA[mA.size()-1]);
 	mA.pop_back();
 	return res;
 }
-Single Mountain::nextHand()//è·å–ä¸‹ä¸€å¼ æ‰‹ç‰Œ
+Single Mountain::nextHand()//»ñÈ¡ÏÂÒ»ÕÅÊÖÅÆ
 {
 	return mA[mHandPtr++];
 }
-int Mountain::remainCount() //è·å–å‰©ä½™ç‰Œæ•°
+int Mountain::remainCount() //»ñÈ¡Ê£ÓàÅÆÊı
 {
 	return mA.size() - mHandPtr;
 }
-Single Mountain::getDora(int index) //è·å–å®ç‰Œ
+Single Mountain::getDora(int index) //»ñÈ¡±¦ÅÆ
 {
 	return getDoraIndicator(index).next();
 }
-Single Mountain::getUra(int index) //è·å–é‡Œå®ç‰Œ
+Single Mountain::getUra(int index) //»ñÈ¡Àï±¦ÅÆ
 {
 	return getUraIndicator(index).next();
 }
-Single Mountain::getDoraIndicator(int index) //è·å–å®ç‰ŒæŒ‡ç¤ºç‰Œ,ä¸‹æ ‡èŒƒå›´0~4
+Single Mountain::getDoraIndicator(int index) //»ñÈ¡±¦ÅÆÖ¸Ê¾ÅÆ,ÏÂ±ê·¶Î§0~4
 {
 	return mB[4 + index * 2];
 }
-Single Mountain::getUraIndicator(int index) //è·å–é‡Œå®ç‰ŒæŒ‡ç¤ºç‰Œ,ä¸‹æ ‡èŒƒå›´0~4
+Single Mountain::getUraIndicator(int index) //»ñÈ¡Àï±¦ÅÆÖ¸Ê¾ÅÆ,ÏÂ±ê·¶Î§0~4
 {
 	return mB[5 + index * 2];
 }
@@ -87,13 +87,13 @@ void Mountain::reset(const Rule& rule)
 	{
 		for (int j = 1; j <= 4; ++j)
 		{
-			if (i==5 && j==1 && rule.doraCount > 0)//çº¢å®ç‰Œ
+			if (i==5 && j==1 && rule.doraCount > 0)//ºì±¦ÅÆ
 			{
 				all.push_back(Single(i, 'm', true));
 				all.push_back(Single(i, 'p', true));
 				all.push_back(Single(i, 's', true));
 			}
-			else if(i==5 && j==2 && rule.doraCount == 4)//çº¢å®ç‰Œ5é¥¼
+			else if(i==5 && j==2 && rule.doraCount == 4)//ºì±¦ÅÆ5±ı
 			{
 				all.push_back(Single(i, 'm',false));
 				all.push_back(Single(i, 'p', true));

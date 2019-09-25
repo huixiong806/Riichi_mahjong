@@ -14,16 +14,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Single.hpp">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Mountain.hpp">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Rules.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Game.hpp">
       <Filter>src</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Player.hpp">
@@ -42,6 +36,12 @@
       <Filter>src\AI</Filter>
     </ClInclude>
     <ClInclude Include="..\src\Algorithms.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game.hpp">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Single.hpp">
       <Filter>src</Filter>
     </ClInclude>
   </ItemGroup>

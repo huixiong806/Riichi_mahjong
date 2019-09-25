@@ -4,12 +4,12 @@
 #include<vector>
 enum class ActionType
 {
-	Null,  //ç©ºæŒ‡ä»¤
+	Null,  //¿ÕÖ¸Áî
 	Skip,
-	Dapai, //æ­£å¸¸æ‰“ç‰Œ
+	Dapai, //Õı³£´òÅÆ
 	Chi,
 	Peng,
-	Gang,  //æ 
+	Gang,  //¸Ü
 	Rong,
 	Lizhi,
 	Zimo,
@@ -18,18 +18,18 @@ enum class ActionType
 };
 enum class ErrorType
 {
-	None,             //æˆåŠŸäº†ï¼Œæ²¡æœ‰error
+	None,             //³É¹¦ÁË£¬Ã»ÓĞerror
 	NotYourTurn,
 	AlreadyActed,
 	ActionRejected,
-	TileNotExist,     //æ‰“ç‰Œæ—¶ä¸å­˜åœ¨è¦æ‰“çš„ä¸œè¥¿
-	CannotChooseNull, //ä¸å‡†ç»™ç©ºæŒ‡ä»¤
+	TileNotExist,     //´òÅÆÊ±²»´æÔÚÒª´òµÄ¶«Î÷
+	CannotChooseNull, //²»×¼¸ø¿ÕÖ¸Áî
 };
 struct Action
 {
 	ActionType type;
-	Single target;//è¡¨ç¤ºæ‰“å“ªå¼ ç‰Œ,ä»…æ‰“ç‰Œæ—¶æœ‰æ•ˆ
-	Group group;//ä»…åƒç¢°æ æœ‰æ•ˆ
+	Single target;//±íÊ¾´òÄÄÕÅÅÆ,½ö´òÅÆÊ±ÓĞĞ§
+	Group group;//½ö³ÔÅö¸ÜÓĞĞ§
 	bool operator<(const Action& rhs)const
 	{
 		if ((int)type < (int)rhs.type)
@@ -64,38 +64,38 @@ struct Action
 };
 struct PlayerInfo
 {
-	std::vector<Group> groupTile;//å‰¯éœ²ç‰Œç»„
-	std::vector<Single>discardTile;//ç‰Œæ²³
-	int lizhi;//ç«‹ç›´å®£è¨€ç‰Œæ˜¯ç‰Œæ²³ä¸­çš„ç¬¬å‡ å¼ ï¼Œ-1ä¸ºæœªç«‹ç›´
-	int lizhiXunmu;//ç«‹ç›´çš„å·¡ç›®
-	int yifa;//æ˜¯å¦å¤„äºä¸€å‘å·¡
+	std::vector<Group> groupTile;//¸±Â¶ÅÆ×é
+	std::vector<Single>discardTile;//ÅÆºÓ
+	int lizhi;//Á¢Ö±ĞûÑÔÅÆÊÇÅÆºÓÖĞµÄµÚ¼¸ÕÅ£¬-1ÎªÎ´Á¢Ö±
+	int lizhiXunmu;//Á¢Ö±µÄÑ²Ä¿
+	int yifa;//ÊÇ·ñ´¦ÓÚÒ»·¢Ñ²
 	int score;
 };
 struct GameInfo
 {
-	Rule rule;//è§„åˆ™
-	std::vector<PlayerInfo>playerInfo;//æŒ‰é¡ºåºåˆ†åˆ«ä¸ºä¸œå—è¥¿åŒ—å››å®¶
-	WindType prevailingWind;   //åœºé£
-	WindType selfWind;   //é—¨é£
+	Rule rule;//¹æÔò
+	std::vector<PlayerInfo>playerInfo;//°´Ë³Ğò·Ö±ğÎª¶«ÄÏÎ÷±±ËÄ¼Ò
+	WindType prevailingWind;   //³¡·ç
+	WindType selfWind;   //ÃÅ·ç
 	WindType nowWind;
 	/*
-	  è¡¨ç¤ºæ‰“å‡ºç‰Œ(mingpai=true)/è¯¥æ‰“ç‰Œ(mingpai=false)çš„äººçš„é—¨é£ã€‚
-	  å¦‚æœä¸ºè‡ªå·±çš„è¯ï¼Œmingpai=trueè¡¨ç¤ºè‡ªå·±ä»€ä¹ˆä¹Ÿå¹²ä¸äº†(å› ä¸ºä¸èƒ½é¸£è‡ªå·±çš„ç‰Œ)ï¼Œéœ€è¦ç»™ç©ºæŒ‡ä»¤ã€‚
-	  mingpai=falseè¡¨ç¤ºè‡ªå·±è¯¥æ‰“ç‰Œäº†ï¼Œmingpai=falseå¹¶ä¸”è‡ªæ‘¸ç‰Œä¸ºNullè¯´æ˜æ˜¯åˆšåƒã€ç¢°è¿‡ç‰Œåçš„æ‰“ç‰Œã€‚
-	  å¦‚æœä¸ºåˆ«äººçš„è¯ï¼Œmingpai=trueæ—¶è‡ªå·±å¿…é¡»é€‰æ‹©ä¸€æ ·æ“ä½œï¼Œmingpai=falseæ—¶éœ€è¦ç»™ç©ºæŒ‡ä»¤
+	  ±íÊ¾´ò³öÅÆ(mingpai=true)/¸Ã´òÅÆ(mingpai=false)µÄÈËµÄÃÅ·ç¡£
+	  Èç¹ûÎª×Ô¼ºµÄ»°£¬mingpai=true±íÊ¾×Ô¼ºÊ²Ã´Ò²¸É²»ÁË(ÒòÎª²»ÄÜÃù×Ô¼ºµÄÅÆ)£¬ĞèÒª¸ø¿ÕÖ¸Áî¡£
+	  mingpai=false±íÊ¾×Ô¼º¸Ã´òÅÆÁË£¬mingpai=false²¢ÇÒ×ÔÃşÅÆÎªNullËµÃ÷ÊÇ¸Õ³Ô¡¢Åö¹ıÅÆºóµÄ´òÅÆ¡£
+	  Èç¹ûÎª±ğÈËµÄ»°£¬mingpai=trueÊ±×Ô¼º±ØĞëÑ¡ÔñÒ»Ñù²Ù×÷£¬mingpai=falseÊ±ĞèÒª¸ø¿ÕÖ¸Áî
 	*/
-	std::vector<Single>handTile;//æ‰‹ç‰Œ
-	std::vector<Single>doraIndicator;//å®ç‰ŒæŒ‡ç¤ºç‰Œ
-	Single nowTile;//å†³ç­–è€…çš„è‡ªæ‘¸ç‰Œæˆ–æ˜¯å¯ä»¥é¸£ç‰Œ/è£å’Œçš„å¯¹è±¡
-	bool mingpai;//ä¸ºtrueè¡¨ç¤ºåˆ«äººåˆšæ‰“å®Œç‰Œï¼Œä½ å¯ä»¥é€‰æ‹©é¸£ç‰Œã€è£å’Œæˆ–è€…è·³è¿‡
-	bool lingshang;//å½“å‰è‡ªæ‘¸ç‰Œæ˜¯å¦ä¸ºå²­ä¸Šç‰Œ(ä»…mingpai=falseæ—¶æœ‰æ•ˆ)
-	bool moqie;//è¡¨ç¤ºæ‰“å‡ºå»è¿™å¼ ç‰Œæ˜¯å¦ä¸ºæ‘¸åˆ‡(ä»…mingpai=trueæ—¶æœ‰æ•ˆ)
-	int lizhibangCount;    //é¢å¤–ç«‹ç›´æ£’æ•°é‡
-	int benchang;    //æœ¬åœºæ•°
-	int subround; //å·¡æ•°
-	int remainTiles;//å‰©ä½™ç‰Œæ•°
-	int round;//å±€æ•°(å¦‚ä¸œ2å±€å°±æ˜¯2)
-	bool w;//æ˜¯å¦å¤„äºwç«‹,å¤©å’Œ,åœ°å’Œå¯æˆç«‹çš„çŠ¶æ€
+	std::vector<Single>handTile;//ÊÖÅÆ
+	std::vector<Single>doraIndicator;//±¦ÅÆÖ¸Ê¾ÅÆ
+	Single nowTile;//¾ö²ßÕßµÄ×ÔÃşÅÆ»òÊÇ¿ÉÒÔÃùÅÆ/ÈÙºÍµÄ¶ÔÏó
+	bool mingpai;//Îªtrue±íÊ¾±ğÈË¸Õ´òÍêÅÆ£¬Äã¿ÉÒÔÑ¡ÔñÃùÅÆ¡¢ÈÙºÍ»òÕßÌø¹ı
+	bool lingshang;//µ±Ç°×ÔÃşÅÆÊÇ·ñÎªÁëÉÏÅÆ(½ömingpai=falseÊ±ÓĞĞ§)
+	bool moqie;//±íÊ¾´ò³öÈ¥ÕâÕÅÅÆÊÇ·ñÎªÃşÇĞ(½ömingpai=trueÊ±ÓĞĞ§)
+	int lizhibangCount;    //¶îÍâÁ¢Ö±°ôÊıÁ¿
+	int benchang;    //±¾³¡Êı
+	int subround; //Ñ²Êı
+	int remainTiles;//Ê£ÓàÅÆÊı
+	int round;//¾ÖÊı(Èç¶«2¾Ö¾ÍÊÇ2)
+	bool w;//ÊÇ·ñ´¦ÓÚwÁ¢,ÌìºÍ,µØºÍ¿É³ÉÁ¢µÄ×´Ì¬
 };
 class ActionGenerator
 {

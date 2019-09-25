@@ -8,10 +8,10 @@ enum WindType
 };
 struct Rule
 {
-	int doraCount=3;  //å®ç‰Œæ•°é‡
-	int fanfu=1;      //ç•ªç¼š
-	int startPoint=25000; //èµ·å§‹ç‚¹æ•°
-	int endPoint=30000;   //ä¸€ä½å¿…è¦ç‚¹æ•°
-	WindType gameType= WindType::SOUTH;//æ¸¸æˆç±»å‹ï¼Œä¸œé£å±€/åŠåº„å±€/å…¨åº„å±€
+	int doraCount=3;  //±¦ÅÆÊıÁ¿
+	int fanfu=1;      //·¬¸¿
+	int startPoint=25000; //ÆğÊ¼µãÊı
+	int endPoint=30000;   //Ò»Î»±ØÒªµãÊı
+	WindType gameType= WindType::SOUTH;//ÓÎÏ·ÀàĞÍ£¬¶«·ç¾Ö/°ë×¯¾Ö/È«×¯¾Ö
 };
 const Rule DefualtRule = Rule();
