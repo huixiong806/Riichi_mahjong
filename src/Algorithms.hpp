@@ -6,6 +6,7 @@
 #include<cassert>
 #include<queue>
 #include<algorithm>
+#include<cstring> 
 //三位16进制数，第一位为番数(役满记d,两倍役满记f)，第二位:0=非食下役/食下役的门清版，1=门清限定，2=食下役的非门清版,第三位为编号
 enum class Yaku
 {
