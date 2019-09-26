@@ -214,6 +214,8 @@ private:
 	static uint8_t distanceToTarget[1953125][10];
 	//到给定目标的距离(字牌)，参数分别为原形状、目标雀头数*5+目标面子数(雀头最多只能有一个) 原形状为9位5进制数，从低到高表示手牌中东南西北白发中有几个
 	static uint8_t distanceToTargetZ[78125][10];
+	//标准型役种判断
+	static TryToAgariResult YakuCheckForStandard(const AgariParameters& par, int depth, std::vector<Group>& mianzi);
 public:
 	
 	//试图和牌，返回点数最大的结果
@@ -237,9 +239,9 @@ public:
 	//预处理，计算单花色离目标的距离(仅允许插入和删除两个操作)
 	static void preprocessDistance();
 	//计算14张手牌的标准型向听数(0为一向听，-1为和牌)
-	static int getDistance14Standard(std::vector<Single>& handTile);
+	static int getDistance14Standard(const std::vector<Single>& handTile);
 	//计算14张手牌的七对型向听数(0为一向听，-1为和牌)
-	static int getDistance14Qidui(std::vector<Single>& handTile);
+	static int getDistance14Qidui(const std::vector<Single>& handTile);
 	//获得单花色向听数
 	static int getDistanceSingle(int shape,int mianzi,int quetou,bool z);
 }; 
@@ -389,6 +391,331 @@ TryToAgariResult Algorithms::agari(const AgariParameters par)
 	TryToAgariResult normal = agariSearch(par, 0, allTiles, std::vector<Group>());
 	return std::max(qiduizi, normal);
 }
+//标准型和牌役种判断
+TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, int depth, std::vector<Group>& mianzi)
+{
+	AgariResult result = AgariResult();
+	int menqingCount = mianzi.size() - 1;//非副露的面子数
+	bool menqing = menqingCount == 4;//是否门清
+	mianzi.insert(mianzi.end(), par.groupTile.begin(), par.groupTile.end());
+	if (mianzi.size() != 5)return TryToAgariResult(AgariFaildReason::ShapeWrong);
+	//TODO:判断役种
+	result.zimo = par.type == 0;
+	//役满型 
+	//天和、地和
+	bool tianhu = false;
+	if (par.state == 1 && par.type == 0)
+	{
+		if (par.selfWind == WindType::EAST)
+		{
+			result.yaku.push_back(Yaku::Tianhu);
+			tianhu = true;
+		}
+		else
+			result.yaku.push_back(Yaku::Dihu);
+		result.fan -= 1;
+	}
+	//字一色和四杠子
+	bool ziyise = true;
+	int gangziCount = 0;
+	for (auto& group : mianzi)
+	{
+		if (group.type == GroupType::Gang)
+			gangziCount++;
+		if (group.color != 'z')
+			ziyise = false;
+	}
+	if (ziyise == true)
+	{
+		result.fan -= 1;
+		result.yaku.push_back(Yaku::Ziyise);
+	}
+	if (gangziCount == 4)
+	{
+		result.fan -= 1;
+		result.yaku.push_back(Yaku::Sigangzi);
+	}
+	//小四喜、大四喜和大三元
+	int fengCount=0;//风面子/雀头计数
+	int sanyuanCount = 0;
+	bool fengQuetou = false,sanyuanQuetou=false;
+	for (auto& group : mianzi)
+	{
+		if (group.color == 'z')
+		{
+			if (group.value <= 4)
+				fengCount++;
+			else sanyuanCount++;
+			if (group.type == GroupType::Quetou)
+			{
+				if (group.value <= 4)
+					fengQuetou=true;
+				else sanyuanQuetou=true;
+			}
+		}	
+	}
+	if (fengCount == 4)
+	{
+		if (fengQuetou)
+		{
+			result.yaku.push_back(Yaku::Xiaosixi);
+			result.fan -= 1;
+		}
+		else
+		{
+			result.yaku.push_back(Yaku::Dasixi);
+			result.fan -= 2;
+		}
+	}
+	if (sanyuanCount == 4)
+	{
+		if (!sanyuanQuetou)
+		{
+			result.yaku.push_back(Yaku::Dasanyuan);
+			result.fan -= 1;
+		}
+	}
+	//四暗刻和四暗刻单骑
+	if (menqing == true)
+	{
+		int keziCount = 0;
+		Single quetou;
+		for (auto& group : mianzi)
+		{
+			if (group.type == GroupType::Kezi)
+				keziCount++;
+			if (group.type == GroupType::Quetou)
+				quetou = Single(group.value, group.color, 0);
+		}
+		if (keziCount == 4)
+		{
+			//判断四暗刻单骑
+			if (par.target.valueEqual(quetou)||tianhu)
+			{
+				result.yaku.push_back(Yaku::Siankedanqi);
+				result.fan -= 2;
+			}
+			else if(par.type == 0)
+			{
+				//判断四暗刻
+				result.yaku.push_back(Yaku::Sianke);
+				result.fan -= 1;
+			}
+			
+		}
+	}
+	//满足役满型
+	if (result.fan < 0)
+	{
+		return AgariResult(getScore(par.selfWind, result));
+	}
+	//检查dora，akadora和uradora
+	auto myHandTile = par.handTile;
+	myHandTile.push_back(par.target);
+	for (auto& doraneko : par.dora)
+		for (auto& item : myHandTile)
+			if (doraneko.valueEqual(item))
+				result.dora++;
+	for (auto& doraneko : par.ura)
+		for (auto& item : myHandTile)
+			if (doraneko.valueEqual(item))
+				result.uradora++;
+	for (auto& item : myHandTile)
+		if (item.isAkadora())
+			result.akadora++;
+	result.fan += result.dora + result.akadora + result.uradora;
+	//平和和符数计算
+	result.fu = 20;
+	bool pinghu = true;
+	//首先判断雀头是否为役牌
+	if (mianzi[0].color == 'z')
+	{
+		if (mianzi[0].value >= 5)
+		{
+			pinghu = false;
+			result.fu += 2;
+		}
+		if (mianzi[0].value == par.prevailingWind + 1)
+		{
+			result.fu += 2;
+			pinghu = false;
+		}
+		if (mianzi[0].value == par.selfWind + 1)
+		{
+			result.fu += 2;
+			pinghu = false;
+		}
+	}
+	//判断是否有刻子
+	for (int i = 1; i <= 4; ++i)
+	{
+		if (mianzi[i].type != GroupType::Shunzi)
+		{
+			pinghu = false;
+			if (mianzi[i].type == GroupType::Kezi)
+				result.fu += 2 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
+			if (mianzi[i].type == GroupType::Gang)
+				result.fu += 8 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
+		}
+	}
+	//和牌方式是否为两面
+	bool liangmianOnly = true;//是否只能被看成两面
+	bool liangmian = false;//是否可以被看成两面
+	for (int i = 1; i <= menqingCount; ++i)
+	{
+		if (mianzi[i].type == GroupType::Shunzi)
+		{
+			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
+				liangmian = true;
+			if (par.target.valueEqual(Single(mianzi[i].value + 2, mianzi[i].color, false)))
+				liangmian = true;
+		}
+		if (mianzi[i].type == GroupType::Quetou)
+		{
+			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
+				liangmianOnly = false;
+		}
+		if (mianzi[i].type == GroupType::Kezi || mianzi[i].type == GroupType::Gang)
+		{
+			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
+				liangmianOnly = false;
+		}
+	}
+	if (liangmian == false)
+		pinghu = false;
+	//为平和型
+	if (pinghu)
+	{
+		//门清，附加平和一役
+		if (menqingCount == 4)
+		{
+			result.fan++;
+			result.yaku.push_back(Yaku::Pinghu);
+			if (par.type == 1)result.fu += 10;
+			//assert(res.result.fu == 20);
+		}
+		else //非门清,30符固定
+			result.fu = 30;
+	}
+	else
+	{
+		if (liangmianOnly == false)
+			result.fu += 2;
+		//门清荣和+10符,自摸+2符
+		if (menqingCount == 4)
+		{
+			if (par.type >= 1)
+				result.fu += 10;
+			else result.fu += 2;
+		}
+		else //副露自摸+2符
+		{
+			if (par.type == 0)
+				result.fu += 2;
+		}
+	}
+	if (result.fu % 10 != 0)result.fu = result.fu - result.fu % 10 + 10;
+	//清一色，混一色，断幺九，混老头的判断
+	bool qingyise = true, hunyise = true, duanyao = true, hunlaotou = true;
+	char color = '0';
+	//副露牌
+	for (auto& group : mianzi)
+	{
+		if (group.color == 'z')
+			qingyise = false;
+		else
+		{
+			if (color == '0')
+				color = group.color;
+			else if (color != group.color)
+			{
+				qingyise = false;
+				hunyise = false;
+			}
+		}
+		if (group.type == GroupType::Shunzi)
+		{
+			hunlaotou = false;
+			if (group.value == 7 || group.value == 1)
+				duanyao = false;
+		}
+		else //刻子、杠子或者雀头
+		{
+			if(group.isyaojiu())
+				duanyao = false;
+			else hunlaotou = false;
+		}
+	}
+	if (qingyise)
+	{
+		if(menqing)
+			result.fan += 6;
+		else 
+			result.fan += 5;
+		result.yaku.push_back(Yaku::Qingyise);
+	}
+	else if (hunyise)
+	{
+		result.fan += 3;
+		result.yaku.push_back(Yaku::Hunyise);
+	}
+	if (duanyao)
+	{
+		result.fan += 1;
+		result.yaku.push_back(Yaku::Duanyaojiu);
+	}
+	if (hunlaotou)
+	{
+		result.fan += 2;
+		result.yaku.push_back(Yaku::Hunlaotou);
+	}
+	//立直,两立直和一发
+	if (par.lizhiXunmu != -1)
+	{
+		//w立
+		if (par.lizhiXunmu == -2)
+		{
+			result.fan += 2;
+			result.yaku.push_back(Yaku::Lianglizhi);
+		}
+		else
+		{
+			result.fan += 1;
+			result.yaku.push_back(Yaku::Lizhi);
+		}
+		if (par.yifa == true)
+		{
+			result.fan += 1;
+			result.yaku.push_back(Yaku::Yifa);
+		}
+	}
+	//检查抢杠
+	if (par.type == 2)
+	{
+		result.fan += 1;
+		result.yaku.push_back(Yaku::Qianggang);
+	}
+	//检查门清自摸
+	if (par.type == 0 && menqingCount == 4)
+	{
+		result.fan += 1;
+		result.yaku.push_back(Yaku::Menqianqingzimo);
+	}
+	//检查河底/海底
+	if (par.state == 2)
+	{
+		if (par.type == 0)
+			result.yaku.push_back(Yaku::Haidilaoyue);
+		else if (par.type == 1)result.yaku.push_back(Yaku::Hedilaoyu);
+	}
+	result = getScore(par.selfWind, result);
+	//std::cout << "*" << std::endl;
+	if (result.fan == 0)
+	{
+		return TryToAgariResult(AgariFaildReason::NoYaku);
+	}
+	return TryToAgariResult(result);
+}
 //判断是否为标准和牌型，返回(点数最大的)结果,depth=0表示枚举雀头，dep=4为最深层
 /*type
 自摸=0
@@ -405,179 +732,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 	TryToAgariResult bestResult;
 	if (remainTiles.empty())
 	{
-		AgariResult result = AgariResult();
-		int menqingCount = mianzi.size() - 1;//非副露的面子数
-		mianzi.insert(mianzi.end(), par.groupTile.begin(), par.groupTile.end());
-		if (mianzi.size() != 5)return TryToAgariResult(AgariFaildReason::ShapeWrong);
-		//TODO:判断役种
-		result.zimo = par.type == 0;
-		//役满型 天和、地和
-		if (par.state == 1 && par.type == 0)
-		{
-			if (par.selfWind == WindType::EAST)
-				result.yaku.push_back(Yaku::Tianhu);
-			else
-				result.yaku.push_back(Yaku::Dihu);
-			result.fan -= 1;
-		}
-		//满足役满型
-		if (result.fan < 0)
-		{
-			return AgariResult(getScore(par.selfWind, result));
-		}
-		//检查dora，akadora和uradora
-		auto myHandTile = par.handTile;
-		myHandTile.push_back(par.target);
-		for (auto& doraneko : par.dora)
-			for (auto& item : myHandTile)
-				if (doraneko.valueEqual(item))
-					result.dora++;
-		for (auto& doraneko : par.ura)
-			for (auto& item : myHandTile)
-				if (doraneko.valueEqual(item))
-					result.uradora++;
-		for (auto& item : myHandTile)
-			if (item.isAkadora())
-				result.akadora++;
-		result.fan += result.dora + result.akadora + result.uradora;
-		//平和和符数计算
-		result.fu = 20;
-		bool pinghu = true;
-		//首先判断雀头是否为役牌
-		if (mianzi[0].color == 'z')
-		{
-			if (mianzi[0].value >= 5)
-			{
-				pinghu = false;
-				result.fu += 2;
-			}
-			if (mianzi[0].value == par.prevailingWind + 1)
-			{
-				result.fu += 2;
-				pinghu = false;
-			}
-			if (mianzi[0].value == par.selfWind + 1)
-			{
-				result.fu += 2;
-				pinghu = false;
-			}
-		}
-		//判断是否有刻子
-		for (int i = 1; i <= 4; ++i)
-		{
-			if (mianzi[i].type != GroupType::Shunzi)
-			{
-				pinghu = false;
-				if (mianzi[i].type == GroupType::Kezi)
-					result.fu += 2 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
-				if (mianzi[i].type == GroupType::Gang)
-					result.fu += 8 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
-			}
-		}
-		//和牌方式是否为两面
-		bool liangmianOnly = true;//是否只能被看成两面
-		bool liangmian = false;//是否可以被看成两面
-		for (int i = 1; i <= menqingCount; ++i)
-		{
-			if (mianzi[i].type == GroupType::Shunzi)
-			{
-				if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
-					liangmian = true;
-				if (par.target.valueEqual(Single(mianzi[i].value + 2, mianzi[i].color, false)))
-					liangmian = true;
-			}
-			if (mianzi[i].type == GroupType::Quetou)
-			{
-				if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
-					liangmianOnly = false;
-			}
-			if (mianzi[i].type == GroupType::Kezi || mianzi[i].type == GroupType::Gang)
-			{
-				if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
-					liangmianOnly = false;
-			}
-		}
-		if (liangmian == false)
-			pinghu = false;
-		//为平和型
-		if (pinghu)
-		{
-			//门清，附加平和一役
-			if (menqingCount == 4)
-			{
-				result.fan++;
-				result.yaku.push_back(Yaku::Pinghu);
-				if (par.type == 1)result.fu += 10;
-				//assert(res.result.fu == 20);
-			}
-			else //非门清,30符固定
-				result.fu = 30;
-		}
-		else
-		{
-			if (liangmianOnly == false)
-				result.fu += 2;
-			//门清荣和+10符,自摸+2符
-			if (menqingCount == 4)
-			{
-				if (par.type >= 1)
-					result.fu += 10;
-				else result.fu += 2;
-			}
-			else //副露自摸+2符
-			{
-				if (par.type == 0)
-					result.fu += 2;
-			}
-		}
-		if (result.fu % 10 != 0)result.fu = result.fu - result.fu % 10 + 10;
-		//立直,两立直和一发
-		if (par.lizhiXunmu != -1)
-		{
-			//w立
-			if (par.lizhiXunmu == -2)
-			{
-				result.fan += 2;
-				result.yaku.push_back(Yaku::Lianglizhi);
-			}
-			else
-			{
-				result.fan += 1;
-				result.yaku.push_back(Yaku::Lizhi);
-			}
-			if (par.yifa == true)
-			{
-				result.fan += 1;
-				result.yaku.push_back(Yaku::Yifa);
-			}
-		}
-		//检查抢杠
-		if (par.type == 2)
-		{
-			result.fan += 1;
-			result.yaku.push_back(Yaku::Qianggang);
-		}
-		//检查门清自摸
-		if (par.type == 0 && menqingCount == 4)
-		{
-			result.fan += 1;
-			result.yaku.push_back(Yaku::Menqianqingzimo);
-		}
-		//检查河底/海底
-		if (par.state == 2)
-		{
-			if (par.type == 0)
-				result.yaku.push_back(Yaku::Haidilaoyue);
-			else if (par.type == 1)result.yaku.push_back(Yaku::Hedilaoyu);
-		}
-		result = getScore(par.selfWind, result);
-		//std::cout << "*" << std::endl;
-		if (result.fan == 0)
-		{
-			return TryToAgariResult(AgariFaildReason::NoYaku);
-		}
-
-		return TryToAgariResult(result);
+		return YakuCheckForStandard(par, depth, mianzi);
 	}
 	if (depth == 0)
 	{
@@ -1201,7 +1356,7 @@ int Algorithms::getDistanceSingle(int shape,int mianzi,int quetou, bool z)
 	return distanceToTargetZ[shape][mianzi + quetou * 5];
 }
 //计算14张手牌的向听数(0为一向听，-1为和牌)
-int Algorithms::getDistance14Standard(std::vector<Single>& handTile)
+int Algorithms::getDistance14Standard(const std::vector<Single>& handTile)
 {	
 	int shape[5] = { 0,0,0,0,0 };//1~4分别表示mpsz，其中z的格式为5位16进制数,从低到高分别为出现了0,1,2,3,4张的牌共有几种,高位无意义
 	for (auto& item:handTile)
@@ -1278,11 +1433,9 @@ int Algorithms::getDistance14Standard(std::vector<Single>& handTile)
 	return dp[4][4][1]/2-1;
 }
 //计算14张手牌的向听数(0为一向听，-1为和牌)
-int Algorithms::getDistance14Qidui(std::vector<Single>& handTile)
+int Algorithms::getDistance14Qidui(const std::vector<Single>& handTile)
 {
 	int shape[5] = { 0,0,0,0,0 };//1~4分别表示mpsz，其中z的格式为5位16进制数,从低到高分别为出现了0,1,2,3,4张的牌共有几种,高位无意义
-	int count[8];//字牌个数统计
-	memset(count, 0, sizeof(count));
 	for (auto& item : handTile)
 	{
 		if (item.color() == 'm')
@@ -1292,16 +1445,16 @@ int Algorithms::getDistance14Qidui(std::vector<Single>& handTile)
 		if (item.color() == 's')
 			addNumberCount(shape[3], item.value(), 1);
 		if (item.color() == 'z')
-			count[item.value()]++;
+			addNumberCount(shape[4], item.value(), 1);
 	}
-	for (int i = 1; i <= 7; ++i)
-		shape[4] += 1 << (count[i] << 2);
 	//计算七对子向听数
 	int duiziCount = 0;
-	for (int i = 1; i <= 3; ++i)
-		for (int j = 1; j <= 9; ++j)
+	int fupaiCount = 0;
+	for (int i = 1; i <= 4; ++i)
+		for (int j = 1; j <=(i==4?7:9); ++j)
 			if (getNumberCount(shape[i], j) >= 2)
 				duiziCount++;
-	duiziCount += (shape[4] >> 8) % 0xF;
-	return 6 - duiziCount;
+			else if (getNumberCount(shape[i], j) == 1)
+				fupaiCount++;
+	return 6 - duiziCount+std::max(0,7-duiziCount-fupaiCount);
 }

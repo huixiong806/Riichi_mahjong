@@ -6,6 +6,7 @@
 #include<algorithm>
 class Mountain
 {
+private:
 protected:
 	std::vector<Single>mA;        //四家摸牌
 	std::vector<Single>mB;        //岭上，dora指示牌

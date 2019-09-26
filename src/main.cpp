@@ -83,27 +83,27 @@ void test()
 	//手牌
 	res.handTile.push_back(Single(1, 'z', 0));
 	res.handTile.push_back(Single(1, 'z', 0));
+	res.handTile.push_back(Single(1, 'z', 0));
 	res.handTile.push_back(Single(2, 'z', 0));
 	res.handTile.push_back(Single(2, 'z', 0));
 	res.handTile.push_back(Single(3, 'z', 0));
 	res.handTile.push_back(Single(3, 'z', 0));
+	res.handTile.push_back(Single(3, 'z', 0));
+	res.handTile.push_back(Single(4, 'z', 0));
 	res.handTile.push_back(Single(4, 'z', 0));
 	res.handTile.push_back(Single(4, 'z', 0));
 	res.handTile.push_back(Single(5, 'z', 0));
 	res.handTile.push_back(Single(5, 'z', 0));
-	res.handTile.push_back(Single(6, 'z', 0));
-	res.handTile.push_back(Single(6, 'z', 0));
-	res.handTile.push_back(Single(7, 'z', 0));
-	res.nowTile = Single(7, 'z', 0);
+	res.nowTile = Single(5, 'z', 0);
 	res.prevailingWind = WindType::EAST;   //场风
-	res.selfWind =WindType::WEST;  //门风
-	res.nowWind = WindType::WEST;
+	res.selfWind =WindType::EAST;  //门风
+	res.nowWind = WindType::EAST;
 	res.mingpai = false;
-	res.w = false;
+	res.w = true;
 	human->generateAction(res);
 	Player p;
 	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, 0);
-	auto r=p.zimo(res.prevailingWind,0, {}, {});
+	auto r=p.zimo(res.prevailingWind,1, {}, {});
 	auto re = r.result;
 	cout << "Test " << (re.zimo ? "自摸" : "荣和") << endl;
 	cout << endl;
@@ -149,7 +149,6 @@ void test2()
 }
 int main()
 {
-	
 	cout << "预处理中..." << endl;
 	Algorithms::preprocessDistance();
 	cout << "预处理结束" << endl;
@@ -215,10 +214,11 @@ int main()
 				cout << "宝牌" << res.dora << "   红宝牌" << res.akadora << "   里宝牌" << res.uradora << endl;
 				if (res.fan < 0)
 				{
+					const string ykman[7] = { "","一","两","三","四","五","六" };
 					if (res.fan == -1)
 						cout << "役满 " << res.scoreAdd << "点" << endl;
-					const string ykman[7] = { "","一","两","三","四","五","六" };
-					cout << ykman[-res.fan] << "倍役满 " << res.scoreAdd << "点" << endl;
+					else
+						cout << ykman[-res.fan] << "倍役满 " << res.scoreAdd << "点" << endl;
 				}
 				else
 				{
