@@ -19,9 +19,34 @@ struct Group
 	static Group createShunzi(Single a, Single b, Single target, int source);
 	static Group createGangzi(Single a, Single b,Single c, Single target, int source);
 	static Group createQuetou(Single a, Single b);
-	//是否为幺九
+	//是否为绿牌
+	bool isgreen()
+	{
+		if (color == 'z')return value == 6;
+		else if (color == 's')
+		{
+			if (type != GroupType::Shunzi)
+				return value == 2 || value == 3 || value == 4 || value == 6 || value == 8;
+			else return value == 2;
+		}
+		return false;
+	}
+	//是否为老头牌组(非字牌19)
+	bool islaotou()
+	{
+		if (type == GroupType::Shunzi)return false;
+		if (color == 'z')return true;
+		if (value == 1 || value == 9)return true;
+		return false;
+	}
+	//是否为幺九牌组(允许顺子，允许字牌)
 	bool isyaojiu()
 	{
+		if (type == GroupType::Shunzi)
+		{
+			if (value == 7 || value ==  1)return true;
+			return false;
+		}
 		if (color == 'z')return true;
 		if (value == 1 || value == 9)return true;
 		return false;
@@ -29,6 +54,28 @@ struct Group
 	const std::string getString()const
 	{
 		std::string res;
+		if (state % 10 == 0 && type != GroupType::Gang)
+		{
+			if (type == GroupType::Shunzi)
+			{
+				res.push_back(value + '0');
+				res.push_back(value + '1');
+				res.push_back(value + '2');
+			}
+			else if (type == GroupType::Quetou)
+			{
+				res.push_back(value + '0');
+				res.push_back(value + '0');
+			}
+			else
+			{
+				res.push_back(value + '0');
+				res.push_back(value + '0');
+				res.push_back(value + '0');
+			}
+			res.push_back(color);
+			return res;
+		}
 		if(type== GroupType::Shunzi)
 		{
 			if (state / 10 == 0)

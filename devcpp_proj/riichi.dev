@@ -29,7 +29,7 @@ IncludeVersionInfo=0
 SupportXPThemes=0
 CompilerSet=0
 CompilerSettings=0000000000000000000000000
-UnitCount=11
+UnitCount=12
 
 [VersionInfo]
 Major=1
@@ -152,6 +152,16 @@ BuildCmd=
 
 [Unit11]
 FileName=..\src\Algorithms.hpp
+CompileCpp=1
+Folder=
+Compile=1
+Link=1
+Priority=1000
+OverrideBuildCmd=0
+BuildCmd=
+
+[Unit12]
+FileName=..\src\Yaku.hpp
 CompileCpp=1
 Folder=
 Compile=1

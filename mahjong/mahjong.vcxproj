@@ -125,6 +125,7 @@
     <ClInclude Include="..\src\Player.hpp" />
     <ClInclude Include="..\src\Single.hpp" />
     <ClInclude Include="..\src\Rules.h" />
+    <ClInclude Include="..\src\Yaku.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\main.cpp" />

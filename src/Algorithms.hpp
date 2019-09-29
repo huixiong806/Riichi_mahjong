@@ -1,4 +1,5 @@
 #pragma once
+#include "Yaku.hpp"
 #include "Single.hpp"
 #include "Group.hpp"
 #include<set>
@@ -7,69 +8,6 @@
 #include<queue>
 #include<algorithm>
 #include<cstring> 
-//三位16进制数，第一位为番数(役满记d,两倍役满记f)，第二位:0=非食下役/食下役的门清版，1=门清限定，2=食下役的非门清版,第三位为编号
-enum class Yaku
-{
-	Lizhi = 0x110,
-	Yifa = 0x111,
-	Menqianqingzimo = 0x112,
-	Duanyaojiu = 0x100,
-	Yipaizifeng = 0x101,
-	Yipaichangfeng = 0x102,
-	Yipaibai = 0x103,
-	Yipaifa = 0x104,
-	Yipaizhong = 0x105,
-	Pinghu = 0x113,
-	Yibeikou = 0x114,
-	Qianggang = 0x106,
-	Lingshangkaihua = 0x107,
-	Haidilaoyue = 0x108,
-	Hedilaoyu = 0x109,
-
-	Lianglizhi = 0x210,
-	Sansetongke = 0x200,
-	Sangangzi = 0x201,
-	Duiduihu = 0x202,
-	Sananke = 0x203,
-	Xiaosanyuan = 0x204,
-	Hunlaotou = 0x205,
-	Qiduizi = 0x211,
-
-	Hunquandaiyaojiu = 0x206,
-	HunquandaiyaojiuF = 0x226,
-	Yiqitongguan = 0x207,
-	YiqitongguanF = 0x227,
-	Sansetongshun = 0x208,
-	SansetongshunF = 0x228,
-
-	Erbeikou = 0x310,
-	Chunquantaiyaojiu = 0x300,
-	ChunquantaiyaojiuF = 0x320,
-	Hunyise = 0x301,
-	HunyiseF = 0x321,
-
-	Liujumanguan = 0x500,
-	Qingyise = 0x600,
-	QingyiseF = 0x620,
-
-
-	Tianhu = 0xd00,
-	Dihu = 0xd01,
-	Dasanyuan = 0xd02,
-	Sianke = 0xd10,
-	Ziyise = 0xd03,
-	Lvyise = 0xd04,
-	Qinglaotou = 0xd05,
-	Guoshiwushuang = 0xd11,
-	Xiaosixi = 0xd06,
-	Sigangzi = 0xd07,
-	Jiulianbaodeng = 0xd12,
-
-	Siankedanqi = 0xf10,
-	Guoshiwushuangshisanmian = 0xf11,
-	Chunzhengjiulianbaodeng = 0xf12,
-	Dasixi = 0xf00,
-};
 struct AgariResult
 {
 	bool zimo;
@@ -196,7 +134,7 @@ private:
 	static bool guoshiWithoutYaku(const Single& target, const std::vector<Single>& handTile);
 	//判断是否为七对和牌型
 	static bool qiduiWithoutYaku(const Single& target, const std::vector<Single>& handTile);
-	//判断是否为标准和牌型
+	//判断是否为标准和牌型,*************有bug，勿用！！！请用getdistance返回向听数是否为-1*****************
 	static bool agariSearchWithoutYaku(std::vector<int> pool);
 	//判断是否形式和牌,不考虑役
 	static bool agariWithoutYaku(const Single& target, const std::vector<Single>& handTile);
@@ -239,9 +177,9 @@ public:
 	//预处理，计算单花色离目标的距离(仅允许插入和删除两个操作)
 	static void preprocessDistance();
 	//计算14张手牌的标准型向听数(0为一向听，-1为和牌)
-	static int getDistance14Standard(const std::vector<Single>& handTile);
+	static int getDistanceStandard(const std::vector<Single>& handTile);
 	//计算14张手牌的七对型向听数(0为一向听，-1为和牌)
-	static int getDistance14Qidui(const std::vector<Single>& handTile);
+	static int getDistanceQidui(const std::vector<Single>& handTile);
 	//获得单花色向听数
 	static int getDistanceSingle(int shape,int mianzi,int quetou,bool z);
 }; 
@@ -435,14 +373,21 @@ TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, in
 		result.fan -= 1;
 		result.yaku.push_back(Yaku::Sigangzi);
 	}
-	//小四喜、大四喜和大三元
+	//小四喜、大四喜和大三元、清老头、绿一色、清一色(为了判断九莲宝灯)
 	int fengCount=0;//风面子/雀头计数
 	int sanyuanCount = 0;
 	bool fengQuetou = false,sanyuanQuetou=false;
+	char color='0';
+	bool qingyise = true;
+	bool lvyise = true;
+	bool qinglaotou = true;
 	for (auto& group : mianzi)
 	{
+		if (!group.islaotou())qinglaotou = false;
+		if (!group.isgreen())lvyise = false;
 		if (group.color == 'z')
 		{
+			qingyise = false;
 			if (group.value <= 4)
 				fengCount++;
 			else sanyuanCount++;
@@ -453,6 +398,23 @@ TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, in
 				else sanyuanQuetou=true;
 			}
 		}	
+		else
+		{
+			if (color == '0')
+				color = group.color;
+			else if (color != group.color)
+				qingyise = false;
+		}
+	}
+	if (qinglaotou)
+	{
+		result.yaku.push_back(Yaku::Qinglaotou);
+		result.fan -= 1;
+	}
+	if (lvyise)
+	{
+		result.yaku.push_back(Yaku::Lvyise);
+		result.fan -= 1;
 	}
 	if (fengCount == 4)
 	{
@@ -504,14 +466,54 @@ TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, in
 			
 		}
 	}
+	auto myHandTile = par.handTile;
+	myHandTile.push_back(par.target);
+	//九莲宝灯，纯正九莲宝灯
+	if (qingyise)
+	{
+		int ct[10] = { 0,0,0,0,0,0,0,0,0,0 };
+		for (auto& item : par.handTile)
+			ct[item.value()]++;
+		bool chunzhengjiulianbaodeng = true;
+		for (int i = 1; i <= 9; ++i)
+		{
+			if ((i == 1||i==9) && ct[i] != 3)chunzhengjiulianbaodeng=false;
+			if(i>1&&i<9&&ct[i]!=1)chunzhengjiulianbaodeng = false;
+		}
+		ct[par.target.value()]++;
+		bool subflag = false;
+		for (int i = 1; i <= 9; ++i)
+		{
+			if (!subflag &&(ct[i]>0&&ct[i]%2==0))
+			{
+				ct[i]--;
+				subflag = true;
+			}
+		}
+		bool jiulianbaodeng = true;
+		if (!subflag)jiulianbaodeng = false;
+		for (int i = 1; i <= 9; ++i)
+		{
+			if ((i == 1 || i == 9) && ct[i] != 3)jiulianbaodeng = false;
+			if (i > 1 && i < 9 && ct[i] != 1)jiulianbaodeng = false;
+		}
+		if (chunzhengjiulianbaodeng||(jiulianbaodeng&&tianhu))
+		{
+			result.yaku.push_back(Yaku::Chunzhengjiulianbaodeng);
+			result.fan -= 2;
+		}
+		else if (jiulianbaodeng)
+		{
+			result.yaku.push_back(Yaku::Jiulianbaodeng);
+			result.fan -= 1;
+		}
+	}
 	//满足役满型
 	if (result.fan < 0)
 	{
 		return AgariResult(getScore(par.selfWind, result));
 	}
 	//检查dora，akadora和uradora
-	auto myHandTile = par.handTile;
-	myHandTile.push_back(par.target);
 	for (auto& doraneko : par.dora)
 		for (auto& item : myHandTile)
 			if (doraneko.valueEqual(item))
@@ -587,7 +589,7 @@ TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, in
 	if (pinghu)
 	{
 		//门清，附加平和一役
-		if (menqingCount == 4)
+		if (menqing)
 		{
 			result.fan++;
 			result.yaku.push_back(Yaku::Pinghu);
@@ -602,7 +604,7 @@ TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, in
 		if (liangmianOnly == false)
 			result.fu += 2;
 		//门清荣和+10符,自摸+2符
-		if (menqingCount == 4)
+		if (menqing)
 		{
 			if (par.type >= 1)
 				result.fu += 10;
@@ -615,23 +617,30 @@ TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, in
 		}
 	}
 	if (result.fu % 10 != 0)result.fu = result.fu - result.fu % 10 + 10;
-	//清一色，混一色，断幺九，混老头的判断
-	bool qingyise = true, hunyise = true, duanyao = true, hunlaotou = true;
-	char color = '0';
+	//清一色，混一色，断幺九，混老头，纯全带幺九，混全带幺九的判断
+	bool hunyise = true, duanyao = true, hunlaotou = true,chunquan=true,hunquan=true;
+	color = '0';
 	//副露牌
 	for (auto& group : mianzi)
 	{
-		if (group.color == 'z')
-			qingyise = false;
-		else
+		if (!group.isyaojiu())
+		{
+			hunquan = false;
+			chunquan = false;
+		}
+		if (group.color != 'z')
 		{
 			if (color == '0')
 				color = group.color;
 			else if (color != group.color)
 			{
-				qingyise = false;
+				
 				hunyise = false;
 			}
+		}
+		else
+		{
+			chunquan = false;
 		}
 		if (group.type == GroupType::Shunzi)
 		{
@@ -646,18 +655,32 @@ TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, in
 			else hunlaotou = false;
 		}
 	}
+	if (qingyise)hunyise = false;
 	if (qingyise)
 	{
-		if(menqing)
+		if (menqing)
+		{
 			result.fan += 6;
-		else 
+			result.yaku.push_back(Yaku::Qingyise);
+		}
+		else
+		{
 			result.fan += 5;
-		result.yaku.push_back(Yaku::Qingyise);
+			result.yaku.push_back(Yaku::QingyiseF);
+		}
 	}
 	else if (hunyise)
 	{
-		result.fan += 3;
-		result.yaku.push_back(Yaku::Hunyise);
+		if (menqing)
+		{
+			result.fan += 3;
+			result.yaku.push_back(Yaku::Hunyise);
+		}
+		else
+		{
+			result.fan += 2;
+			result.yaku.push_back(Yaku::HunyiseF);
+		}
 	}
 	if (duanyao)
 	{
@@ -668,6 +691,31 @@ TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, in
 	{
 		result.fan += 2;
 		result.yaku.push_back(Yaku::Hunlaotou);
+	}
+	if (chunquan)
+	{
+		if (menqing)
+		{
+			result.fan += 3;
+			result.yaku.push_back(Yaku::Chunquantaiyaojiu);
+		}
+		else
+		{
+			result.fan += 2;
+			result.yaku.push_back(Yaku::ChunquantaiyaojiuF);
+		}
+	}else if (hunquan)
+	{
+		if (menqing)
+		{
+			result.fan += 2;
+			result.yaku.push_back(Yaku::Hunquandaiyaojiu);
+		}
+		else
+		{
+			result.fan += 1;
+			result.yaku.push_back(Yaku::HunquandaiyaojiuF);
+		}
 	}
 	//立直,两立直和一发
 	if (par.lizhiXunmu != -1)
@@ -714,14 +762,29 @@ TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, in
 	{
 		return TryToAgariResult(AgariFaildReason::NoYaku);
 	}
+	/*输出调试信息-不同拆牌方式的牌型和役种
+	for (auto& item : mianzi)
+	{
+		std::cout << item.getString() << " ";
+	}
+	std::cout << std::endl;
+	for (auto& yk : result.yaku)
+	{
+		std::cout << getYakuName((int)yk) << " ";
+		std::cout << std::endl;
+	}
+	std::cout << std::endl;
+	*/
 	return TryToAgariResult(result);
 }
 //判断是否为标准和牌型，返回(点数最大的)结果,depth=0表示枚举雀头，dep=4为最深层
-/*type
+/*
+type
 自摸=0
 荣和=1
 抢杠=2
 抢暗杠=3
+
 state
 正常=0
 天地和=1
@@ -808,9 +871,9 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 				mianzi.pop_back();
 				mianzi.pop_back();
 				//三同顺
-				mianzi.push_back(Group::createKezi(group[0][0], group[1][0], group[2][0], 0));
-				mianzi.push_back(Group::createKezi(group[0][1], group[1][1], group[2][1], 0));
-				mianzi.push_back(Group::createKezi(group[0][2], group[1][2], group[2][2], 0));
+				mianzi.push_back(Group::createShunzi(group[0][0], group[1][0], group[2][0], 0));
+				mianzi.push_back(Group::createShunzi(group[0][1], group[1][1], group[2][1], 0));
+				mianzi.push_back(Group::createShunzi(group[0][2], group[1][2], group[2][2], 0));
 				bestResult = std::max(bestResult, agariSearch(par, depth + 3, newRemainTiles, mianzi));
 				return bestResult;
 			}
@@ -1159,10 +1222,6 @@ bool Algorithms::qiduiWithoutYaku(const Single& target, const std::vector<Single
 }
 bool Algorithms::agariSearchWithoutYaku(std::vector<int> pool)
 {
-	//判断是否虚和(一种牌拿5张)
-	for (int i = 0; i <= 33; ++i)
-		if (pool[i] >= 5)
-			return false;
 	//判断雀头
 	for (int i = 0; i <= 33; ++i)
 	{
@@ -1201,17 +1260,20 @@ bool Algorithms::agariWithoutYaku(const Single& target, const std::vector<Single
 	//国士无双型的判定
 	bool guoshi = guoshiWithoutYaku(target, handTile);
 	if (guoshi)return true;
+	std::vector<Single>allTiles = handTile;
+	allTiles.push_back(target);
+	auto pool = getPool(allTiles);
+	//判断是否虚和(一种牌拿5张)
+	for (int i = 0; i <= 33; ++i)
+		if (pool[i] >= 5)
+			return false;
 	//七对型的判定(两杯口将被拆解为七对型)
-	bool qiduizi = qiduiWithoutYaku(target, handTile);
+	bool qiduizi = getDistanceQidui(allTiles) == -1;
 	if (qiduizi)
 		return true;
 	//一般型的判定
-	std::vector<Single>allTiles = handTile;
-	allTiles.push_back(target);
-	sort(allTiles.begin(), allTiles.end());
-	auto pool = getPool(allTiles);
-	bool normal = agariSearchWithoutYaku(pool);
-	return std::max(qiduizi, normal);
+	bool normal = getDistanceStandard(allTiles)==-1;
+	return normal;
 }
 void Algorithms::constructTarget(int quetou,int mianzi, std::queue<int>&q,int shape, int target,bool z)
 {
@@ -1356,7 +1418,7 @@ int Algorithms::getDistanceSingle(int shape,int mianzi,int quetou, bool z)
 	return distanceToTargetZ[shape][mianzi + quetou * 5];
 }
 //计算14张手牌的向听数(0为一向听，-1为和牌)
-int Algorithms::getDistance14Standard(const std::vector<Single>& handTile)
+int Algorithms::getDistanceStandard(const std::vector<Single>& handTile)
 {	
 	int shape[5] = { 0,0,0,0,0 };//1~4分别表示mpsz，其中z的格式为5位16进制数,从低到高分别为出现了0,1,2,3,4张的牌共有几种,高位无意义
 	for (auto& item:handTile)
@@ -1433,7 +1495,7 @@ int Algorithms::getDistance14Standard(const std::vector<Single>& handTile)
 	return dp[4][4][1]/2-1;
 }
 //计算14张手牌的向听数(0为一向听，-1为和牌)
-int Algorithms::getDistance14Qidui(const std::vector<Single>& handTile)
+int Algorithms::getDistanceQidui(const std::vector<Single>& handTile)
 {
 	int shape[5] = { 0,0,0,0,0 };//1~4分别表示mpsz，其中z的格式为5位16进制数,从低到高分别为出现了0,1,2,3,4张的牌共有几种,高位无意义
 	for (auto& item : handTile)

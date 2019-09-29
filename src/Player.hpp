@@ -298,6 +298,11 @@ public:
 		auto backup = handTile;
 		handTile = myTile;
 		bool isTingpai = tingpai();
+		/*
+		for (int i = 0; i < handTile.size(); ++i)
+			std::cout << handTile[i].getDisplay() << " ";
+		std::cout << isTingpai << std::endl;
+		*/
 		handTile = backup;
 		if (isTingpai)
 		{
