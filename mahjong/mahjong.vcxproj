@@ -115,20 +115,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Algorithms.hpp" />
+    <ClInclude Include="..\src\Algorithms.h" />
     <ClInclude Include="..\src\AutoFurikomu.hpp" />
-    <ClInclude Include="..\src\Game.hpp" />
-    <ClInclude Include="..\src\Group.hpp" />
+    <ClInclude Include="..\src\Game.h" />
+    <ClInclude Include="..\src\Group.h" />
     <ClInclude Include="..\src\Human.hpp" />
-    <ClInclude Include="..\src\Mountain.hpp" />
+    <ClInclude Include="..\src\Mountain.h" />
     <ClInclude Include="..\src\MovementGenerator.hpp" />
     <ClInclude Include="..\src\Player.hpp" />
-    <ClInclude Include="..\src\Single.hpp" />
+    <ClInclude Include="..\src\ResultInspector.hpp" />
+    <ClInclude Include="..\src\Single.h" />
     <ClInclude Include="..\src\Rules.h" />
-    <ClInclude Include="..\src\Yaku.hpp" />
+    <ClInclude Include="..\src\Yaku.h" />
+    <ClInclude Include="..\src\YakuChecker.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\Algorithms.cpp" />
+    <ClCompile Include="..\src\Game.cpp" />
+    <ClCompile Include="..\src\Group.cpp" />
     <ClCompile Include="..\src\main.cpp" />
+    <ClCompile Include="..\src\Mountain.cpp" />
+    <ClCompile Include="..\src\Rules.cpp" />
+    <ClCompile Include="..\src\Single.cpp" />
+    <ClCompile Include="..\src\Yaku.cpp" />
+    <ClCompile Include="..\src\YakuChecker.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

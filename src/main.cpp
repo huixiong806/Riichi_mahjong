@@ -3,13 +3,12 @@
 #include<ctime>
 #include<vector>
 #include<unordered_map>
-#include"Game.hpp"
+#include"Game.h"
 #include"Human.hpp"
 #include"AutoFurikomu.hpp"
 using namespace std;
 shared_ptr<ActionGenerator> player[4];
 Game game;
-
 void test()
 {
 	auto human = make_shared<Human>("≤‚ ‘»À");

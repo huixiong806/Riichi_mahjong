@@ -12,43 +12,82 @@
     <Filter Include="src\AI">
       <UniqueIdentifier>{1e7f3356-d635-45de-8018-cf40dae32202}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\hppFiles">
+      <UniqueIdentifier>{e428c333-99cb-4968-bdf1-88fbbf9371d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\headFiles">
+      <UniqueIdentifier>{431f134d-f5b0-415f-96fa-b5ac35c9569b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\sourceFiles">
+      <UniqueIdentifier>{4a3f4841-f125-4e41-8b06-495a8716fdab}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\Mountain.hpp">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Rules.h">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Player.hpp">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\Group.hpp">
-      <Filter>src</Filter>
-    </ClInclude>
-    <ClInclude Include="..\src\MovementGenerator.hpp">
-      <Filter>src</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Human.hpp">
       <Filter>src\AI</Filter>
     </ClInclude>
     <ClInclude Include="..\src\AutoFurikomu.hpp">
       <Filter>src\AI</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Algorithms.hpp">
-      <Filter>src</Filter>
+    <ClInclude Include="..\src\Group.h">
+      <Filter>src\headFiles</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Game.hpp">
-      <Filter>src</Filter>
+    <ClInclude Include="..\src\Algorithms.h">
+      <Filter>src\headFiles</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Single.hpp">
-      <Filter>src</Filter>
+    <ClInclude Include="..\src\YakuChecker.h">
+      <Filter>src\headFiles</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Yaku.hpp">
-      <Filter>src</Filter>
+    <ClInclude Include="..\src\Mountain.h">
+      <Filter>src\headFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Single.h">
+      <Filter>src\headFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Game.h">
+      <Filter>src\headFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Rules.h">
+      <Filter>src\headFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Yaku.h">
+      <Filter>src\headFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ResultInspector.hpp">
+      <Filter>src\hppFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\MovementGenerator.hpp">
+      <Filter>src\hppFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Player.hpp">
+      <Filter>src\hppFiles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\YakuChecker.cpp">
+      <Filter>src\sourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Algorithms.cpp">
+      <Filter>src\sourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Mountain.cpp">
+      <Filter>src\sourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Group.cpp">
+      <Filter>src\sourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Single.cpp">
+      <Filter>src\sourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Game.cpp">
+      <Filter>src\sourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Rules.cpp">
+      <Filter>src\sourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Yaku.cpp">
+      <Filter>src\sourceFiles</Filter>
+    </ClCompile>
     <ClCompile Include="..\src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>

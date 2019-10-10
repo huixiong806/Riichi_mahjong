@@ -14,4 +14,4 @@ struct Rule
 	int endPoint=30000;   //一位必要点数
 	WindType gameType= WindType::SOUTH;//游戏类型，东风局/半庄局/全庄局
 };
-const Rule DefualtRule = Rule();
+extern const Rule DefualtRule;

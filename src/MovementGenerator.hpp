@@ -1,6 +1,6 @@
 #pragma once
-#include"Single.hpp"
-#include"Group.hpp"
+#include"Single.h"
+#include"Group.h"
 #include<vector>
 enum class ActionType
 {

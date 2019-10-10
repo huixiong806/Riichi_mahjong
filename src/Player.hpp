@@ -1,7 +1,7 @@
 #pragma once
-#include"Single.hpp"
-#include"Group.hpp"
-#include"Game.hpp"
+#include"Single.h"
+#include"Group.h"
+#include"Game.h"
 #include"MovementGenerator.hpp"
 #include<vector>
 #include<algorithm>
@@ -9,7 +9,7 @@
 #include<map>
 #include<set>
 #include<cassert>
-#include"Algorithms.hpp"
+#include"Algorithms.h"
 class Player
 {
 private:
