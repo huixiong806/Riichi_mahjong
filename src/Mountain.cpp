@@ -1,9 +1,12 @@
-#include"Mountain.h"
+#include "Mountain.h"
+#include <algorithm>
+#include <random>
+
 Mountain::Mountain()
 {
 	mHandPtr = mLingshangPtr = 0;
 }
-std::string Mountain::getMountainString()//»ñµÃÅÆÉ½ĞòÁĞ
+std::string Mountain::getMountainString()//è·å¾—ç‰Œå±±åºåˆ—
 {
 	std::string res;
 	for (auto& item : mMountain)
@@ -15,34 +18,34 @@ std::string Mountain::getMountainString()//»ñµÃÅÆÉ½ĞòÁĞ
 	}
 	return res;
 }
-Single Mountain::nextLingshang()//»ñÈ¡ÏÂÒ»ÕÅÁëÉÏÅÆ(×Ô¶¯ÒÆº£µ×ÅÆ)
+Single Mountain::nextLingshang()//è·å–ä¸‹ä¸€å¼ å²­ä¸Šç‰Œ(è‡ªåŠ¨ç§»æµ·åº•ç‰Œ)
 {
 	Single res=mB[mLingshangPtr++];
 	mB.push_back(mA[mA.size()-1]);
 	mA.pop_back();
 	return res;
 }
-Single Mountain::nextHand()//»ñÈ¡ÏÂÒ»ÕÅÊÖÅÆ
+Single Mountain::nextHand()//è·å–ä¸‹ä¸€å¼ æ‰‹ç‰Œ
 {
 	return mA[mHandPtr++];
 }
-int Mountain::remainCount() //»ñÈ¡Ê£ÓàÅÆÊı
+int Mountain::remainCount() //è·å–å‰©ä½™ç‰Œæ•°
 {
 	return mA.size() - mHandPtr;
 }
-Single Mountain::getDora(int index) //»ñÈ¡±¦ÅÆ
+Single Mountain::getDora(int index) //è·å–å®ç‰Œ
 {
 	return getDoraIndicator(index).next();
 }
-Single Mountain::getUra(int index) //»ñÈ¡Àï±¦ÅÆ
+Single Mountain::getUra(int index) //è·å–é‡Œå®ç‰Œ
 {
 	return getUraIndicator(index).next();
 }
-Single Mountain::getDoraIndicator(int index) //»ñÈ¡±¦ÅÆÖ¸Ê¾ÅÆ,ÏÂ±ê·¶Î§0~4
+Single Mountain::getDoraIndicator(int index) //è·å–å®ç‰ŒæŒ‡ç¤ºç‰Œ,ä¸‹æ ‡èŒƒå›´0~4
 {
 	return mB[4 + index * 2];
 }
-Single Mountain::getUraIndicator(int index) //»ñÈ¡Àï±¦ÅÆÖ¸Ê¾ÅÆ,ÏÂ±ê·¶Î§0~4
+Single Mountain::getUraIndicator(int index) //è·å–é‡Œå®ç‰ŒæŒ‡ç¤ºç‰Œ,ä¸‹æ ‡èŒƒå›´0~4
 {
 	return mB[5 + index * 2];
 }
@@ -55,33 +58,35 @@ void Mountain::reset(const Rule& rule)
 	mB.clear();
 	for (int j = 0; j < 4; ++j)
 		hand[j].clear();
-	std::vector<Single>all;
+	std::vector<Single> all;
 	for (int i = 1; i <= 9; ++i)
 	{
 		for (int j = 1; j <= 4; ++j)
 		{
-			if (i==5 && j==1 && rule.doraCount > 0)//ºì±¦ÅÆ
+			if (i==5 && j==1 && rule.doraCount > 0)//çº¢å®ç‰Œ
 			{
-				all.push_back(Single(i, 'm', true));
-				all.push_back(Single(i, 'p', true));
-				all.push_back(Single(i, 's', true));
+				all.emplace_back(i, 'm', true);
+				all.emplace_back(i, 'p', true);
+				all.emplace_back(i, 's', true);
 			}
-			else if(i==5 && j==2 && rule.doraCount == 4)//ºì±¦ÅÆ5±ı
+			else if(i==5 && j==2 && rule.doraCount == 4)//çº¢å®ç‰Œ5é¥¼
 			{
-				all.push_back(Single(i, 'm',false));
-				all.push_back(Single(i, 'p', true));
-				all.push_back(Single(i, 's', false));
+				all.emplace_back(i, 'm',false);
+				all.emplace_back(i, 'p', true);
+				all.emplace_back(i, 's', false);
 			}
 			else
 			{
-				all.push_back(Single(i, 'm',false));
-				all.push_back(Single(i, 'p', false));
-				all.push_back(Single(i, 's', false));
+				all.emplace_back(i, 'm',false);
+				all.emplace_back(i, 'p', false);
+				all.emplace_back(i, 's', false);
 			}
-			if(i<=7)all.push_back(Single(i, 'z', false));
+			if(i<=7)all.emplace_back(i, 'z', false);
 		}
 	}
-	std::random_shuffle(all.begin(), all.end());
+    std::random_device rd;
+    std::mt19937 g(rd());
+    std::shuffle(all.begin(), all.end(), g);
 	int ptr = 0;
 	for (int i = 1; i <= 13; ++i)
 		for (int j = 0; j < 4; ++j)

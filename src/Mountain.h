@@ -1,30 +1,30 @@
 #pragma once
-#include"Single.h"
-#include"Rules.h"
-#include"ResultInspector.hpp"
-#include<vector>
-#include<string>
-#include<algorithm>
+#include "Single.h"
+#include "Rules.h"
+#include "ResultInspector.hpp"
+#include <vector>
+#include <string>
+#include <algorithm>
 class Mountain
 {
 private:
 protected:
-	std::vector<Single>mA;        //ËÄ¼ÒÃşÅÆ
-	std::vector<Single>mB;        //ÁëÉÏ£¬doraÖ¸Ê¾ÅÆ
-	std::vector<Single>mMountain;  //ÅÆÉ½ĞòÁĞ
-	int mHandPtr;  //ÊÖÅÆÖ¸Õë
-	int mLingshangPtr;  //ÁëÉÏÅÆÖ¸Õë
+	std::vector<Single>mA;        //å››å®¶æ‘¸ç‰Œ
+	std::vector<Single>mB;        //å²­ä¸Šï¼ŒdoraæŒ‡ç¤ºç‰Œ
+	std::vector<Single>mMountain;  //ç‰Œå±±åºåˆ—
+	int mHandPtr;  //æ‰‹ç‰ŒæŒ‡é’ˆ
+	int mLingshangPtr;  //å²­ä¸Šç‰ŒæŒ‡é’ˆ
 public:
-	std::vector<Single>hand[4];  //ËÄ¼Ò³õÊ¼ÊÖÅÆ
-	Single zimo;//×¯¼Ò0Ñ²µÄ×ÔÃşÅÆ
-	Mountain();//¹¹Ôìº¯Êı
-	virtual void reset(const Rule& rule);  //²úÉúĞÂÅÆÉ½
-	Single getDora(int index); //»ñÈ¡±¦ÅÆ
-	Single getUra(int index); //»ñÈ¡Àï±¦ÅÆ
-	Single getDoraIndicator(int index); //»ñÈ¡±¦ÅÆÖ¸Ê¾ÅÆ,ÏÂ±ê·¶Î§0~4
-	Single getUraIndicator(int index); //»ñÈ¡Àï±¦ÅÆÖ¸Ê¾ÅÆ,ÏÂ±ê·¶Î§0~4
-	Single nextLingshang();//»ñÈ¡ÏÂÒ»ÕÅÁëÉÏÅÆ(×Ô¶¯ÒÆº£µ×ÅÆ)
-	Single nextHand();//»ñÈ¡ÏÂÒ»ÕÅÊÖÅÆ
-	int remainCount(); //»ñÈ¡Ê£ÓàÅÆÊı
-	std::string getMountainString();//»ñµÃÅÆÉ½ĞòÁĞ
+	std::vector<Single>hand[4];  //å››å®¶åˆå§‹æ‰‹ç‰Œ
+	Single zimo;//åº„å®¶0å·¡çš„è‡ªæ‘¸ç‰Œ
+	Mountain();//æ„é€ å‡½æ•°
+	virtual void reset(const Rule& rule);  //äº§ç”Ÿæ–°ç‰Œå±±
+	Single getDora(int index); //è·å–å®ç‰Œ
+	Single getUra(int index); //è·å–é‡Œå®ç‰Œ
+	Single getDoraIndicator(int index); //è·å–å®ç‰ŒæŒ‡ç¤ºç‰Œ,ä¸‹æ ‡èŒƒå›´0~4
+	Single getUraIndicator(int index); //è·å–é‡Œå®ç‰ŒæŒ‡ç¤ºç‰Œ,ä¸‹æ ‡èŒƒå›´0~4
+	Single nextLingshang();//è·å–ä¸‹ä¸€å¼ å²­ä¸Šç‰Œ(è‡ªåŠ¨ç§»æµ·åº•ç‰Œ)
+	Single nextHand();//è·å–ä¸‹ä¸€å¼ æ‰‹ç‰Œ
+	int remainCount(); //è·å–å‰©ä½™ç‰Œæ•°
+	std::string getMountainString();//è·å¾—ç‰Œå±±åºåˆ—
 };

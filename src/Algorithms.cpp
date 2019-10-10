@@ -3,12 +3,12 @@
 uint8_t Algorithms::distanceToTarget[1953125][10];
 uint8_t Algorithms::distanceToTargetZ[78125][10];
 const int Algorithms::pow5[10] = { 1,5,25,125,625,3125,15625,78125,390625,1953125 };
-//shapeÎªÑ¹ËõºóµÄÅÆĞÍ²ÎÊı£¬valueÎªÒª»ñÈ¡¸öÊıµÄÊı×Ö
+//shapeä¸ºå‹ç¼©åçš„ç‰Œå‹å‚æ•°ï¼Œvalueä¸ºè¦è·å–ä¸ªæ•°çš„æ•°å­—
 int Algorithms::getNumberCount(int shape, int value)
 {
 	return (shape / pow5[value - 1]) % 5;
 }
-//count²»µÃ³¬¹ı4
+//countä¸å¾—è¶…è¿‡4
 void Algorithms::setNumberCount(int& shape, int value, int count)
 {
 	shape = (shape / pow5[value]) * pow5[value] + count * pow5[value - 1] + shape % pow5[value - 1];
@@ -23,13 +23,13 @@ std::vector<Single> Algorithms::tingpai(std::vector<Single> handTile)
 	for (int i = 1; i <= 9; ++i)
 	{
 		if (agariWithoutYaku(Single(i, 'm', 0), handTile))
-			res.push_back(Single(i, 'm', 0));
+			res.emplace_back(i, 'm', 0);
 		if (agariWithoutYaku(Single(i, 'p', 0), handTile))
-			res.push_back(Single(i, 'p', 0));
+			res.emplace_back(i, 'p', 0);
 		if (agariWithoutYaku(Single(i, 's', 0), handTile))
-			res.push_back(Single(i, 's', 0));
+			res.emplace_back(i, 's', 0);
 		if (i <= 7 && agariWithoutYaku(Single(i, 'z', 0), handTile))
-			res.push_back(Single(i, 'z', 0));
+			res.emplace_back(i, 'z', 0);
 	}
 	return res;
 }
@@ -66,7 +66,7 @@ AgariResult Algorithms::getScore(WindType selfWind, AgariResult inp)
 {
 	int east = selfWind == WindType::EAST;
 	AgariResult res = inp;
-	//ÒÛÂúĞÍ ***ÔİÊ±²»¿¼ÂÇ°üÅÆ*** 
+	//å½¹æ»¡å‹ ***æš‚æ—¶ä¸è€ƒè™‘åŒ…ç‰Œ*** 
 	if (inp.fan < 0)
 	{
 		res.scoreAdd = (-inp.fan) * 16000 * (2 + east);
@@ -81,7 +81,7 @@ AgariResult Algorithms::getScore(WindType selfWind, AgariResult inp)
 		}
 		return res;
 	}
-	//·ÇÒÛÂúĞÍ
+	//éå½¹æ»¡å‹
 	if (inp.fan < 1)res.scoreAdd = 0;
 	if (inp.fan >= 13)
 	{
@@ -125,45 +125,45 @@ AgariResult Algorithms::getScore(WindType selfWind, AgariResult inp)
 		res.scoreDecXian = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) / 400 + 1) * 100;
 		res.scoreDecZhuang = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) / 200 + 1) * 100;
 	}
-	res.scoreDecFangchong = res.scoreAdd;//·Åï¥Ê§µãµÈÓÚºÍÅÆµÃµã 
+	res.scoreDecFangchong = res.scoreAdd;//æ”¾é“³å¤±ç‚¹ç­‰äºå’Œç‰Œå¾—ç‚¹ 
 	return res;
 }
 TryToAgariResult Algorithms::agari(const AgariParameters par)
 {
-	//¹úÊ¿ÎŞË«µÄÅĞ¶¨
+	//å›½å£«æ— åŒçš„åˆ¤å®š
 	AgariResult res;
 	TryToAgariResult guoshi = guoshiwushuang(par);
 	if (guoshi.success)
 		return guoshi;
-	//Ö»ÓĞ¹úÊ¿ÄÜÇÀ°µ¸Ü
+	//åªæœ‰å›½å£«èƒ½æŠ¢æš—æ 
 	if (par.state == 3)return TryToAgariResult(AgariFaildReason::CantQiangAnGang);
-	//Æß¶ÔĞÍµÄÅĞ¶¨(Á½±­¿Ú½«±»²ğ½âÎªÆß¶ÔĞÍ)
+	//ä¸ƒå¯¹å‹çš„åˆ¤å®š(ä¸¤æ¯å£å°†è¢«æ‹†è§£ä¸ºä¸ƒå¯¹å‹)
 	TryToAgariResult qiduizi = qidui(par);
-	//Ò»°ãĞÍµÄÅĞ¶¨
+	//ä¸€èˆ¬å‹çš„åˆ¤å®š
 	std::vector<Single>allTiles = par.handTile;
 	allTiles.push_back(par.target);
 	sort(allTiles.begin(), allTiles.end());
 	TryToAgariResult normal = agariSearch(par, 0, allTiles, std::vector<Group>());
 	return std::max(qiduizi, normal);
 }
-//±ê×¼ĞÍºÍÅÆÒÛÖÖÅĞ¶Ï
+//æ ‡å‡†å‹å’Œç‰Œå½¹ç§åˆ¤æ–­
 TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, std::vector<Group>& mianzi)
 {
 	YakuChecker yakucheker;
 	return yakucheker.getResult(par, mianzi);
 }
-//ÅĞ¶ÏÊÇ·ñÎª±ê×¼ºÍÅÆĞÍ£¬·µ»Ø(µãÊı×î´óµÄ)½á¹û,depth=0±íÊ¾Ã¶¾ÙÈ¸Í·£¬dep=4Îª×îÉî²ã
+//åˆ¤æ–­æ˜¯å¦ä¸ºæ ‡å‡†å’Œç‰Œå‹ï¼Œè¿”å›(ç‚¹æ•°æœ€å¤§çš„)ç»“æœ,depth=0è¡¨ç¤ºæšä¸¾é›€å¤´ï¼Œdep=4ä¸ºæœ€æ·±å±‚
 /*
 type
-×ÔÃş=0
-ÈÙºÍ=1
-ÇÀ¸Ü=2
-ÇÀ°µ¸Ü=3
+è‡ªæ‘¸=0
+è£å’Œ=1
+æŠ¢æ =2
+æŠ¢æš—æ =3
 
 state
-Õı³£=0
-ÌìµØºÍ=1
-ºÓµ×/º£µ×=2
+æ­£å¸¸=0
+å¤©åœ°å’Œ=1
+æ²³åº•/æµ·åº•=2
 */
 TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, std::vector<Single> remainTiles, std::vector<Group> mianzi)
 {
@@ -192,10 +192,10 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 		return bestResult;
 	}
 	std::vector<int> pool = Algorithms::getPool(remainTiles);
-	//ÅĞ¶ÏË³×ÓºÍ¿Ì×Ó
+	//åˆ¤æ–­é¡ºå­å’Œåˆ»å­
 	for (int i = 0; i <= 33; ++i)
 	{
-		//Î¨Ò»µÄ·ÖÆçµã£¬ÈıÁ¬¿ÌºÍÈıÍ¬Ë³
+		//å”¯ä¸€çš„åˆ†æ­§ç‚¹ï¼Œä¸‰è¿åˆ»å’Œä¸‰åŒé¡º
 		if (i != 7 && i != 8 && i != 16 && i != 17 && i <= 24)
 		{
 			if (pool[i] >= 3 && pool[i + 1] >= 3 && pool[i + 2] >= 3)
@@ -237,7 +237,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 					if (!equalToStandard)
 						newRemainTiles.push_back(item);
 				}
-				//ÈıÁ¬¿Ì
+				//ä¸‰è¿åˆ»
 				mianzi.push_back(Group::createKezi(group[0][0], group[0][1], group[0][2], 0));
 				mianzi.push_back(Group::createKezi(group[1][0], group[1][1], group[1][2], 0));
 				mianzi.push_back(Group::createKezi(group[2][0], group[2][1], group[2][2], 0));
@@ -245,7 +245,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 				mianzi.pop_back();
 				mianzi.pop_back();
 				mianzi.pop_back();
-				//ÈıÍ¬Ë³
+				//ä¸‰åŒé¡º
 				mianzi.push_back(Group::createShunzi(group[0][0], group[1][0], group[2][0], 0));
 				mianzi.push_back(Group::createShunzi(group[0][1], group[1][1], group[2][1], 0));
 				mianzi.push_back(Group::createShunzi(group[0][2], group[1][2], group[2][2], 0));
@@ -253,7 +253,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 				return bestResult;
 			}
 		}
-		//¿Ì×Ó
+		//åˆ»å­
 		if (pool[i] >= 3)
 		{
 			std::vector<Single> newRemainTiles;
@@ -281,7 +281,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 			bestResult = agariSearch(par, depth + 1, newRemainTiles, mianzi);
 			return bestResult;
 		}
-		//Ë³×Ó
+		//é¡ºå­
 		if (i != 7 && i != 8 && i != 16 && i != 17 && i <= 24)
 		{
 			if (pool[i] > 0 && pool[i + 1] > 0 && pool[i + 2] > 0)
@@ -324,13 +324,13 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 					if (!equalToStandard)
 						newRemainTiles.push_back(item);
 				}
-				//Ë³×Ó
+				//é¡ºå­
 				mianzi.push_back(Group::createShunzi(group[0], group[1], group[2], 0));
 				bestResult = agariSearch(par, depth + 1, newRemainTiles, mianzi);
 				return bestResult;
 			}
 		}
-		//´æÔÚ¸¡ÅÆ
+		//å­˜åœ¨æµ®ç‰Œ
 		if (pool[i] > 0)
 		{
 			return TryToAgariResult(AgariFaildReason::ShapeWrong);
@@ -354,8 +354,8 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par)
 			return TryToAgariResult(AgariFaildReason::ShapeWrong);
 		}
 	}
-	//¼ì²é¿ÉÒÔºÍÆß¶Ô×Ó¸´ºÏµÄÒÛÖÖ:dora,ura,aka,Á¢Ö±,Ò»·¢,Á½Á¢Ö±,ÃÅÇå×ÔÃş,ÇÀ¸Ü,¶ÏçÛ¾Å,ÇåÒ»É«,º£µ×ÃşÔÂ,ºÓµ×ÀÌÓã,»ìÀÏÍ·,»ìÒ»É«
-	//ÒÛÂúĞÍ:ÌìºÍ,µØºÍ,×ÖÒ»É«
+	//æ£€æŸ¥å¯ä»¥å’Œä¸ƒå¯¹å­å¤åˆçš„å½¹ç§:dora,ura,aka,ç«‹ç›´,ä¸€å‘,ä¸¤ç«‹ç›´,é—¨æ¸…è‡ªæ‘¸,æŠ¢æ ,æ–­å¹ºä¹,æ¸…ä¸€è‰²,æµ·åº•æ‘¸æœˆ,æ²³åº•æé±¼,æ··è€å¤´,æ··ä¸€è‰²
+	//å½¹æ»¡å‹:å¤©å’Œ,åœ°å’Œ,å­—ä¸€è‰²
 	if (par.state == 1 && par.type == 0)
 	{
 		if (par.selfWind == WindType::EAST)
@@ -381,17 +381,17 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par)
 		res.yaku.push_back(Yaku::Ziyise);
 	}
 	res.zimo = par.type == 0;
-	//Âú×ãÒÛÂúĞÍ
+	//æ»¡è¶³å½¹æ»¡å‹
 	if (res.fan < 0)
 	{
 		res = getScore(par.selfWind, res);
 		return TryToAgariResult(res);
 	}
-	//²»Âú×ãÒÛÂúĞÍ£¬ÔòÒ»¶¨ĞèÒª¼ÆËãÆß¶ÔĞÍ
+	//ä¸æ»¡è¶³å½¹æ»¡å‹ï¼Œåˆ™ä¸€å®šéœ€è¦è®¡ç®—ä¸ƒå¯¹å‹
 	res.fan += 2;
 	res.fu = 25;
 	res.yaku.push_back(Yaku::Qiduizi);
-	//¼ì²édora£¬akadoraºÍuradora
+	//æ£€æŸ¥doraï¼Œakadoraå’Œuradora
 	auto myHandTile = par.handTile;
 	myHandTile.push_back(par.target);
 	for (auto& doraneko : par.dora)
@@ -406,10 +406,10 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par)
 		if (item.isAkadora())
 			res.akadora++;
 	res.fan += res.dora + res.akadora + res.uradora;
-	//¼ì²éÁ¢Ö±,Á½Á¢Ö±ºÍÒ»·¢
+	//æ£€æŸ¥ç«‹ç›´,ä¸¤ç«‹ç›´å’Œä¸€å‘
 	if (par.lizhiXunmu != -1)
 	{
-		//wÁ¢
+		//wç«‹
 		if (par.lizhiXunmu == -2)
 		{
 			res.fan += 2;
@@ -426,26 +426,26 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par)
 			res.yaku.push_back(Yaku::Yifa);
 		}
 	}
-	//¼ì²éÇÀ¸Ü
+	//æ£€æŸ¥æŠ¢æ 
 	if (par.type == 2)
 	{
 		res.fan += 1;
 		res.yaku.push_back(Yaku::Qianggang);
 	}
-	//¼ì²éÃÅÇå×ÔÃş
+	//æ£€æŸ¥é—¨æ¸…è‡ªæ‘¸
 	if (par.type == 0)
 	{
 		res.fan += 1;
 		res.yaku.push_back(Yaku::Menqianqingzimo);
 	}
-	//¼ì²éºÓµ×/º£µ×
+	//æ£€æŸ¥æ²³åº•/æµ·åº•
 	if (par.state == 2)
 	{
 		if (par.type == 0)
 			res.yaku.push_back(Yaku::Haidilaoyue);
 		else if (par.type == 1)res.yaku.push_back(Yaku::Hedilaoyu);
 	}
-	//¼ì²éÇåÒ»É«£¬»ìÒ»É«£¬¶ÏçÛ¾Å£¬»ìÀÏÍ·
+	//æ£€æŸ¥æ¸…ä¸€è‰²ï¼Œæ··ä¸€è‰²ï¼Œæ–­å¹ºä¹ï¼Œæ··è€å¤´
 	bool qingyise = true, hunyise = true, duanyao = true, hunlaotou = true;
 	char color = '0';
 	for (auto& item : myHandTile)
@@ -493,7 +493,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par)
 	res = getScore(par.selfWind, res);
 	return TryToAgariResult(res);
 }
-//ÅĞ¶ÏÊÇ·ñÎª¹úÊ¿ÎŞË«ºÍÅÆĞÍ
+//åˆ¤æ–­æ˜¯å¦ä¸ºå›½å£«æ— åŒå’Œç‰Œå‹
 TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par)
 {
 	AgariResult res = AgariResult();
@@ -504,7 +504,7 @@ TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par)
 		for (auto& item : par.handTile)
 			if (item.value() == 1 || item.value() == 9 || item.color() == 'z')
 				all.insert(item);
-		//¹úÊ¿
+		//å›½å£«
 		if (all.size() == 12)
 		{
 			if (par.target.value() == 1 || par.target.value() == 9 || par.target.color() == 'z')
@@ -514,14 +514,14 @@ TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par)
 					guoshi = 1;
 			}
 		}
-		//¹úÊ¿Ê®ÈıÃæ
+		//å›½å£«åä¸‰é¢
 		else if (all.size() == 13)
 		{
 			if (par.target.value() == 1 || par.target.value() == 9 || par.target.color() == 'z')
 				guoshi = 2;
 		}
 	}
-	//¿ÉÒÔ¸´ºÏÌìµØºÍ
+	//å¯ä»¥å¤åˆå¤©åœ°å’Œ
 	if (par.state == 1 && par.type == 0)
 	{
 		if (par.selfWind == WindType::EAST)
@@ -563,7 +563,7 @@ bool Algorithms::guoshiWithoutYaku(const Single& target, const std::vector<Singl
 		for (auto& item : handTile)
 			if (item.value() == 1 || item.value() == 9 || item.color() == 'z')
 				all.insert(item);
-		//¹úÊ¿
+		//å›½å£«
 		if (all.size() == 12)
 		{
 			if (target.value() == 1 || target.value() == 9 || target.color() == 'z')
@@ -573,7 +573,7 @@ bool Algorithms::guoshiWithoutYaku(const Single& target, const std::vector<Singl
 					guoshi = 1;
 			}
 		}
-		//¹úÊ¿Ê®ÈıÃæ
+		//å›½å£«åä¸‰é¢
 		else if (all.size() == 13)
 		{
 			if (target.value() == 1 || target.value() == 9 || target.color() == 'z')
@@ -597,18 +597,18 @@ bool Algorithms::qiduiWithoutYaku(const Single& target, const std::vector<Single
 }
 bool Algorithms::agariSearchWithoutYaku(std::vector<int> pool)
 {
-	//ÅĞ¶ÏÈ¸Í·
+	//åˆ¤æ–­é›€å¤´
 	for (int i = 0; i <= 33; ++i)
 	{
 		if (pool[i] >= 2)
 		{
 			std::vector<int> tempPool = pool;
 			tempPool[i] -= 2;
-			//¿Ì×Ó
+			//åˆ»å­
 			for (int i = 0; i <= 33; ++i)
 				if (tempPool[i] >= 3)
 					tempPool[i] -= 3;
-			//Ë³×Ó
+			//é¡ºå­
 			for (int i = 0; i <= 33; ++i)
 				if (i != 7 && i != 8 && i != 16 && i != 17 && i <= 24)
 					if (tempPool[i] > 0 && tempPool[i + 1] > 0 && tempPool[i + 2] > 0)
@@ -617,7 +617,7 @@ bool Algorithms::agariSearchWithoutYaku(std::vector<int> pool)
 						tempPool[i + 1]--;
 						tempPool[i + 2]--;
 					}
-			//´æÔÚ¸¡ÅÆ
+			//å­˜åœ¨æµ®ç‰Œ
 			bool res = true;
 			for (int i = 0; i <= 33; ++i)
 				if (tempPool[i] > 0)
@@ -632,21 +632,21 @@ bool Algorithms::agariSearchWithoutYaku(std::vector<int> pool)
 }
 bool Algorithms::agariWithoutYaku(const Single& target, const std::vector<Single>& handTile)
 {
-	//¹úÊ¿ÎŞË«ĞÍµÄÅĞ¶¨
+	//å›½å£«æ— åŒå‹çš„åˆ¤å®š
 	bool guoshi = guoshiWithoutYaku(target, handTile);
 	if (guoshi)return true;
 	std::vector<Single>allTiles = handTile;
 	allTiles.push_back(target);
 	auto pool = getPool(allTiles);
-	//ÅĞ¶ÏÊÇ·ñĞéºÍ(Ò»ÖÖÅÆÄÃ5ÕÅ)
+	//åˆ¤æ–­æ˜¯å¦è™šå’Œ(ä¸€ç§ç‰Œæ‹¿5å¼ )
 	for (int i = 0; i <= 33; ++i)
 		if (pool[i] >= 5)
 			return false;
-	//Æß¶ÔĞÍµÄÅĞ¶¨(Á½±­¿Ú½«±»²ğ½âÎªÆß¶ÔĞÍ)
+	//ä¸ƒå¯¹å‹çš„åˆ¤å®š(ä¸¤æ¯å£å°†è¢«æ‹†è§£ä¸ºä¸ƒå¯¹å‹)
 	bool qiduizi = getDistanceQidui(allTiles) == -1;
 	if (qiduizi)
 		return true;
-	//Ò»°ãĞÍµÄÅĞ¶¨
+	//ä¸€èˆ¬å‹çš„åˆ¤å®š
 	bool normal = getDistanceStandard(allTiles) == -1;
 	return normal;
 }
@@ -668,7 +668,7 @@ void Algorithms::constructTarget(int quetou, int mianzi, std::queue<int>& q, int
 	}
 	if (mianzi > 0)
 	{
-		//¿Ì×Ó
+		//åˆ»å­
 		for (int value = 1; value <= (z ? 7 : 9); ++value)
 		{
 			nextShape = shape;
@@ -679,7 +679,7 @@ void Algorithms::constructTarget(int quetou, int mianzi, std::queue<int>& q, int
 				constructTarget(quetou, mianzi - 1, q, nextShape, target, z);
 			}
 		}
-		//Ë³×Ó
+		//é¡ºå­
 		if (!z)
 		{
 			for (int value = 1; value <= 7; ++value)
@@ -703,7 +703,7 @@ void Algorithms::constructTarget(int quetou, int mianzi, std::queue<int>& q, int
 	if (!z)distanceToTarget[shape][target] = 0;
 	else distanceToTargetZ[shape][target] = 0;
 }
-//Ô¤´¦Àí£¬¼ÆËãµ¥»¨É«ÀëÄ¿±êµÄ¾àÀë(½öÔÊĞí²åÈëºÍÉ¾³ıÁ½¸ö²Ù×÷)
+//é¢„å¤„ç†ï¼Œè®¡ç®—å•èŠ±è‰²ç¦»ç›®æ ‡çš„è·ç¦»(ä»…å…è®¸æ’å…¥å’Œåˆ é™¤ä¸¤ä¸ªæ“ä½œ)
 void Algorithms::preprocessDistance()
 {
 	for (int j = 0; j < 10; ++j)
@@ -714,12 +714,12 @@ void Algorithms::preprocessDistance()
 			distanceToTargetZ[i][j] = 255;
 	}
 
-	//Ã¶¾ÙÄ¿±ê
+	//æšä¸¾ç›®æ ‡
 	for (int target = 0; target < 10; ++target)
 	{
 		int quetou = target / 5;
 		int mianzi = target % 5;
-		//¹¹ÔìÄ¿±ê(Í¬Ê±Ò²ÊÇBFSµÄÆğµã)
+		//æ„é€ ç›®æ ‡(åŒæ—¶ä¹Ÿæ˜¯BFSçš„èµ·ç‚¹)
 		std::queue<int>q;
 		constructTarget(quetou, mianzi, q, 0, target, 0);
 		while (!q.empty())
@@ -752,7 +752,7 @@ void Algorithms::preprocessDistance()
 				}
 			}
 		}
-		//×ÖÅÆ
+		//å­—ç‰Œ
 		constructTarget(quetou, mianzi, q, 0, target, 1);
 		while (!q.empty())
 		{
@@ -786,16 +786,16 @@ void Algorithms::preprocessDistance()
 		}
 	}
 }
-//»ñµÃµ¥»¨É«ÏòÌıÊı
+//è·å¾—å•èŠ±è‰²å‘å¬æ•°
 int Algorithms::getDistanceSingle(int shape, int mianzi, int quetou, bool z)
 {
 	if (!z)return distanceToTarget[shape][mianzi + quetou * 5];
 	return distanceToTargetZ[shape][mianzi + quetou * 5];
 }
-//¼ÆËã14ÕÅÊÖÅÆµÄÏòÌıÊı(0ÎªÒ»ÏòÌı£¬-1ÎªºÍÅÆ)
+//è®¡ç®—14å¼ æ‰‹ç‰Œçš„å‘å¬æ•°(0ä¸ºä¸€å‘å¬ï¼Œ-1ä¸ºå’Œç‰Œ)
 int Algorithms::getDistanceStandard(const std::vector<Single>& handTile)
 {
-	int shape[5] = { 0,0,0,0,0 };//1~4·Ö±ğ±íÊ¾mpsz£¬ÆäÖĞzµÄ¸ñÊ½Îª5Î»16½øÖÆÊı,´ÓµÍµ½¸ß·Ö±ğÎª³öÏÖÁË0,1,2,3,4ÕÅµÄÅÆ¹²ÓĞ¼¸ÖÖ,¸ßÎ»ÎŞÒâÒå
+	int shape[5] = { 0,0,0,0,0 };//1~4åˆ†åˆ«è¡¨ç¤ºmpszï¼Œå…¶ä¸­zçš„æ ¼å¼ä¸º5ä½16è¿›åˆ¶æ•°,ä»ä½åˆ°é«˜åˆ†åˆ«ä¸ºå‡ºç°äº†0,1,2,3,4å¼ çš„ç‰Œå…±æœ‰å‡ ç§,é«˜ä½æ— æ„ä¹‰
 	for (auto& item : handTile)
 	{
 		if (item.color() == 'm')
@@ -807,20 +807,20 @@ int Algorithms::getDistanceStandard(const std::vector<Single>& handTile)
 		if (item.color() == 'z')
 			addNumberCount(shape[4], item.value(), 1);
 	}
-	//¼ÆËã±ê×¼ĞÍÏòÌıÊı
-	int dp[5][5][2];//aµ±Ç°ÒÑ¾­Íê³ÉµÄ»¨É«Êı£¬bµ±Ç°ÒÑ¾­Íê³ÉµÄÃæ×ÓÊı£¬cµ±Ç°ÒÑ¾­Íê³ÉµÄÈ¸Í·Êı,dp±íÊ¾×îĞ¡¾àÀë
+	//è®¡ç®—æ ‡å‡†å‹å‘å¬æ•°
+	int dp[5][5][2];//aå½“å‰å·²ç»å®Œæˆçš„èŠ±è‰²æ•°ï¼Œbå½“å‰å·²ç»å®Œæˆçš„é¢å­æ•°ï¼Œcå½“å‰å·²ç»å®Œæˆçš„é›€å¤´æ•°,dpè¡¨ç¤ºæœ€å°è·ç¦»
 	//int pre[5][5][2];
 	for (int i = 0; i < 5; ++i)
 		for (int j = 0; j < 5; ++j)
 			for (int k = 0; k < 2; ++k)
 			{
-				dp[i][j][k] = 99;//´Ë¾àÀë×î´óÎª18£¬±íÊ¾8ÏòÌı
+				dp[i][j][k] = 99;//æ­¤è·ç¦»æœ€å¤§ä¸º18ï¼Œè¡¨ç¤º8å‘å¬
 				//pre[i][j][k] = -1;
 			}
-	dp[0][0][0] = 0;//Éè¶¨±ß½çÖµ£¬0»¨É«0Ãæ×Ó0È¸Í·¾àÀëÎª0
+	dp[0][0][0] = 0;//è®¾å®šè¾¹ç•Œå€¼ï¼Œ0èŠ±è‰²0é¢å­0é›€å¤´è·ç¦»ä¸º0
 	for (int a = 1; a < 5; ++a)
 		for (int b = 0; b < 5; ++b)
-			for (int k = 0; k < 5 && b - k >= 0; ++k)//Ã¶¾ÙÕâÒ»ÖÖ»¨É«Òª´ï³ÉµÄÃæ×ÓÊı
+			for (int k = 0; k < 5 && b - k >= 0; ++k)//æšä¸¾è¿™ä¸€ç§èŠ±è‰²è¦è¾¾æˆçš„é¢å­æ•°
 			{
 				dp[a][b][0] = std::min(dp[a][b][0], dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 0, a == 4));
 				dp[a][b][1] = std::min(dp[a][b][1], dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 1, a == 4));
@@ -869,10 +869,10 @@ int Algorithms::getDistanceStandard(const std::vector<Single>& handTile)
 	}*/
 	return dp[4][4][1] / 2 - 1;
 }
-//¼ÆËã14ÕÅÊÖÅÆµÄÏòÌıÊı(0ÎªÒ»ÏòÌı£¬-1ÎªºÍÅÆ)
+//è®¡ç®—14å¼ æ‰‹ç‰Œçš„å‘å¬æ•°(0ä¸ºä¸€å‘å¬ï¼Œ-1ä¸ºå’Œç‰Œ)
 int Algorithms::getDistanceQidui(const std::vector<Single>& handTile)
 {
-	int shape[5] = { 0,0,0,0,0 };//1~4·Ö±ğ±íÊ¾mpsz£¬ÆäÖĞzµÄ¸ñÊ½Îª5Î»16½øÖÆÊı,´ÓµÍµ½¸ß·Ö±ğÎª³öÏÖÁË0,1,2,3,4ÕÅµÄÅÆ¹²ÓĞ¼¸ÖÖ,¸ßÎ»ÎŞÒâÒå
+	int shape[5] = { 0,0,0,0,0 };//1~4åˆ†åˆ«è¡¨ç¤ºmpszï¼Œå…¶ä¸­zçš„æ ¼å¼ä¸º5ä½16è¿›åˆ¶æ•°,ä»ä½åˆ°é«˜åˆ†åˆ«ä¸ºå‡ºç°äº†0,1,2,3,4å¼ çš„ç‰Œå…±æœ‰å‡ ç§,é«˜ä½æ— æ„ä¹‰
 	for (auto& item : handTile)
 	{
 		if (item.color() == 'm')
@@ -884,7 +884,7 @@ int Algorithms::getDistanceQidui(const std::vector<Single>& handTile)
 		if (item.color() == 'z')
 			addNumberCount(shape[4], item.value(), 1);
 	}
-	//¼ÆËãÆß¶Ô×ÓÏòÌıÊı
+	//è®¡ç®—ä¸ƒå¯¹å­å‘å¬æ•°
 	int duiziCount = 0;
 	int fupaiCount = 0;
 	for (int i = 1; i <= 4; ++i)

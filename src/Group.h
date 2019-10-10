@@ -4,25 +4,25 @@
 #include"Single.h"
 enum class GroupType
 {
-	Quetou,//È¸Í·
-	Shunzi, //Ë³×Ó
-	Kezi,  //¿Ì×Ó
-	Gang,  //¸Ü
+	Quetou,//é›€å¤´
+	Shunzi, //é¡ºå­
+	Kezi,  //åˆ»å­
+	Gang,  //æ 
 };
 class Group
 {
 public:
 	GroupType type;
 	char color;//'m','p','s','z'
-	uint8_t value;//Ë³×ÓµÄ»°valueµÈÓÚ×îĞ¡µÄÄÇ¸ö
-	uint8_t akadora;//´ÓµÍµ½¸ß·Ö±ğ±íÊ¾ÈıÕÅÅÆ(´ÓĞ¡µ½´ó)ÊÇ·ñÎªºì±¦ÅÆ
-	uint8_t state;//µÍÎ»±íÊ¾³Ô/Åö/¸ÜµÄÄÇÕÅÅÆµÄÀ´Ô´(0,1,2,3¶ÔÓ¦³Ô¡¢Åö¡¢ÈÙ¸Ü¡¢°µ¸ÜµÄ×ÔÏÂ¶ÔÉÏ,4,5,6,7¶ÔÓ¦¼Ó¸ÜµÄ×ÔÏÂ¶ÔÉÏ(4ÎŞĞ§))£¬¸ßÎ»0£¬10£¬20·Ö±ğ±íÊ¾µÚÒ»ÕÅ£¬µÚ¶şÕÅ£¬µÚÈıÕÅ¡£(¿Ì×Ó£¬¸Ü×ÓÄ¬ÈÏÎª0)
-	//source±íÊ¾ÅöµÄÄÇÕÅÅÆµÄÀ´Ô´(0,1,2,3¶ÔÓ¦×ÔÏÂ¶ÔÉÏ,4,5,6,7Ò²¶ÔÓ¦×ÔÏÂ¶ÔÉÏ£¬²¢ÇÒÎª¼Ó¸Ü(4ÎŞĞ§))
+	uint8_t value;//é¡ºå­çš„è¯valueç­‰äºæœ€å°çš„é‚£ä¸ª
+	uint8_t akadora;//ä»ä½åˆ°é«˜åˆ†åˆ«è¡¨ç¤ºä¸‰å¼ ç‰Œ(ä»å°åˆ°å¤§)æ˜¯å¦ä¸ºçº¢å®ç‰Œ
+	uint8_t state;//ä½ä½è¡¨ç¤ºåƒ/ç¢°/æ çš„é‚£å¼ ç‰Œçš„æ¥æº(0,1,2,3å¯¹åº”åƒã€ç¢°ã€è£æ ã€æš—æ çš„è‡ªä¸‹å¯¹ä¸Š,4,5,6,7å¯¹åº”åŠ æ çš„è‡ªä¸‹å¯¹ä¸Š(4æ— æ•ˆ))ï¼Œé«˜ä½0ï¼Œ10ï¼Œ20åˆ†åˆ«è¡¨ç¤ºç¬¬ä¸€å¼ ï¼Œç¬¬äºŒå¼ ï¼Œç¬¬ä¸‰å¼ ã€‚(åˆ»å­ï¼Œæ å­é»˜è®¤ä¸º0)
+	//sourceè¡¨ç¤ºç¢°çš„é‚£å¼ ç‰Œçš„æ¥æº(0,1,2,3å¯¹åº”è‡ªä¸‹å¯¹ä¸Š,4,5,6,7ä¹Ÿå¯¹åº”è‡ªä¸‹å¯¹ä¸Šï¼Œå¹¶ä¸”ä¸ºåŠ æ (4æ— æ•ˆ))
 	static Group createKezi(Single a, Single b, Single target, int source);
 	static Group createShunzi(Single a, Single b, Single target, int source);
 	static Group createGangzi(Single a, Single b,Single c, Single target, int source);
 	static Group createQuetou(Single a, Single b);
-	//ÊÇ·ñÎªÂÌÅÆ
+	//æ˜¯å¦ä¸ºç»¿ç‰Œ
 	bool isgreen()
 	{
 		if (color == 'z')return value == 6;
@@ -34,7 +34,7 @@ public:
 		}
 		return false;
 	}
-	//ÊÇ·ñÎªÀÏÍ·ÅÆ×é(·Ç×ÖÅÆ19)
+	//æ˜¯å¦ä¸ºè€å¤´ç‰Œç»„(éå­—ç‰Œ19)
 	bool islaotou()
 	{
 		if (type == GroupType::Shunzi)return false;
@@ -42,7 +42,7 @@ public:
 		if (value == 1 || value == 9)return true;
 		return false;
 	}
-	//ÊÇ·ñÎªçÛ¾ÅÅÆ×é(ÔÊĞíË³×Ó£¬ÔÊĞí×ÖÅÆ)
+	//æ˜¯å¦ä¸ºå¹ºä¹ç‰Œç»„(å…è®¸é¡ºå­ï¼Œå…è®¸å­—ç‰Œ)
 	bool isyaojiu()
 	{
 		if (type == GroupType::Shunzi)
@@ -155,7 +155,7 @@ public:
 		}
 		else if (type == GroupType::Gang)
 		{
-			//°µ¸Ü
+			//æš—æ 
 			if (state % 10 == 0)
 			{
 				res.push_back('O');
@@ -165,7 +165,7 @@ public:
 			}
 			else
 			{
-				//Ã÷¸Ü(µÚËÄÕÅ²»´øÀ¨ºÅ)¼Ó¸Ü(µÚËÄÕÅ´øÀ¨ºÅ£¬state/10==3)
+				//æ˜æ (ç¬¬å››å¼ ä¸å¸¦æ‹¬å·)åŠ æ (ç¬¬å››å¼ å¸¦æ‹¬å·ï¼Œstate/10==3)
 				if (state % 10 == 3|| state % 10 == 7)
 				{
 					res.push_back('(');

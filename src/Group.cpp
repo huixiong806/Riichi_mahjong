@@ -14,7 +14,7 @@ Group Group::createGangzi(Single a, Single b, Single c, Single target, int sourc
 	temp.push_back(a);
 	temp.push_back(b);
 	temp.push_back(c);
-	//Í³Ò»³àÆÕ¹²´æµÄÇé¿ö£¬±ÜÃâËüÃÇÒòË³Ðò²»Í¬¶ø±»µ±³ÉÁ½ÖÖ²»Í¬¸Ü×Ó(¸ù±¾Ã»ÓÃ£¬ÒòÎª¸ÜÖ»¿ÉÄÜÓÐÒ»ÖÖÑ¡Ôñ)
+	//ç»Ÿä¸€èµ¤æ™®å…±å­˜çš„æƒ…å†µï¼Œé¿å…å®ƒä»¬å› é¡ºåºä¸åŒè€Œè¢«å½“æˆä¸¤ç§ä¸åŒæ å­(æ ¹æœ¬æ²¡ç”¨ï¼Œå› ä¸ºæ åªå¯èƒ½æœ‰ä¸€ç§é€‰æ‹©)
 	std::sort(temp.begin(), temp.end());
 	res.akadora |= target.isAkadora();
 	res.akadora |= temp[0].isAkadora() << 1;
@@ -31,7 +31,7 @@ Group Group::createKezi(Single a, Single b, Single target, int source)
 	res.value = target.value();
 	res.state = source;
 	res.akadora = 0;
-	if (a > b)std::swap(a, b);//Í³Ò»³àÆÕ¹²´æµÄÇé¿ö£¬±ÜÃâËüÃÇÒòË³Ðò²»Í¬¶ø±»µ±³ÉÁ½ÖÖ²»Í¬¿Ì×Ó
+	if (a > b)std::swap(a, b);//ç»Ÿä¸€èµ¤æ™®å…±å­˜çš„æƒ…å†µï¼Œé¿å…å®ƒä»¬å› é¡ºåºä¸åŒè€Œè¢«å½“æˆä¸¤ç§ä¸åŒåˆ»å­
 	res.akadora |= target.isAkadora();
 	res.akadora |= (uint8_t)a.isAkadora() << 1;
 	res.akadora |= (uint8_t)b.isAkadora() << 2;

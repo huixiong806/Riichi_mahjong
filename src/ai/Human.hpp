@@ -6,8 +6,8 @@
 #include<set>
 #include<iostream>
 #include<iomanip>
-const std::string windName[4] = { "¶«","ÄÏ","Î÷","±±" };
-const std::string actionName[11] = { "error","Ìø¹ı","error","³Ô","Åö","¸Ü","ºÍ","Á¢Ö±","×ÔÃş","Á÷¾Ö","°Î±±" };
+const std::string windName[4] = { "ä¸œ","å—","è¥¿","åŒ—" };
+const std::string actionName[11] = { "error","è·³è¿‡","error","åƒ","ç¢°","æ ","å’Œ","ç«‹ç›´","è‡ªæ‘¸","æµå±€","æ‹”åŒ—" };
 class Human:public ActionGenerator
 {
 private:
@@ -32,7 +32,7 @@ public:
 std::vector<Action> Human::getAllActionsMingpai(const GameInfo& info)
 {
 	std::vector<Action> res;
-	res.push_back(ActionType::Skip);
+	res.emplace_back(ActionType::Skip);
 	std::vector<Action> temp = getPengActions(info);
 	res.insert(res.end(), temp.begin(), temp.end());
 	temp = getRongGangActions(info);
@@ -46,10 +46,10 @@ std::vector<Action> Human::getAllActionsNormal(const GameInfo& info)
 	std::vector<Action> res;
 	std::vector<Action> temp = getZimoAction(info);
 	if (info.nowTile != Null)
-		res.push_back(Action(ActionType::Dapai,info.nowTile));
+		res.emplace_back(ActionType::Dapai,info.nowTile);
 	if (info.playerInfo[(int)info.selfWind].lizhiXunmu == -1)
 		for (int i = 0; i < info.handTile.size(); ++i)
-			res.push_back(Action(ActionType::Dapai, info.handTile[i]));
+			res.emplace_back(ActionType::Dapai, info.handTile[i]);
 	res.insert(res.end(), temp.begin(), temp.end());
 	temp = getLizhiAction(info);
 	res.insert(res.end(), temp.begin(), temp.end());
@@ -66,13 +66,13 @@ void Human::printActions(std::vector<Action>actions)
 		{
 			if (i>0 && actions[i - 1].type== ActionType::Dapai)
 			{
-				std::cout << "´òÅÆ(0ÃşÇĞ)" << std::endl;
+				std::cout << "æ‰“ç‰Œ(0æ‘¸åˆ‡)" << std::endl;
 			}
 			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Peng || actions[i].type == ActionType::Gang)
 				std::cout << num << "." << actionName[(int)actions[i].type] << " " << actions[i].group.getString() << std::endl;
 			else if (actions[i].type == ActionType::Lizhi)
 			{
-				std::cout << num << ".ÇĞ"<<actions[i].target.getDisplay()<<"Á¢Ö±"<< std::endl;
+				std::cout << num << ".åˆ‡"<<actions[i].target.getDisplay()<<"ç«‹ç›´"<< std::endl;
 			}
 			else
 				std::cout << num << "." << actionName[(int)actions[i].type] << std::endl;
@@ -81,7 +81,7 @@ void Human::printActions(std::vector<Action>actions)
 	}
 	if (actions[actions.size() - 1].type == ActionType::Dapai)
 	{
-		std::cout << "´òÅÆ(0ÃşÇĞ)" << std::endl;
+		std::cout << "æ‰“ç‰Œ(0æ‘¸åˆ‡)" << std::endl;
 	}
 }
 std::vector<Action> Human::getRongAction(const GameInfo& info)
@@ -92,7 +92,7 @@ std::vector<Action> Human::getRongAction(const GameInfo& info)
 	else if (info.remainTiles == 0)state = 2;
 	bool result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind, info.playerInfo[info.selfWind].lizhiXunmu, info.playerInfo[info.selfWind].yifa, state, 1, info.nowTile, info.handTile, info.playerInfo[info.selfWind].groupTile, std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
-		res.push_back(Action(ActionType::Rong));
+		res.emplace_back(ActionType::Rong);
 	return res;
 }
 std::vector<Action> Human::getZimoAction(const GameInfo& info)
@@ -103,7 +103,7 @@ std::vector<Action> Human::getZimoAction(const GameInfo& info)
 	else if (info.remainTiles == 0)state = 2;
 	bool result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind, info.playerInfo[info.selfWind].lizhiXunmu, info.playerInfo[info.selfWind].yifa, state, 0, info.nowTile, info.handTile, info.playerInfo[info.selfWind].groupTile, std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
-		res.push_back(Action(ActionType::Zimo));
+		res.emplace_back(ActionType::Zimo);
 	return res;
 }
 std::vector<Action> Human::getLizhiAction(const GameInfo& info)
@@ -134,7 +134,7 @@ std::vector<Action> Human::getLizhiAction(const GameInfo& info)
 }
 std::vector<Action> Human::getChiActions(const GameInfo& info)
 {
-	//Ö»ÄÜ³ÔÉÏ¼ÒÅÆ
+	//åªèƒ½åƒä¸Šå®¶ç‰Œ
 	if (info.nowWind != (info.selfWind + 3) % 4)return std::vector<Action>();
 	if (info.playerInfo[(int)info.selfWind].lizhiXunmu != -1)
 		return std::vector<Action>();
@@ -151,7 +151,7 @@ std::vector<Action> Human::getRongGangActions(const GameInfo& info)
 			candidate.push_back(target);
 	if (candidate.size() < 3)return res;
 	assert(candidate.size() == 3);
-	res.push_back(Action(ActionType::Gang, Group::createGangzi(candidate[0], candidate[1], candidate[2], target, (info.nowWind - info.selfWind + 4) % 4)));
+	res.emplace_back(ActionType::Gang, Group::createGangzi(candidate[0], candidate[1], candidate[2], target, (info.nowWind - info.selfWind + 4) % 4));
 	return res;
 }
 std::vector<Action> Human::getPengActions(const GameInfo& info)
@@ -167,7 +167,7 @@ std::vector<Action> Human::getPengActions(const GameInfo& info)
 	if (candidate.size() < 2)return res;
 	if (candidate.size() == 2)
 	{
-		res.push_back(Action(ActionType::Peng, Group::createKezi(candidate[0], candidate[1], target, (info.nowWind - info.selfWind + 4) % 4)));
+		res.emplace_back(ActionType::Peng, Group::createKezi(candidate[0], candidate[1], target, (info.nowWind - info.selfWind + 4) % 4));
 		return res;
 	}
 	assert(candidate.size() == 3);
@@ -185,19 +185,19 @@ void Human::printInfo(const GameInfo& info)
 {
 	std::cout << std::endl;
 	std::cout << name << std::endl;
-	std::cout << windName[(int)info.prevailingWind] << info.round << "¾Ö " << info.benchang << "±¾³¡ Ê£Óà" << info.remainTiles << "ÕÅ" << std::endl;
-	std::cout << "×Ô·çÎª" << windName[(int)info.selfWind] << std::endl;
-	//<< "  ³¡·çÒÛÅÆ:" << Single((int)info.prevailingWind + 1, 'z', false).getString() << "  ×Ô·çÒÛÅÆ:" << Single((int)info.selfWind + 1, 'z', false).getString() << std::endl;
-	std::cout << "±¦ÅÆÖ¸Ê¾ÅÆ ";
+	std::cout << windName[(int)info.prevailingWind] << info.round << "å±€ " << info.benchang << "æœ¬åœº å‰©ä½™" << info.remainTiles << "å¼ " << std::endl;
+	std::cout << "è‡ªé£ä¸º" << windName[(int)info.selfWind] << std::endl;
+	//<< "  åœºé£å½¹ç‰Œ:" << Single((int)info.prevailingWind + 1, 'z', false).getString() << "  è‡ªé£å½¹ç‰Œ:" << Single((int)info.selfWind + 1, 'z', false).getString() << std::endl;
+	std::cout << "å®ç‰ŒæŒ‡ç¤ºç‰Œ ";
 	for (auto& item : info.doraIndicator)
 	{
 		std::cout << item.getString() << " ";
 	}
 	std::cout << std::endl;
-	std::cout << "ĞÅÏ¢:" << std::endl;
+	std::cout << "ä¿¡æ¯:" << std::endl;
 	for (int wind = 0; wind <= 3; ++wind)
 	{
-		std::cout << windName[wind] << "¼Ò  " << std::setw(7) << std::left << info.playerInfo[wind].score << std::setw(0) << "|";
+		std::cout << windName[wind] << "å®¶  " << std::setw(7) << std::left << info.playerInfo[wind].score << std::setw(0) << "|";
 		for (auto& item : info.playerInfo[wind].groupTile)
 		{
 			std::cout << item.getString() << " ";
@@ -211,7 +211,7 @@ void Human::printInfo(const GameInfo& info)
 	}
 	auto hand = info.handTile;
 	hand.push_back(info.nowTile);
-	std::cout << "µ±Ç°±ê×¼ĞÍ" << Algorithms::getDistanceStandard(hand) << "ÏòÌı£¬Æß¶Ô" << Algorithms::getDistanceQidui(hand) << "ÏòÌı"<<std::endl;
+	std::cout << "å½“å‰æ ‡å‡†å‹" << Algorithms::getDistanceStandard(hand) << "å‘å¬ï¼Œä¸ƒå¯¹" << Algorithms::getDistanceQidui(hand) << "å‘å¬"<<std::endl;
 	std::cout << windName[info.selfWind] << "| ";
 	
 	for (auto& item : info.handTile)
@@ -239,9 +239,9 @@ Action Human::generateAction(const GameInfo& info)
 		std::vector<Action>actions;
 		if (info.nowTile != Null)
 		{
-			std::cout << "Ãş " << info.nowTile.getDisplay() << std::endl << std::endl;
+			std::cout << "æ‘¸ " << info.nowTile.getDisplay() << std::endl << std::endl;
 			actions = getAllActionsNormal(info);
-			std::cout << "ÇëÑ¡Ôñ:" << std::endl;
+			std::cout << "è¯·é€‰æ‹©:" << std::endl;
 			printActions(actions);
 			int index;
 			std::cin >> index;
@@ -250,7 +250,7 @@ Action Human::generateAction(const GameInfo& info)
 		}
 		else
 		{
-			std::cout << "´òµÚ¼¸ÕÅÅÆ?(0ÎªÃşÇĞ)" << std::endl;
+			std::cout << "æ‰“ç¬¬å‡ å¼ ç‰Œ?(0ä¸ºæ‘¸åˆ‡)" << std::endl;
 			int index;
 			std::cin >> index;
 			if (index <= info.handTile.size())
@@ -269,12 +269,12 @@ Action Human::generateAction(const GameInfo& info)
 		std::vector<Action>actions = getAllActionsMingpai(info);
 		if (actions.size() != 1)
 			printInfo(info);
-		std::cout << windName[(int)info.nowWind] << "¼Ò´ò³öÁË" << info.nowTile.getDisplay() << std::endl;
+		std::cout << windName[(int)info.nowWind] << "å®¶æ‰“å‡ºäº†" << info.nowTile.getDisplay() << std::endl;
 		if (actions.size() == 1)
 			res = actions[0];
 		else
 		{
-			std::cout << "ÇëÑ¡ÔñÒ»ÖÖ²Ù×÷:" << std::endl;
+			std::cout << "è¯·é€‰æ‹©ä¸€ç§æ“ä½œ:" << std::endl;
 			printActions(actions);
 			int opt = 0;
 			std::cin >> opt;

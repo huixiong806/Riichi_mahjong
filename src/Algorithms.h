@@ -9,56 +9,56 @@
 class Algorithms
 {
 private:
-	//ÅĞ¶ÏÊÇ·ñÎª¹úÊ¿ÎŞË«ºÍÅÆĞÍ
+	//åˆ¤æ–­æ˜¯å¦ä¸ºå›½å£«æ— åŒå’Œç‰Œå‹
 	static bool guoshiWithoutYaku(const Single& target, const std::vector<Single>& handTile);
-	//ÅĞ¶ÏÊÇ·ñÎªÆß¶ÔºÍÅÆĞÍ
+	//åˆ¤æ–­æ˜¯å¦ä¸ºä¸ƒå¯¹å’Œç‰Œå‹
 	static bool qiduiWithoutYaku(const Single& target, const std::vector<Single>& handTile);
-	//ÅĞ¶ÏÊÇ·ñÎª±ê×¼ºÍÅÆĞÍ,*************ÓĞbug£¬ÎğÓÃ£¡£¡£¡ÇëÓÃgetdistance·µ»ØÏòÌıÊıÊÇ·ñÎª-1*****************
+	//åˆ¤æ–­æ˜¯å¦ä¸ºæ ‡å‡†å’Œç‰Œå‹,*************æœ‰bugï¼Œå‹¿ç”¨ï¼ï¼ï¼è¯·ç”¨getdistanceè¿”å›å‘å¬æ•°æ˜¯å¦ä¸º-1*****************
 	static bool agariSearchWithoutYaku(std::vector<int> pool);
-	//ÅĞ¶ÏÊÇ·ñĞÎÊ½ºÍÅÆ,²»¿¼ÂÇÒÛ
+	//åˆ¤æ–­æ˜¯å¦å½¢å¼å’Œç‰Œ,ä¸è€ƒè™‘å½¹
 	static bool agariWithoutYaku(const Single& target, const std::vector<Single>& handTile);
-	//ÊÔÍ¼ºÍÅÆ£¬²¢¼ÆËã¹úÊ¿ÎŞË«ĞÍºÍÅÆµãÊı
+	//è¯•å›¾å’Œç‰Œï¼Œå¹¶è®¡ç®—å›½å£«æ— åŒå‹å’Œç‰Œç‚¹æ•°
 	static TryToAgariResult guoshiwushuang(const AgariParameters& par);
-	//ÊÔÍ¼ºÍÅÆ£¬²¢¼ÆËã±ê×¼ĞÍºÍÅÆµãÊı£¬·µ»Ø(µãÊı×î´óµÄ)½á¹û,depth=0±íÊ¾Ã¶¾ÙÈ¸Í·£¬dep=4Îª×îÉî²ã
+	//è¯•å›¾å’Œç‰Œï¼Œå¹¶è®¡ç®—æ ‡å‡†å‹å’Œç‰Œç‚¹æ•°ï¼Œè¿”å›(ç‚¹æ•°æœ€å¤§çš„)ç»“æœ,depth=0è¡¨ç¤ºæšä¸¾é›€å¤´ï¼Œdep=4ä¸ºæœ€æ·±å±‚
 	static TryToAgariResult agariSearch(const AgariParameters& par, int depth, std::vector<Single> remainTiles, std::vector<Group> mianzi);
-	//ÊÔÍ¼ºÍÅÆ£¬²¢¼ÆËãÆß¶ÔĞÍºÍÅÆµãÊı
+	//è¯•å›¾å’Œç‰Œï¼Œå¹¶è®¡ç®—ä¸ƒå¯¹å‹å’Œç‰Œç‚¹æ•°
 	static TryToAgariResult qidui(const AgariParameters& par);
-	//¹¹Ôì¸ø¶¨ÊıÁ¿µÄÈ¸Í·ºÍÃæ×ÓµÄÅÆĞÍ£¬´æµ½queueÖĞ
+	//æ„é€ ç»™å®šæ•°é‡çš„é›€å¤´å’Œé¢å­çš„ç‰Œå‹ï¼Œå­˜åˆ°queueä¸­
 	static void constructTarget(int quetou, int mianzi, std::queue<int>& q,int shape,int target,bool z);
-	//5µÄÃİ
+	//5çš„å¹‚
 	static const int pow5[10];
-	//µ½¸ø¶¨Ä¿±êµÄ¾àÀë£¬²ÎÊı·Ö±ğÎªÔ­ĞÎ×´¡¢Ä¿±êÈ¸Í·Êı*5+Ä¿±êÃæ×ÓÊı(È¸Í·×î¶àÖ»ÄÜÓĞÒ»¸ö) Ô­ĞÎ×´Îª9Î»5½øÖÆÊı£¬´ÓµÍµ½¸ß±íÊ¾ÊÖÅÆÖĞÊı×Ö1~9ÓĞ¼¸¸ö
+	//åˆ°ç»™å®šç›®æ ‡çš„è·ç¦»ï¼Œå‚æ•°åˆ†åˆ«ä¸ºåŸå½¢çŠ¶ã€ç›®æ ‡é›€å¤´æ•°*5+ç›®æ ‡é¢å­æ•°(é›€å¤´æœ€å¤šåªèƒ½æœ‰ä¸€ä¸ª) åŸå½¢çŠ¶ä¸º9ä½5è¿›åˆ¶æ•°ï¼Œä»ä½åˆ°é«˜è¡¨ç¤ºæ‰‹ç‰Œä¸­æ•°å­—1~9æœ‰å‡ ä¸ª
 	static uint8_t distanceToTarget[1953125][10];
-	//µ½¸ø¶¨Ä¿±êµÄ¾àÀë(×ÖÅÆ)£¬²ÎÊı·Ö±ğÎªÔ­ĞÎ×´¡¢Ä¿±êÈ¸Í·Êı*5+Ä¿±êÃæ×ÓÊı(È¸Í·×î¶àÖ»ÄÜÓĞÒ»¸ö) Ô­ĞÎ×´Îª9Î»5½øÖÆÊı£¬´ÓµÍµ½¸ß±íÊ¾ÊÖÅÆÖĞ¶«ÄÏÎ÷±±°×·¢ÖĞÓĞ¼¸¸ö
+	//åˆ°ç»™å®šç›®æ ‡çš„è·ç¦»(å­—ç‰Œ)ï¼Œå‚æ•°åˆ†åˆ«ä¸ºåŸå½¢çŠ¶ã€ç›®æ ‡é›€å¤´æ•°*5+ç›®æ ‡é¢å­æ•°(é›€å¤´æœ€å¤šåªèƒ½æœ‰ä¸€ä¸ª) åŸå½¢çŠ¶ä¸º9ä½5è¿›åˆ¶æ•°ï¼Œä»ä½åˆ°é«˜è¡¨ç¤ºæ‰‹ç‰Œä¸­ä¸œå—è¥¿åŒ—ç™½å‘ä¸­æœ‰å‡ ä¸ª
 	static uint8_t distanceToTargetZ[78125][10];
-	//±ê×¼ĞÍÒÛÖÖÅĞ¶Ï
+	//æ ‡å‡†å‹å½¹ç§åˆ¤æ–­
 	static TryToAgariResult YakuCheckForStandard(const AgariParameters& par, std::vector<Group>& mianzi);
 public:
 	
-	//ÊÔÍ¼ºÍÅÆ£¬·µ»ØµãÊı×î´óµÄ½á¹û
+	//è¯•å›¾å’Œç‰Œï¼Œè¿”å›ç‚¹æ•°æœ€å¤§çš„ç»“æœ
 	static TryToAgariResult agari(const AgariParameters par);
 	/*type
-	×ÔÃş=0
-	ÈÙºÍ=1
-	ÇÀ¸Ü=2
-	ÇÀ°µ¸Ü=3
+	è‡ªæ‘¸=0
+	è£å’Œ=1
+	æŠ¢æ =2
+	æŠ¢æš—æ =3
 	*/
-	//¸ù¾İºÍÅÆ½á¹û¼ÆËã´òµã
+	//æ ¹æ®å’Œç‰Œç»“æœè®¡ç®—æ‰“ç‚¹
 	static AgariResult getScore(WindType selfWind, AgariResult inp);
-	//0~8 Íò×Ö,9~17 ±ı×Ó,18~26 Ë÷×Ó,27~33 ¶«ÄÏÎ÷±±°×·¢ÖĞ
+	//0~8 ä¸‡å­—,9~17 é¥¼å­,18~26 ç´¢å­,27~33 ä¸œå—è¥¿åŒ—ç™½å‘ä¸­
 	static std::vector<int> getPool(const std::vector<Single>& tiles);
-	//¿ìËÙÅĞ¶ÏÊÇ·ñĞÎÊ½ÌıÅÆ¡£²»ÔÊĞíĞéÌı£¬ÔÊĞí¿ÕÌı¡£·µ»ØÌıÅÆÖÖÀà
+	//å¿«é€Ÿåˆ¤æ–­æ˜¯å¦å½¢å¼å¬ç‰Œã€‚ä¸å…è®¸è™šå¬ï¼Œå…è®¸ç©ºå¬ã€‚è¿”å›å¬ç‰Œç§ç±»
 	static std::vector<Single> tingpai(std::vector<Single> handTile);
-	//shapeÎªÑ¹ËõºóµÄÅÆĞÍ²ÎÊı£¬valueÎªÒª»ñÈ¡¸öÊıµÄÊı×Ö¡£º¯Êı¶Ôµ¥»¨É«ÅÆµÄÑ¹ËõĞÍ½øĞĞ²Ù×÷¡£
+	//shapeä¸ºå‹ç¼©åçš„ç‰Œå‹å‚æ•°ï¼Œvalueä¸ºè¦è·å–ä¸ªæ•°çš„æ•°å­—ã€‚å‡½æ•°å¯¹å•èŠ±è‰²ç‰Œçš„å‹ç¼©å‹è¿›è¡Œæ“ä½œã€‚
 	static int getNumberCount(int shape, int value);
 	static void setNumberCount(int& shape, int value, int count);
 	static void addNumberCount(int& shape, int value, int count);
-	//Ô¤´¦Àí£¬¼ÆËãµ¥»¨É«ÀëÄ¿±êµÄ¾àÀë(½öÔÊĞí²åÈëºÍÉ¾³ıÁ½¸ö²Ù×÷)
+	//é¢„å¤„ç†ï¼Œè®¡ç®—å•èŠ±è‰²ç¦»ç›®æ ‡çš„è·ç¦»(ä»…å…è®¸æ’å…¥å’Œåˆ é™¤ä¸¤ä¸ªæ“ä½œ)
 	static void preprocessDistance();
-	//¼ÆËã14ÕÅÊÖÅÆµÄ±ê×¼ĞÍÏòÌıÊı(0ÎªÒ»ÏòÌı£¬-1ÎªºÍÅÆ)
+	//è®¡ç®—14å¼ æ‰‹ç‰Œçš„æ ‡å‡†å‹å‘å¬æ•°(0ä¸ºä¸€å‘å¬ï¼Œ-1ä¸ºå’Œç‰Œ)
 	static int getDistanceStandard(const std::vector<Single>& handTile);
-	//¼ÆËã14ÕÅÊÖÅÆµÄÆß¶ÔĞÍÏòÌıÊı(0ÎªÒ»ÏòÌı£¬-1ÎªºÍÅÆ)
+	//è®¡ç®—14å¼ æ‰‹ç‰Œçš„ä¸ƒå¯¹å‹å‘å¬æ•°(0ä¸ºä¸€å‘å¬ï¼Œ-1ä¸ºå’Œç‰Œ)
 	static int getDistanceQidui(const std::vector<Single>& handTile);
-	//»ñµÃµ¥»¨É«ÏòÌıÊı
+	//è·å¾—å•èŠ±è‰²å‘å¬æ•°
 	static int getDistanceSingle(int shape,int mianzi,int quetou,bool z);
 }; 

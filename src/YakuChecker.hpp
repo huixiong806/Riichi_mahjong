@@ -1,5 +1,5 @@
 #include"ResultInspector.hpp"
-#include "Algorithms.hpp"
+#include "Algorithms.h"
 class YakuChecker
 {
 private:

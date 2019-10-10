@@ -1,12 +1,12 @@
 #include "Game.h"
-//¿ªÊ¼ĞÂ¾Ö
+//å¼€å§‹æ–°å±€
 void Game::startNewRound()
 {
 	w = true;
 	gameIsOver = false;
 	roundIsOver = false;
-	turn = east;//¶«¼ÒÆğÊÖ
-	mountain.reset(rule);//ÅÆÉ½ÖØÖÃ
+	turn = east;//ä¸œå®¶èµ·æ‰‹
+	mountain.reset(rule);//ç‰Œå±±é‡ç½®
 	for (int i = east, j = 0; j < 4; i = (i + 1) % 4, j++)
 	{
 		player[i].groupTile.clear();
@@ -79,7 +79,7 @@ ActionResult Game::doAction(int index, Action act)
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				//Á¢Ö±ºó²»ÄÜÃùÅÆ
+				//ç«‹ç›´åä¸èƒ½é¸£ç‰Œ
 				if (player[index].lizhiXunmu != -1)
 				{
 					res.success = false;
@@ -97,7 +97,7 @@ ActionResult Game::doAction(int index, Action act)
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				//Á¢Ö±ºó²»ÄÜÃùÅÆ
+				//ç«‹ç›´åä¸èƒ½é¸£ç‰Œ
 				if (player[index].lizhiXunmu != -1)
 				{
 					res.success = false;
@@ -114,7 +114,7 @@ ActionResult Game::doAction(int index, Action act)
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				//Á¢Ö±ºó²»ÄÜÃùÅÆ
+				//ç«‹ç›´åä¸èƒ½é¸£ç‰Œ
 				if (player[index].lizhiXunmu != -1)
 				{
 					res.success = false;
@@ -194,7 +194,7 @@ ActionResult Game::doAction(int index, Action act)
 			{
 				doraIndicatorCount++;
 				player[index].lingshang = false;
-				//todo:ÅĞ¶ÏËÄ¸ÜÉ¢ÁË
+				//todo:åˆ¤æ–­å››æ æ•£äº†
 			}
 			waitMingpai = true;
 			for (int i = 0; i < 4; ++i)
@@ -237,8 +237,8 @@ ActionResult Game::doAction(int index, Action act)
 			return res;
 			break;
 		}
-		//ÔİÊ±²»¿¼ÂÇÃùÅÆ
-		//Ò»¾Ö½áÊøÅĞ¶Ï
+		//æš‚æ—¶ä¸è€ƒè™‘é¸£ç‰Œ
+		//ä¸€å±€ç»“æŸåˆ¤æ–­
 		//std::cout << "***********" << std::endl;
 		if (mountain.remainCount() == 0)
 		{
@@ -253,12 +253,12 @@ ActionResult Game::doAction(int index, Action act)
 	}
 	return res;
 }
-//Íæ¼Ò»ñÈ¡ÓÎÏ·ĞÅÏ¢
+//ç©å®¶è·å–æ¸¸æˆä¿¡æ¯
 GameInfo Game::getGameInfo(int index)
 {
 	GameInfo res;
-	res.rule = rule;//¹æÔò
-					 //Ã¿¸öÍæ¼ÒµÄÅÆºÓ£¬ÊÇ·ñÁ¢Ö±£¬ÒÔ¼°¸±Â¶ÅÆ×é
+	res.rule = rule;//è§„åˆ™
+					 //æ¯ä¸ªç©å®¶çš„ç‰Œæ²³ï¼Œæ˜¯å¦ç«‹ç›´ï¼Œä»¥åŠå‰¯éœ²ç‰Œç»„
 	for (int i = 0, j = east; i <= 3; ++i, j = (j + 1) % 4)
 	{
 		PlayerInfo info;
@@ -270,17 +270,17 @@ GameInfo Game::getGameInfo(int index)
 		info.score= player[j].score;
 		res.playerInfo.push_back(info);
 	}
-	//ÊÖÅÆ
+	//æ‰‹ç‰Œ
 	res.handTile = player[index].handTile;
-	//Ê£ÓàÅÆÊı
+	//å‰©ä½™ç‰Œæ•°
 	res.remainTiles = mountain.remainCount();
-	//±¦ÅÆÖ¸Ê¾ÅÆ
+	//å®ç‰ŒæŒ‡ç¤ºç‰Œ
 	for (int i = 0; i < doraIndicatorCount; i++)
 	{
 		res.doraIndicator.push_back(mountain.getDoraIndicator(i));
 	}
-	res.prevailingWind = prevailingWind;   //³¡·ç
-	res.selfWind = player[index].selfWind;  //ÃÅ·ç
+	res.prevailingWind = prevailingWind;   //åœºé£
+	res.selfWind = player[index].selfWind;  //é—¨é£
 	if (waitMingpai)
 	{
 		res.nowWind = player[turn].selfWind;
@@ -295,8 +295,8 @@ GameInfo Game::getGameInfo(int index)
 			res.nowTile = Null;
 	}
 	res.remainTiles = mountain.remainCount();
-	res.lizhibangCount = lizhibang;  //¶îÍâÁ¢Ö±°ôÊıÁ¿
-	res.benchang = benchang;//±¾³¡
+	res.lizhibangCount = lizhibang;  //é¢å¤–ç«‹ç›´æ£’æ•°é‡
+	res.benchang = benchang;//æœ¬åœº
 	res.mingpai = waitMingpai;
 	res.round = round;
 	res.w = w;

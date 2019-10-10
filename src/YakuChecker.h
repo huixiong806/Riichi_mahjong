@@ -10,7 +10,7 @@ private:
 	void addYaku(AgariResult& result,Yaku yaku);
 public:
 	YakuChecker();
-	//ÒÛÂúĞÍ
+	//å½¹æ»¡å‹
 	bool tianhu(const AgariParameters& par);
 	bool dihu(const AgariParameters& par);
 	bool ziyise(const AgariParameters& par, const std::vector<Group>& mianzi);

@@ -45,25 +45,25 @@ bool YakuChecker::sigangzi(const AgariParameters& par, const std::vector<Group>&
 TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::vector<Group>& menqingMianzi)
 {
 	AgariResult result = AgariResult();
-	menqingCount = menqingMianzi.size() - 1;//·Ç¸±Â¶µÄÃæ×ÓÊı
-	menqing = menqingCount == 4;//ÊÇ·ñÃÅÇå
+	menqingCount = menqingMianzi.size() - 1;//éå‰¯éœ²çš„é¢å­æ•°
+	menqing = menqingCount == 4;//æ˜¯å¦é—¨æ¸…
 	std::vector<Group> mianzi = menqingMianzi;
 	mianzi.insert(mianzi.end(), par.groupTile.begin(), par.groupTile.end());
 	if (mianzi.size() != 5)return TryToAgariResult(AgariFaildReason::ShapeWrong);
 	result.zimo = par.type == 0;
-	//ÒÛÂúĞÍ 
-	//ÌìµØºÍ
+	//å½¹æ»¡å‹ 
+	//å¤©åœ°å’Œ
 	if (tianhu(par))
 		addYaku(result, Yaku::Tianhu);
 	if (dihu(par))
 		addYaku(result, Yaku::Dihu);
-	//×ÖÒ»É«¡¢ËÄ¸Ü×Ó
+	//å­—ä¸€è‰²ã€å››æ å­
 	if (ziyise(par,mianzi))
 		addYaku(result, Yaku::Ziyise);
 	if (sigangzi(par, mianzi))
 		addYaku(result, Yaku::Sigangzi);
-	//Ğ¡ËÄÏ²¡¢´óËÄÏ²ºÍ´óÈıÔª¡¢ÇåÀÏÍ·¡¢ÂÌÒ»É«¡¢ÇåÒ»É«(ÎªÁËÅĞ¶Ï¾ÅÁ«±¦µÆ)
-	int fengCount = 0;//·çÃæ×Ó/È¸Í·¼ÆÊı
+	//å°å››å–œã€å¤§å››å–œå’Œå¤§ä¸‰å…ƒã€æ¸…è€å¤´ã€ç»¿ä¸€è‰²ã€æ¸…ä¸€è‰²(ä¸ºäº†åˆ¤æ–­ä¹è²å®ç¯)
+	int fengCount = 0;//é£é¢å­/é›€å¤´è®¡æ•°
 	int sanyuanCount = 0;
 	bool fengQuetou = false, sanyuanQuetou = false;
 	char color = '0';
@@ -126,7 +126,7 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 			result.fan -= 1;
 		}
 	}
-	//ËÄ°µ¿ÌºÍËÄ°µ¿Ìµ¥Æï
+	//å››æš—åˆ»å’Œå››æš—åˆ»å•éª‘
 	if (menqing == true)
 	{
 		int keziCount = 0;
@@ -140,7 +140,7 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 		}
 		if (keziCount == 4)
 		{
-			//ÅĞ¶ÏËÄ°µ¿Ìµ¥Æï
+			//åˆ¤æ–­å››æš—åˆ»å•éª‘
 			if (par.target.valueEqual(quetou) || tianhu(par))
 			{
 				result.yaku.push_back(Yaku::Siankedanqi);
@@ -148,14 +148,14 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 			}
 			else if (par.type == 0)
 			{
-				//ÅĞ¶ÏËÄ°µ¿Ì
+				//åˆ¤æ–­å››æš—åˆ»
 				result.yaku.push_back(Yaku::Sianke);
 				result.fan -= 1;
 			}
 
 		}
 	}
-	//¾ÅÁ«±¦µÆ£¬´¿Õı¾ÅÁ«±¦µÆ
+	//ä¹è²å®ç¯ï¼Œçº¯æ­£ä¹è²å®ç¯
 	if (qingyise)
 	{
 		int ct[10] = { 0,0,0,0,0,0,0,0,0,0 };
@@ -195,14 +195,14 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 			result.fan -= 1;
 		}
 	}
-	//Âú×ãÒÛÂúĞÍ
+	//æ»¡è¶³å½¹æ»¡å‹
 	if (result.fan < 0)
 	{
 		return AgariResult(Algorithms::getScore(par.selfWind, result));
 	}
 	auto myHandTile = par.handTile;
 	myHandTile.push_back(par.target);
-	//¼ì²édora£¬akadoraºÍuradora
+	//æ£€æŸ¥doraï¼Œakadoraå’Œuradora
 	for (auto& doraneko : par.dora)
 		for (auto& item : myHandTile)
 			if (doraneko.valueEqual(item))
@@ -215,10 +215,10 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 		if (item.isAkadora())
 			result.akadora++;
 	result.fan += result.dora + result.akadora + result.uradora;
-	//Æ½ºÍºÍ·ûÊı¼ÆËã
+	//å¹³å’Œå’Œç¬¦æ•°è®¡ç®—
 	result.fu = 20;
 	bool pinghu = true;
-	//Ê×ÏÈÅĞ¶ÏÈ¸Í·ÊÇ·ñÎªÒÛÅÆ
+	//é¦–å…ˆåˆ¤æ–­é›€å¤´æ˜¯å¦ä¸ºå½¹ç‰Œ
 	if (mianzi[0].color == 'z')
 	{
 		if (mianzi[0].value >= 5)
@@ -237,7 +237,7 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 			pinghu = false;
 		}
 	}
-	//ÅĞ¶ÏÊÇ·ñÓĞ¿Ì×Ó
+	//åˆ¤æ–­æ˜¯å¦æœ‰åˆ»å­
 	for (int i = 1; i <= 4; ++i)
 	{
 		if (mianzi[i].type != GroupType::Shunzi)
@@ -249,9 +249,9 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 				result.fu += 8 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
 		}
 	}
-	//ºÍÅÆ·½Ê½ÊÇ·ñÎªÁ½Ãæ
-	bool liangmianOnly = true;//ÊÇ·ñÖ»ÄÜ±»¿´³ÉÁ½Ãæ
-	bool liangmian = false;//ÊÇ·ñ¿ÉÒÔ±»¿´³ÉÁ½Ãæ
+	//å’Œç‰Œæ–¹å¼æ˜¯å¦ä¸ºä¸¤é¢
+	bool liangmianOnly = true;//æ˜¯å¦åªèƒ½è¢«çœ‹æˆä¸¤é¢
+	bool liangmian = false;//æ˜¯å¦å¯ä»¥è¢«çœ‹æˆä¸¤é¢
 	for (int i = 1; i <= menqingCount; ++i)
 	{
 		if (mianzi[i].type == GroupType::Shunzi)
@@ -274,10 +274,10 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 	}
 	if (liangmian == false)
 		pinghu = false;
-	//ÎªÆ½ºÍĞÍ
+	//ä¸ºå¹³å’Œå‹
 	if (pinghu)
 	{
-		//ÃÅÇå£¬¸½¼ÓÆ½ºÍÒ»ÒÛ
+		//é—¨æ¸…ï¼Œé™„åŠ å¹³å’Œä¸€å½¹
 		if (menqing)
 		{
 			result.fan++;
@@ -285,31 +285,31 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 			if (par.type == 1)result.fu += 10;
 			//assert(res.result.fu == 20);
 		}
-		else //·ÇÃÅÇå,30·û¹Ì¶¨
+		else //éé—¨æ¸…,30ç¬¦å›ºå®š
 			result.fu = 30;
 	}
 	else
 	{
 		if (liangmianOnly == false)
 			result.fu += 2;
-		//ÃÅÇåÈÙºÍ+10·û,×ÔÃş+2·û
+		//é—¨æ¸…è£å’Œ+10ç¬¦,è‡ªæ‘¸+2ç¬¦
 		if (menqing)
 		{
 			if (par.type >= 1)
 				result.fu += 10;
 			else result.fu += 2;
 		}
-		else //¸±Â¶×ÔÃş+2·û
+		else //å‰¯éœ²è‡ªæ‘¸+2ç¬¦
 		{
 			if (par.type == 0)
 				result.fu += 2;
 		}
 	}
 	if (result.fu % 10 != 0)result.fu = result.fu - result.fu % 10 + 10;
-	//ÇåÒ»É«£¬»ìÒ»É«£¬¶ÏçÛ¾Å£¬»ìÀÏÍ·£¬´¿È«´øçÛ¾Å£¬»ìÈ«´øçÛ¾ÅµÄÅĞ¶Ï
+	//æ¸…ä¸€è‰²ï¼Œæ··ä¸€è‰²ï¼Œæ–­å¹ºä¹ï¼Œæ··è€å¤´ï¼Œçº¯å…¨å¸¦å¹ºä¹ï¼Œæ··å…¨å¸¦å¹ºä¹çš„åˆ¤æ–­
 	bool hunyise = true, duanyao = true, hunlaotou = true, chunquan = true, hunquan = true;
 	color = '0';
-	//¸±Â¶ÅÆ
+	//å‰¯éœ²ç‰Œ
 	for (auto& group : mianzi)
 	{
 		if (!group.isyaojiu())
@@ -337,7 +337,7 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 			if (group.value == 7 || group.value == 1)
 				duanyao = false;
 		}
-		else //¿Ì×Ó¡¢¸Ü×Ó»òÕßÈ¸Í·
+		else //åˆ»å­ã€æ å­æˆ–è€…é›€å¤´
 		{
 			if (group.isyaojiu())
 				duanyao = false;
@@ -408,7 +408,7 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 		}
 	}
 	/*
-	//ÈıÉ«Í¬Ë³£¬ÈıÉ«Í¬¿ÌµÄÅĞ¶Ï
+	//ä¸‰è‰²åŒé¡ºï¼Œä¸‰è‰²åŒåˆ»çš„åˆ¤æ–­
 	int sansetongshun_bukkit[9];
 	int sansetongke_bukkit[9];
 	memset(sansetongshun_bukkit, 0, sizeof(sansetongshun_bukkit));
@@ -431,10 +431,10 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 			break;
 		}
 	}*/
-	//Á¢Ö±,Á½Á¢Ö±ºÍÒ»·¢
+	//ç«‹ç›´,ä¸¤ç«‹ç›´å’Œä¸€å‘
 	if (par.lizhiXunmu != -1)
 	{
-		//wÁ¢
+		//wç«‹
 		if (par.lizhiXunmu == -2)
 		{
 			result.fan += 2;
@@ -451,19 +451,19 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 			result.yaku.push_back(Yaku::Yifa);
 		}
 	}
-	//¼ì²éÇÀ¸Ü
+	//æ£€æŸ¥æŠ¢æ 
 	if (par.type == 2)
 	{
 		result.fan += 1;
 		result.yaku.push_back(Yaku::Qianggang);
 	}
-	//¼ì²éÃÅÇå×ÔÃş
+	//æ£€æŸ¥é—¨æ¸…è‡ªæ‘¸
 	if (par.type == 0 && menqingCount == 4)
 	{
 		result.fan += 1;
 		result.yaku.push_back(Yaku::Menqianqingzimo);
 	}
-	//¼ì²éºÓµ×/º£µ×
+	//æ£€æŸ¥æ²³åº•/æµ·åº•
 	if (par.state == 2)
 	{
 		if (par.type == 0)
@@ -476,7 +476,7 @@ TryToAgariResult YakuChecker::getResult(const AgariParameters& par, const std::v
 	{
 		return TryToAgariResult(AgariFaildReason::NoYaku);
 	}
-	/*Êä³öµ÷ÊÔĞÅÏ¢-²»Í¬²ğÅÆ·½Ê½µÄÅÆĞÍºÍÒÛÖÖ
+	/*è¾“å‡ºè°ƒè¯•ä¿¡æ¯-ä¸åŒæ‹†ç‰Œæ–¹å¼çš„ç‰Œå‹å’Œå½¹ç§
 	for (auto& item : mianzi)
 	{
 		std::cout << item.getString() << " ";

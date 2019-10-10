@@ -45,10 +45,10 @@ std::string Single::getDisplay()const
 	}
 	else
 	{
-		const std::string zi[8] = { "??","¶«","ÄÏ","Î÷","±±","°×","·¢","ÖĞ" };
+		const std::string zi[8] = { "??","ä¸œ","å—","è¥¿","åŒ—","ç™½","å‘","ä¸­" };
 		res = zi[mValue];
 	}
 	return res;
 }
-//NullÓÀÔ¶ÊÇ×î´óµÄ
+//Nullæ°¸è¿œæ˜¯æœ€å¤§çš„
 const Single Null = { 1,'z' + 1,true };

@@ -7,17 +7,17 @@
 struct AgariResult
 {
 	bool zimo;
-	int fangchongID;//·Åï¥ÈËID 
-	int hupaiID;//ºÍÅÆÈËID 
-	int fan;//-1=ÒÛÂú£¬-2=Á½±¶ÒÛÂú£¬-3=Èı±¶ÒÛÂú£¬ÒÔ´ËÀàÍÆ,13·¬ÀÛ¼ÆÒÛÂú
+	int fangchongID;//æ”¾é“³äººID 
+	int hupaiID;//å’Œç‰ŒäººID 
+	int fan;//-1=å½¹æ»¡ï¼Œ-2=ä¸¤å€å½¹æ»¡ï¼Œ-3=ä¸‰å€å½¹æ»¡ï¼Œä»¥æ­¤ç±»æ¨,13ç•ªç´¯è®¡å½¹æ»¡
 	int fu;
 	int dora;
 	int akadora;
 	int uradora;
-	int scoreAdd;//²»°üº¬Á¢Ö±°ôºÍ±¾³¡°ôµÄ¼ÆËã
-	int scoreDecFangchong;//×ÔÃşÎŞĞ§ 
-	int scoreDecZhuang;//ÈÙºÍÎŞĞ§ 
-	int scoreDecXian;//ÈÙºÍÎŞĞ§ 
+	int scoreAdd;//ä¸åŒ…å«ç«‹ç›´æ£’å’Œæœ¬åœºæ£’çš„è®¡ç®—
+	int scoreDecFangchong;//è‡ªæ‘¸æ— æ•ˆ 
+	int scoreDecZhuang;//è£å’Œæ— æ•ˆ 
+	int scoreDecXian;//è£å’Œæ— æ•ˆ 
 	//int nukidora;
 	AgariResult()
 	{
@@ -35,11 +35,11 @@ struct AgariResult
 };
 enum class AgariFaildReason
 {
-	Null,//¿Õ
-	ShapeWrong,//²»Âú×ãºÍÅÆĞÍ
-	NoYaku,//ÎŞÒÛ
-	NotEnoughFan,//·¬¸¿
-	CantQiangAnGang//·Ç¹úÊ¿ÎŞË«²»ÄÜÇÀ°µ¸Ü
+	Null,//ç©º
+	ShapeWrong,//ä¸æ»¡è¶³å’Œç‰Œå‹
+	NoYaku,//æ— å½¹
+	NotEnoughFan,//ç•ªç¼š
+	CantQiangAnGang//éå›½å£«æ— åŒä¸èƒ½æŠ¢æš—æ 
 };
 struct TryToAgariResult
 {
@@ -74,14 +74,14 @@ struct TryToAgariResult
 	}
 };
 /*type
-	×ÔÃş=0
-	ÈÙºÍ=1
-	ÇÀ¸Ü=2
-	ÇÀ°µ¸Ü=3
+	è‡ªæ‘¸=0
+	è£å’Œ=1
+	æŠ¢æ =2
+	æŠ¢æš—æ =3
 	state
-	Õı³£=0
-	ÌìµØºÍ=1
-	ºÓµ×/º£µ×=2
+	æ­£å¸¸=0
+	å¤©åœ°å’Œ=1
+	æ²³åº•/æµ·åº•=2
 */
 struct AgariParameters
 {
