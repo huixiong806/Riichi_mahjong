@@ -1,13 +1,8 @@
 #pragma once
 #include "ResultInspector.hpp"
-#include<set>
-#include<map>
-#include<cassert>
-#include<queue>
-#include<algorithm>
-#include<cstring>
-class Algorithms
-{
+#include <queue>
+
+class Algorithms {
 private:
 	//判断是否为国士无双和牌型
 	static bool guoshiWithoutYaku(const Single& target, const std::vector<Single>& handTile);
@@ -20,11 +15,12 @@ private:
 	//试图和牌，并计算国士无双型和牌点数
 	static TryToAgariResult guoshiwushuang(const AgariParameters& par);
 	//试图和牌，并计算标准型和牌点数，返回(点数最大的)结果,depth=0表示枚举雀头，dep=4为最深层
-	static TryToAgariResult agariSearch(const AgariParameters& par, int depth, std::vector<Single> remainTiles, std::vector<Group> mianzi);
+	static TryToAgariResult agariSearch(const AgariParameters& par, int depth, std::vector<Single> remainTiles,
+	                                    std::vector<Group> mianzi);
 	//试图和牌，并计算七对型和牌点数
 	static TryToAgariResult qidui(const AgariParameters& par);
 	//构造给定数量的雀头和面子的牌型，存到queue中
-	static void constructTarget(int quetou, int mianzi, std::queue<int>& q,int shape,int target,bool z);
+	static void constructTarget(int quetou, int mianzi, std::queue<int>& q, int shape, int target, bool z);
 	//5的幂
 	static const int pow5[10];
 	//到给定目标的距离，参数分别为原形状、目标雀头数*5+目标面子数(雀头最多只能有一个) 原形状为9位5进制数，从低到高表示手牌中数字1~9有几个
@@ -34,9 +30,9 @@ private:
 	//标准型役种判断
 	static TryToAgariResult YakuCheckForStandard(const AgariParameters& par, std::vector<Group>& mianzi);
 public:
-	
+
 	//试图和牌，返回点数最大的结果
-	static TryToAgariResult agari(const AgariParameters par);
+	static TryToAgariResult agari(AgariParameters par);
 	/*type
 	自摸=0
 	荣和=1
@@ -60,5 +56,5 @@ public:
 	//计算14张手牌的七对型向听数(0为一向听，-1为和牌)
 	static int getDistanceQidui(const std::vector<Single>& handTile);
 	//获得单花色向听数
-	static int getDistanceSingle(int shape,int mianzi,int quetou,bool z);
-}; 
+	static int getDistanceSingle(int shape, int mianzi, int quetou, bool z);
+};

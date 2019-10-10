@@ -1,13 +1,13 @@
 #pragma once
-#include"ResultInspector.hpp"
+#include "ResultInspector.hpp"
 #include "Algorithms.h"
-class YakuChecker
-{
+
+class YakuChecker {
 private:
-	bool qingyise;
-	bool menqing;
-	int menqingCount;
-	void addYaku(AgariResult& result,Yaku yaku);
+	bool qingyise{};
+	bool menqing{};
+	int menqingCount{};
+	void addYaku(AgariResult& result, Yaku yaku);
 public:
 	YakuChecker();
 	//役满型

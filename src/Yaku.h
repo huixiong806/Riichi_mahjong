@@ -1,8 +1,8 @@
 #pragma once
 #include<unordered_map>
+
 //三位16进制数，第一位为番数(役满记d,两倍役满记f,食下役按照门清版算)，第二位:0=非食下役/食下役的门清版，1=门清限定，2=食下役的非门清版,第三位为编号
-enum class Yaku
-{
+enum class Yaku {
 	Lizhi = 0x110,
 	Yifa = 0x111,
 	Menqianqingzimo = 0x112,
@@ -63,5 +63,6 @@ enum class Yaku
 	Chunzhengjiulianbaodeng = 0xf12,
 	Dasixi = 0xf00,
 };
+
 extern const std::unordered_map<int, const std::string> YakuName;
 const std::string& getYakuName(int index);

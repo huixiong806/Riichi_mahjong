@@ -96,5 +96,8 @@
     <ClCompile Include="..\src\utils\console.cpp">
       <Filter>src\utils</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\ai\Human.cpp">
+      <Filter>src\ai</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
