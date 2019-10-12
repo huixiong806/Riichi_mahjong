@@ -121,8 +121,9 @@ TryToAgariResult Algorithms::agari(const AgariParameters par) {
 
 //标准型和牌役种判断
 TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, std::vector<Group>& mianzi) {
-	YakuChecker yakucheker;
-	return yakucheker.getResult(par, mianzi);
+	auto allMianzi = mianzi;
+	allMianzi.insert(allMianzi.end(), par.groupTile.begin(), par.groupTile.end());
+	return CheckYakuForStandardType(par, allMianzi);
 }
 
 //判断是否为标准和牌型，返回(点数最大的)结果,depth=0表示枚举雀头，dep=4为最深层
