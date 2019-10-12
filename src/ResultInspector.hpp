@@ -23,7 +23,7 @@ struct AgariResult {
 		zimo = fan = fu = dora = akadora = uradora = scoreAdd = scoreDecFangchong = scoreDecZhuang = scoreDecXian = 0;
 	}
 
-	std::vector<Yaku> yaku;
+	Yakus yaku;
 	bool operator <(const AgariResult& rhs) const { return scoreAdd < rhs.scoreAdd; }
 	bool operator ==(const AgariResult& rhs) const { return scoreAdd == rhs.scoreAdd; }
 };

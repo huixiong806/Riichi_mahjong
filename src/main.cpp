@@ -56,8 +56,8 @@ void test() {
 	auto re = r.result;
 	cout << "Test " << (re.zimo ? "自摸" : "荣和") << endl;
 	cout << endl;
-	for (auto& yk : re.yaku) {
-		cout << getYakuName(static_cast<int>(yk)) << " ";
+	for (auto&& yk : re.yaku) {
+		cout << getYakuName(yk) << " ";
 		cout << endl;
 	}
 	cout << "宝牌" << re.dora << "   红宝牌" << re.akadora << "   里宝牌" << re.uradora << endl;
@@ -142,8 +142,8 @@ int main() {
 			for (auto& res : result.agariResult) {
 				cout << player[res.hupaiID]->getName() << " " << (res.zimo ? "自摸" : "荣和") << endl;
 				cout << "役种:" << endl;
-				for (auto& yk : res.yaku) {
-					cout << getYakuName(static_cast<int>(yk)) << " ";
+				for (auto&& yk : res.yaku) {
+					cout << getYakuName(yk) << " ";
 					cout << endl;
 				}
 				cout << "宝牌" << res.dora << "   红宝牌" << res.akadora << "   里宝牌" << res.uradora << endl;

@@ -293,9 +293,9 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	//役满型:天和,地和,字一色
 	if (par.state == 1 && par.type == 0) {
 		if (par.selfWind == EAST)
-			res.yaku.push_back(Yaku::Tianhu);
+			res.yaku.add<Yaku::Tianhu>();
 		else
-			res.yaku.push_back(Yaku::Dihu);
+			res.yaku.add<Yaku::Dihu>();
 		res.fan -= 1;
 	}
 	auto ziyise = true;
@@ -309,7 +309,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 		ziyise = false;
 	if (ziyise == true) {
 		res.fan -= 1;
-		res.yaku.push_back(Yaku::Ziyise);
+		res.yaku.add<Yaku::Ziyise>();
 	}
 	res.zimo = par.type == 0;
 	//满足役满型
@@ -320,7 +320,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	//不满足役满型，则一定需要计算七对型
 	res.fan += 2;
 	res.fu = 25;
-	res.yaku.push_back(Yaku::Qiduizi);
+	res.yaku.add<Yaku::Qiduizi>();
 	//检查dora，akadora和uradora
 	auto myHandTile = par.handTile;
 	myHandTile.push_back(par.target);
@@ -341,32 +341,32 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 		//w立
 		if (par.lizhiXunmu == -2) {
 			res.fan += 2;
-			res.yaku.push_back(Yaku::Lianglizhi);
+			res.yaku.add<Yaku::Lianglizhi>();
 		}
 		else {
 			res.fan += 1;
-			res.yaku.push_back(Yaku::Lizhi);
+			res.yaku.add<Yaku::Lizhi>();
 		}
 		if (par.yifa == true) {
 			res.fan += 1;
-			res.yaku.push_back(Yaku::Yifa);
+			res.yaku.add<Yaku::Yifa>();
 		}
 	}
 	//检查抢杠
 	if (par.type == 2) {
 		res.fan += 1;
-		res.yaku.push_back(Yaku::Qianggang);
+		res.yaku.add<Yaku::Qianggang>();
 	}
 	//检查门清自摸
 	if (par.type == 0) {
 		res.fan += 1;
-		res.yaku.push_back(Yaku::Menqianqingzimo);
+		res.yaku.add<Yaku::Menqianqingzimo>();
 	}
 	//检查河底/海底
 	if (par.state == 2) {
 		if (par.type == 0)
-			res.yaku.push_back(Yaku::Haidilaoyue);
-		else if (par.type == 1)res.yaku.push_back(Yaku::Hedilaoyu);
+			res.yaku.add<Yaku::Haidilaoyue>();
+		else if (par.type == 1)res.yaku.add<Yaku::Hedilaoyu>();
 	}
 	//检查清一色，混一色，断幺九，混老头
 	auto qingyise = true, hunyise = true, duanyao = true, hunlaotou = true;
@@ -391,19 +391,19 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	}
 	if (qingyise) {
 		res.fan += 6;
-		res.yaku.push_back(Yaku::Qingyise);
+		res.yaku.add<Yaku::Qingyise>();
 	}
 	else if (hunyise) {
 		res.fan += 3;
-		res.yaku.push_back(Yaku::Hunyise);
+		res.yaku.add<Yaku::Hunyise>();
 	}
 	if (duanyao) {
 		res.fan += 1;
-		res.yaku.push_back(Yaku::Duanyaojiu);
+		res.yaku.add<Yaku::Duanyaojiu>();
 	}
 	if (hunlaotou) {
 		res.fan += 2;
-		res.yaku.push_back(Yaku::Hunlaotou);
+		res.yaku.add<Yaku::Hunlaotou>();
 	}
 	res = getScore(par.selfWind, res);
 	return TryToAgariResult(res);
@@ -437,19 +437,19 @@ TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par) {
 		if (par.selfWind == EAST) {
 			if (guoshi != 0)
 				guoshi = 2;
-			res.yaku.push_back(Yaku::Tianhu);
+			res.yaku.add<Yaku::Tianhu>();
 		}
 		else
-			res.yaku.push_back(Yaku::Dihu);
+			res.yaku.add<Yaku::Dihu>();
 		if (guoshi > 0)
 			res.fan -= 1;
 	}
 	if (guoshi == 1) {
-		res.yaku.push_back(Yaku::Guoshiwushuang);
+		res.yaku.add<Yaku::Guoshiwushuang>();
 		res.fan -= 1;
 	}
 	else if (guoshi == 2) {
-		res.yaku.push_back(Yaku::Guoshiwushuangshisanmian);
+		res.yaku.add<Yaku::Guoshiwushuangshisanmian>();
 		res.fan -= 2;
 	}
 	else { return TryToAgariResult(AgariFaildReason::ShapeWrong); }
