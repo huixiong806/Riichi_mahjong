@@ -13,6 +13,7 @@ static constexpr const char* YakuName[] =
 	"役牌：中",
 	"平和",
 	"一杯口",
+	"枪杠",
 	"岭上开花",
 	"海底捞月",
 	"河底捞鱼",
@@ -48,12 +49,12 @@ static constexpr const char* YakuName[] =
 	"国士无双",
 	"小四喜",
 	"四杠子",
+	"九莲宝灯",
 	"四暗刻单骑",
 	"国士无双十三面",
 	"纯正九莲宝灯",
 	"大四喜"
 };
-
 std::string_view getYakuName(const Yaku index) noexcept {
 	const auto idx = yakuToIndex(index);
 	return idx != 0xFFFFFFFF ? YakuName[idx] : std::string_view();

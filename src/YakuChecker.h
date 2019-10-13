@@ -47,6 +47,8 @@ public:
 	[[nodiscard]] bool lvyise() const noexcept;
 	[[nodiscard]] bool sianke() const noexcept;
 	[[nodiscard]] bool siankedanqi() const noexcept;
+	[[nodiscard]] bool jiulianbaodengShape() const noexcept;
+	[[nodiscard]] bool chunzhengjiulianbaodengShape() const noexcept;
 	[[nodiscard]] bool jiulianbaodeng() const noexcept;
 	[[nodiscard]] bool chunzhengjiulianbaodeng() const noexcept;
 	//非役满型

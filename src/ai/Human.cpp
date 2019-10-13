@@ -181,8 +181,8 @@ void Human::printInfo(const GameInfo& info) {
 	}
 	auto hand = info.handTile;
 	hand.push_back(info.nowTile);
-	std::cout << "当前标准型" << Algorithms::getDistanceStandard(hand) << "向听，七对" << Algorithms::getDistanceQidui(hand) <<
-		"向听" << std::endl;
+	std::cout << "当前面子手" << Algorithms::getDistanceStandard(hand) << "向听，七对" << Algorithms::getDistanceQidui(hand) <<
+		"向听，国士"<< Algorithms::getDistanceGuoshi(hand) <<"向听"<< std::endl;
 	std::cout << windName[info.selfWind] << "| ";
 
 	for (auto& item : info.handTile)

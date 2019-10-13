@@ -1,7 +1,7 @@
 #pragma once
 #include <string_view>
 
-//三位16进制数，第一位为番数(役满记d,两倍役满记f,食下役按照门清版算)，第二位:0=非食下役/食下役的门清版，1=门清限定，2=食下役的非门清版,第三位为编号
+//三位16进制数，第一位为番数(役满记d,两倍役满记f,食下役按照应有的番数算)，第二位:0=非食下役/食下役的门清版，1=门清限定，2=食下役的非门清版,第三位为编号
 enum class Yaku {
 	Lizhi = 0x110,
 	Yifa = 0x111,
@@ -167,7 +167,7 @@ public:
 
 	struct forward_iterator {
 	private:
-		uint64_t status = 0;
+		uint64_t status = 0xFFFFFFFFFFFFFFFF;
 		int index{};
 	public:
 		constexpr forward_iterator() noexcept = default;
@@ -179,7 +179,13 @@ public:
 		constexpr bool operator !=(const forward_iterator& r) const noexcept { return status != r.status; }
 
 		constexpr forward_iterator& operator++() noexcept {
-			return index = first(status), status &= ~(1ull << index), *this;
+			if (status){
+				index = first(status), status &= ~(1ull << index);
+			}
+			else{
+				status = 0xFFFFFFFFFFFFFFFF;
+			}
+			return *this;
 		}
 
 		constexpr forward_iterator operator++(int) noexcept {

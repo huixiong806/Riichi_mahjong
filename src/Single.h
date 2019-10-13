@@ -39,7 +39,7 @@ public:
 
 	[[nodiscard]] std::string getDisplay() const;
 	[[nodiscard]] std::string getString() const;
-	bool isyaojiu();
+	bool isyaojiu()const;
 };
 
 //Null永远是最大的

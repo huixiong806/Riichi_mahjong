@@ -19,7 +19,7 @@ std::string Single::getString() const {
 	return res;
 }
 
-bool Single::isyaojiu() {
+bool Single::isyaojiu() const {
 	if (mColor == 'z')return true;
 	if (mValue == 1 || mValue == 9)return true;
 	return false;

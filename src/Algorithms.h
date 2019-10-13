@@ -55,6 +55,10 @@ public:
 	static int getDistanceStandard(const std::vector<Single>& handTile);
 	//计算14张手牌的七对型向听数(0为一向听，-1为和牌)
 	static int getDistanceQidui(const std::vector<Single>& handTile);
+	//计算14张手牌的国士无双向听数(0为一向听，-1为和牌)
+	static int getDistanceGuoshi(const std::vector<Single>& handTile);
+	//计算14张手牌的向听数(0为一向听，-1为和牌)
+	static int getDistance(const std::vector<Single>& handTile);
 	//获得单花色向听数
 	static int getDistanceSingle(int shape, int mianzi, int quetou, bool z);
 };

@@ -459,28 +459,9 @@ TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par) {
 }
 
 bool Algorithms::guoshiWithoutYaku(const Single& target, const std::vector<Single>& handTile) {
-	auto res = false;
-	auto guoshi = 0;
-	if (handTile.size() == 13) {
-		std::set<Single> all;
-		for (auto& item : handTile)
-			if (item.value() == 1 || item.value() == 9 || item.color() == 'z')
-				all.insert(item);
-		//国士
-		if (all.size() == 12) {
-			if (target.value() == 1 || target.value() == 9 || target.color() == 'z') {
-				all.insert(target);
-				if (all.size() == 13)
-					guoshi = 1;
-			}
-		}
-			//国士十三面
-		else if (all.size() == 13) {
-			if (target.value() == 1 || target.value() == 9 || target.color() == 'z')
-				guoshi = 2;
-		}
-	}
-	return guoshi > 0;
+	auto allTiles = handTile;
+	allTiles.push_back(target);
+	return getDistanceGuoshi(allTiles) == -1;
 }
 
 bool Algorithms::qiduiWithoutYaku(const Single& target, const std::vector<Single>& handTile) {
@@ -764,4 +745,34 @@ int Algorithms::getDistanceQidui(const std::vector<Single>& handTile) {
 			else if (getNumberCount(shape[i], j) == 1)
 				fupaiCount++;
 	return 6 - duiziCount + std::max(0, 7 - duiziCount - fupaiCount);
+}
+//计算14张手牌的国士无双向听数(0为一向听，-1为和牌)
+int Algorithms::getDistanceGuoshi(const std::vector<Single>& handTile)
+{
+	auto yaojiuTypeCount=0;
+	auto yaojiuCount = 0;
+	bool have[13] = { 0,0,0,0,0,0,0,0,0,0,0,0,0 };//1m9m1p9m1s9s1234567z;
+	for (auto& item : handTile) {
+		if (item.isyaojiu()){
+			yaojiuCount++;
+			int index = -1;
+			if (item.color() == 'm' && item.value() == 1)index = 0;
+			else if (item.color() == 'm' && item.value() == 9)index = 1;
+			else if (item.color() == 'p' && item.value() == 1)index = 2;
+			else if (item.color() == 'p' && item.value() == 9)index = 3;
+			else if (item.color() == 's' && item.value() == 1)index = 4;
+			else if (item.color() == 's' && item.value() == 9)index = 5;
+			else if (item.color() == 'z')index = item.value() + 5;
+			if (!have[index]){
+				yaojiuTypeCount++;
+				have[index] = true;
+			}
+		}
+	}
+	return 12 + (int)(yaojiuCount <= yaojiuTypeCount) - yaojiuTypeCount;
+}
+//计算14张手牌的向听数(0为一向听，-1为和牌)
+int Algorithms::getDistance(const std::vector<Single>& handTile)
+{
+	return std::min(std::min(getDistanceGuoshi(handTile), getDistanceQidui(handTile)), getDistanceStandard(handTile));
 }

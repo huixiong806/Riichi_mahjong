@@ -165,7 +165,7 @@ bool YakuChecker::sianke() const noexcept {
 		if (group.type == GroupType::Quetou)
 			quetou = Single(group.value, group.color, false);
 	}
-	return par.type == 0 && !par.target.valueEqual(quetou) && !tianhu();
+	return keziCount == 4 && par.type == 0 && !par.target.valueEqual(quetou) && !tianhu();
 }
 
 bool YakuChecker::siankedanqi() const noexcept {
@@ -180,44 +180,49 @@ bool YakuChecker::siankedanqi() const noexcept {
 	}
 	return keziCount == 4 && (par.target.valueEqual(quetou) || tianhu());
 }
-
+bool YakuChecker::jiulianbaodengShape()const noexcept{
+	if (!qingyise())return false;
+	int ct[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	for (auto& item : par.handTile)
+		ct[item.value()]++;
+	ct[par.target.value()]++;
+	auto subflag = false;
+	for (auto i = 1; i <= 9; ++i) {
+		if (!subflag && (ct[i] > 0 && ct[i] % 2 == 0)) {
+			ct[i]--;
+			subflag = true;
+		}
+	}
+	if (!subflag) return false;
+	for (auto i = 1; i <= 9; ++i) {
+		if ((i == 1 || i == 9) && ct[i] != 3) return false;
+		if (i > 1 && i < 9 && ct[i] != 1) return false;
+	}
+	return true;
+}
+bool YakuChecker::chunzhengjiulianbaodengShape()const noexcept {
+	if (!qingyise())return false;
+	int ct[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	for (auto& item : par.handTile)
+		ct[item.value()]++;
+	for (auto i = 1; i <= 9; ++i) {
+		if ((i == 1 || i == 9) && ct[i] != 3) return false;
+		if (i > 1 && i < 9 && ct[i] != 1) return false;
+	}
+	return true;
+}
 bool YakuChecker::jiulianbaodeng() const noexcept {
 	return UnSyncCacheInvoke<Yaku::Jiulianbaodeng>(
 		[this]() noexcept {
-			if (qingyise() || chunzhengjiulianbaodeng() || tianhu()) return false;
-			int ct[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-			for (auto& item : par.handTile)
-				ct[item.value()]++;
-			ct[par.target.value()]++;
-			auto subflag = false;
-			for (auto i = 1; i <= 9; ++i) {
-				if (!subflag && (ct[i] > 0 && ct[i] % 2 == 0)) {
-					ct[i]--;
-					subflag = true;
-				}
-			}
-			if (!subflag) return false;
-			for (auto i = 1; i <= 9; ++i) {
-				if ((i == 1 || i == 9) && ct[i] != 3) return false;
-				if (i > 1 && i < 9 && ct[i] != 1) return false;
-			}
-			return true;
+			if (tianhu()|| chunzhengjiulianbaodengShape()) return false;
+			return jiulianbaodengShape();
 		});
 }
 
 bool YakuChecker::chunzhengjiulianbaodeng() const noexcept {
 	return UnSyncCacheInvoke<Yaku::Chunzhengjiulianbaodeng>(
 		[this]() noexcept {
-			if (qingyise()) return false;
-			if (tianhu()) return true;
-			int ct[10] = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-			for (auto& item : par.handTile)
-				ct[item.value()]++;
-			for (auto i = 1; i <= 9; ++i) {
-				if ((i == 1 || i == 9) && ct[i] != 3) return false;
-				if (i > 1 && i < 9 && ct[i] != 1) return false;
-			}
-			return true;
+			return chunzhengjiulianbaodengShape() || (jiulianbaodengShape() && tianhu());
 		});
 }
 

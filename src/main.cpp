@@ -30,17 +30,17 @@ void test() {
 	}
 	//手牌
 	res.handTile.emplace_back(1, 's', 0);
+	res.handTile.emplace_back(9, 's', 0);
+	res.handTile.emplace_back(1, 'm', 0);
+	res.handTile.emplace_back(9, 'm', 0);
+	res.handTile.emplace_back(1, 'p', 0);
+	res.handTile.emplace_back(9, 'p', 0);
 	res.handTile.emplace_back(1, 's', 0);
-	res.handTile.emplace_back(1, 's', 0);
-	res.handTile.emplace_back(1, 's', 0);
 	res.handTile.emplace_back(2, 's', 0);
-	res.handTile.emplace_back(2, 's', 0);
-	res.handTile.emplace_back(2, 's', 0);
-	res.handTile.emplace_back(2, 's', 0);
-	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(3, 's', 0);
+	res.handTile.emplace_back(3, 'z', 0);
+	res.handTile.emplace_back(4, 'z', 0);
+	res.handTile.emplace_back(5, 'z', 0);
+	res.handTile.emplace_back(6, 'z', 0);
 	res.handTile.emplace_back(7, 'z', 0);
 	sort(res.handTile.begin(), res.handTile.end());
 	res.nowTile = Single(7, 'z', false);
@@ -52,7 +52,7 @@ void test() {
 	human->generateAction(res);
 	Player p;
 	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, false);
-	auto r = p.zimo(res.prevailingWind, 0, {}, {});
+	auto r = p.zimo(res.prevailingWind, res.w, {}, {});
 	auto re = r.result;
 	cout << "Test " << (re.zimo ? "自摸" : "荣和") << endl;
 	cout << endl;
