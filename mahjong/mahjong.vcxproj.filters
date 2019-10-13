@@ -22,9 +22,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\src\ai\Human.hpp">
-      <Filter>src\ai</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\ai\AutoFurikomu.hpp">
       <Filter>src\ai</Filter>
     </ClInclude>
@@ -64,6 +61,12 @@
     <ClInclude Include="..\src\utils\console.h">
       <Filter>src\utils</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ai\Human.h">
+      <Filter>src\ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ai\Tester.h">
+      <Filter>src\ai</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YakuChecker.cpp">
@@ -97,6 +100,9 @@
       <Filter>src\utils</Filter>
     </ClCompile>
     <ClCompile Include="..\src\ai\Human.cpp">
+      <Filter>src\ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ai\Tester.cpp">
       <Filter>src\ai</Filter>
     </ClCompile>
   </ItemGroup>

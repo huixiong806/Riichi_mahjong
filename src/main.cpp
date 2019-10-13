@@ -6,12 +6,13 @@
 
 #include <iostream>
 #include <vector>
+#include <ctime>
 #include <unordered_map>
 #include "Game.h"
-#include "ai/Human.hpp"
+#include "ai/Human.h"
 #include "ai/AutoFurikomu.hpp"
 #include "utils/console.h"
-
+#include "ai/Tester.h"
 using namespace std;
 shared_ptr<ActionGenerator> player[4];
 Game game;
@@ -97,21 +98,21 @@ int main() {
 	cout << "预处理中..." << endl;
 	Algorithms::preprocessDistance();
 	cout << "预处理结束" << endl;
-	test();
+	//test();
 	//test2();
 	/*
 	种子收集
 	3 杠3z
 	233 7对子自摸，留1m和3p
 	*/
-	int seed;
-	cout << "输入种子:" << endl;
-	cin >> seed;
+	int seed=time(0);
+	//cout << "输入种子:" << endl;
+	//cin >> seed;
 	srand(seed);
-	player[0] = make_shared<AutoFurikomu>("放铳人A");
-	player[1] = make_shared<AutoFurikomu>("放铳人B");
-	player[2] = make_shared<AutoFurikomu>("放铳人C");
-	player[3] = make_shared<Human>("实战测试人");
+	player[0] = make_shared<Tester>("全自动放铳鸡 A");
+	player[1] = make_shared<Tester>("全自动放铳鸡 B");
+	player[2] = make_shared<Tester>("全自动放铳鸡 C");
+	player[3] = make_shared<Human>("测试人");
 	cout << "游戏开始！" << endl;
 	auto first = true;
 	do {
@@ -125,7 +126,8 @@ int main() {
 				const auto action = player[i]->generateAction(game.getGameInfo(i));
 				const auto res = game.doAction(i, action);
 				if (!res.success) {
-					cout << "出现错误,输入任意内容退出" << endl;
+					cout << "出现错误,输入任意内容退出,错误编码:"<<(int)res.type << endl;
+					assert(0);
 					int a;
 					cin >> a;
 					return 0;
@@ -157,6 +159,7 @@ int main() {
 				else { cout << res.fan << "番" << res.fu << "符   " << res.scoreAdd << "点" << endl; }
 			}
 		}
+		cout << endl;
 	}
 	while (!game.gameOver());
 	cout << "游戏结束！" << endl;

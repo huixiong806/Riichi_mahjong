@@ -15,6 +15,28 @@ void Algorithms::setNumberCount(int& shape, int value, int count) {
 
 void Algorithms::addNumberCount(int& shape, int value, int count) { shape += pow5[value - 1]; }
 
+//0~8 万字,9~17 饼子,18~26 索子,27~33 东南西北白发中
+int Algorithms::getTileIndex(Single& tile)
+{
+	if (tile.color() == 'm')return tile.value() - 1;
+	if (tile.color() == 'p')return tile.value() + 8;
+	if (tile.color() == 's')return tile.value() + 17;
+	if (tile.color() == 'z')return tile.value() + 26;
+	return -1;
+}
+//获取所有类型的牌
+std::vector<Single> Algorithms::allKindsOfTiles()
+{
+	std::vector<Single> res;
+	for (auto i = 1; i <= 9; ++i) {
+		res.emplace_back(i, 'm', 0);
+		res.emplace_back(i, 'p', 0);
+		res.emplace_back(i, 's', 0);
+		if (i <= 7)
+			res.emplace_back(i, 'z', 0);
+	}
+	return res;
+}
 std::vector<Single> Algorithms::tingpai(std::vector<Single> handTile) {
 	std::vector<Single> res;
 	for (auto i = 1; i <= 9; ++i) {

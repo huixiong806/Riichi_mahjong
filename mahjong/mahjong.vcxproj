@@ -142,11 +142,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\ai\Tester.h" />
     <ClInclude Include="..\src\Algorithms.h" />
     <ClInclude Include="..\src\ai\AutoFurikomu.hpp" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\Group.h" />
-    <ClInclude Include="..\src\ai\Human.hpp" />
+    <ClInclude Include="..\src\ai\Human.h" />
     <ClInclude Include="..\src\Mountain.h" />
     <ClInclude Include="..\src\MovementGenerator.hpp" />
     <ClInclude Include="..\src\Player.hpp" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\ai\Human.cpp" />
+    <ClCompile Include="..\src\ai\Tester.cpp" />
     <ClCompile Include="..\src\Algorithms.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\Group.cpp" />

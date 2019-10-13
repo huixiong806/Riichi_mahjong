@@ -42,9 +42,12 @@ public:
 	//根据和牌结果计算打点
 	static AgariResult getScore(WindType selfWind, AgariResult inp);
 	//0~8 万字,9~17 饼子,18~26 索子,27~33 东南西北白发中
+	static int getTileIndex(Single& tile);
 	static std::vector<int> getPool(const std::vector<Single>& tiles);
 	//快速判断是否形式听牌。不允许虚听，允许空听。返回听牌种类
 	static std::vector<Single> tingpai(std::vector<Single> handTile);
+	//获取所有类型的牌
+	static std::vector<Single> allKindsOfTiles();
 	//shape为压缩后的牌型参数，value为要获取个数的数字。函数对单花色牌的压缩型进行操作。
 	static int getNumberCount(int shape, int value);
 	static void setNumberCount(int& shape, int value, int count);

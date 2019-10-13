@@ -79,7 +79,7 @@ struct PlayerInfo {
 	std::vector<Group> groupTile; //副露牌组
 	std::vector<Single> discardTile; //牌河
 	int lizhi{}; //立直宣言牌是牌河中的第几张，-1为未立直
-	int lizhiXunmu{}; //立直的巡目
+	int lizhiXunmu{}; //立直的巡目，-1为未立直，-2为w立
 	int yifa{}; //是否处于一发巡
 	int score{};
 };

@@ -265,7 +265,7 @@ TryToAgariResult YakuChecker::getResult() {
 	if (result.fan < 0) { return AgariResult(Algorithms::getScore(par.selfWind, result)); }
 	auto myHandTile = par.handTile;
 	myHandTile.push_back(par.target);
-	//检查dora，akadora和uradora
+	//检查dora，akadora和uradora,并在最后有役的情况下增加翻数。
 	for (auto& doraneko : par.dora)
 		for (auto& item : myHandTile)
 			if (doraneko.valueEqual(item))
@@ -277,7 +277,6 @@ TryToAgariResult YakuChecker::getResult() {
 	for (auto& item : myHandTile)
 		if (item.isAkadora())
 			result.akadora++;
-	result.fan += result.dora + result.akadora + result.uradora;
 	//平和和符数计算
 	result.fu = 20;
 	auto pinghu = true;
@@ -487,9 +486,10 @@ TryToAgariResult YakuChecker::getResult() {
 			result.yaku.add<Yaku::Haidilaoyue>();
 		else if (par.type == 1)result.yaku.add<Yaku::Hedilaoyu>();
 	}
-	result = Algorithms::getScore(par.selfWind, result);
 	//std::cout << "*" << std::endl;
 	if (result.fan == 0) { return TryToAgariResult(AgariFaildReason::NoYaku); }
+	result.fan += result.dora + result.akadora + result.uradora;
+	result = Algorithms::getScore(par.selfWind, result);
 	/*输出调试信息-不同拆牌方式的牌型和役种
 	for (auto& item : mianzi)
 	{

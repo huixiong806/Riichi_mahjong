@@ -3,7 +3,7 @@
 #include <set>
 #include <iostream>
 #include <iomanip>
-#include "Human.hpp"
+#include "Human.h"
 
 const std::string windName[4] = {"东", "南", "西", "北"};
 const std::string actionName[11] = {"error", "跳过", "error", "吃", "碰", "杠", "和", "立直", "自摸", "流局", "拔北"};
@@ -89,7 +89,11 @@ std::vector<Action> Human::getZimoAction(const GameInfo& info) {
 
 std::vector<Action> Human::getLizhiAction(const GameInfo& info) {
 	std::set<Action> res;
+	if (info.playerInfo[static_cast<int>(info.selfWind)].score < 1000)
+		return std::vector<Action>();
 	if (info.playerInfo[static_cast<int>(info.selfWind)].lizhiXunmu != -1)
+		return std::vector<Action>();
+	if (info.remainTiles<4)
 		return std::vector<Action>();
 	auto allTiles = info.handTile;
 	allTiles.push_back(info.nowTile);
@@ -168,12 +172,12 @@ void Human::printInfo(const GameInfo& info) {
 	std::cout << "自风为" << windName[static_cast<int>(info.selfWind)] << std::endl;
 	//<< "  场风役牌:" << Single((int)info.prevailingWind + 1, 'z', false).getString() << "  自风役牌:" << Single((int)info.selfWind + 1, 'z', false).getString() << std::endl;
 	std::cout << "宝牌指示牌 ";
-	for (auto& item : info.doraIndicator) { std::cout << item.getString() << " "; }
+	for (auto& item : info.doraIndicator) { std::cout << item.getDisplay() << " "; }
 	std::cout << std::endl;
 	std::cout << "信息:" << std::endl;
 	for (auto wind = 0; wind <= 3; ++wind) {
 		std::cout << windName[wind] << "家  " << std::setw(7) << std::left << info.playerInfo[wind].score << std::setw(0)
-			<< "|";
+			<< (info.playerInfo[wind].lizhiXunmu != -1 ? ("（立直）") : ("")) << "|";
 		for (auto& item : info.playerInfo[wind].groupTile) { std::cout << item.getString() << " "; }
 		std::cout << std::endl;
 		for (auto& item : info.playerInfo[wind].discardTile) { std::cout << item.getDisplay() << " "; }
@@ -190,7 +194,8 @@ void Human::printInfo(const GameInfo& info) {
 
 	std::cout << std::endl;
 	std::cout << "ID| ";
-	for (auto j = 0; j < (13 - info.playerInfo[info.selfWind].groupTile.size() * 3); ++j) {
+	int add = info.mingpai == false && info.nowTile == Null;
+	for (auto j = 0; j < (13+add - info.playerInfo[info.selfWind].groupTile.size() * 3); ++j) {
 		if (j < 9)std::cout << " ";
 		std::cout << j + 1 << " ";
 	}
@@ -215,14 +220,12 @@ Action Human::generateAction(const GameInfo& info) {
 			res = actions[index];
 		}
 		else {
-			std::cout << "打第几张牌?(0为摸切)" << std::endl;
+			std::cout << "打第几张牌?" << std::endl;
 			int index;
 			std::cin >> index;
 			if (index <= info.handTile.size()) {
 				res.type = ActionType::Dapai;
-				if (index == 0)
-					res.target = info.nowTile;
-				else res.target = info.handTile[index - 1];
+				res.target = info.handTile[index - 1];
 			}
 		}
 		std::cout << std::endl;
