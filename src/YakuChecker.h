@@ -13,7 +13,8 @@ protected:
 	inline static std::array<InternalInvoke, 52> yakuCheckFunc;
 	// fake constructor for implementing static initialization
 	YakuChecker() noexcept: menqingCount(0), menqing(false), par(*reinterpret_cast<AgariParameters*>(this)),
-	                                  mianzi(*reinterpret_cast<std::vector<Group>*>(this)) { }
+	                        mianzi(*reinterpret_cast<std::vector<Group>*>(this)) { }
+
 private:
 	// operation buffers
 	mutable Yakus exec{}, result{};
@@ -23,8 +24,9 @@ private:
 	const AgariParameters& par;
 	const std::vector<Group>& mianzi;
 
-	template <Yaku Y, class Invoke, class = std::enable_if_t<noexcept(std::declval<Invoke>())>>
+	template <Yaku Y, class Invoke>
 	[[nodiscard]] bool UnSyncCacheInvoke(const Invoke invoke) const noexcept {
+		static_assert(noexcept(std::declval<Invoke>()));
 		if (!exec.has<Y>()) {
 			const auto res = invoke();
 			exec.add<Y>();
@@ -33,6 +35,16 @@ private:
 		}
 		return result.has<Y>();
 	}
+
+	template <Yaku Y, Yaku ... Ys, class Invoke>
+	[[nodiscard]] bool UnSyncUnifiedCacheInvoke(const Invoke invoke) const noexcept {
+		static_assert(noexcept(std::declval<Invoke>()));
+		if (!exec.contains(Yakus::Create<Y, Ys...>())) { invoke(); }
+		return result.has<Y>();
+	}
+
+	template <Yaku Y>
+	void UnSyncCacheSet(const bool val) const noexcept { if (val) { result.add<Y>(); } }
 public:
 	YakuChecker(const AgariParameters& i_par, const std::vector<Group>& i_menqingMianzi) noexcept;
 	//役满型

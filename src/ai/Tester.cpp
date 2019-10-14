@@ -117,13 +117,13 @@ std::vector<Single> Tester::getShowedTiles(const GameInfo& info)
 		for (auto& item : info.playerInfo[wind].groupTile) {
 			if (item.type == GroupType::Gang){
 				for(int i=0;i<4;++i)
-					res.push_back(Single(item.value,item.color,0));
+					res.push_back(Single(item.value,item.color,false));
 			}else if (item.type == GroupType::Kezi) {
 				for (int i = 0; i < 3; ++i)
-					res.push_back(Single(item.value, item.color, 0));
+					res.push_back(Single(item.value, item.color, false));
 			}else if (item.type == GroupType::Shunzi) {
 				for (int i = 0; i < 3; ++i)
-					res.push_back(Single(item.value+i, item.color, 0));
+					res.push_back(Single(item.value+i, item.color, false));
 			}
 		}
 		for (auto& item : info.playerInfo[wind].discardTile) { 

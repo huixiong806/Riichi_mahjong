@@ -15,7 +15,7 @@ private:
 	//试图和牌，并计算国士无双型和牌点数
 	static TryToAgariResult guoshiwushuang(const AgariParameters& par);
 	//试图和牌，并计算标准型和牌点数，返回(点数最大的)结果,depth=0表示枚举雀头，dep=4为最深层
-	static TryToAgariResult agariSearch(const AgariParameters& par, int depth, std::vector<Single> remainTiles,
+	static TryToAgariResult agariSearch(const AgariParameters& par, int depth, const std::vector<Single>& remainTiles,
 	                                    std::vector<Group> mianzi);
 	//试图和牌，并计算七对型和牌点数
 	static TryToAgariResult qidui(const AgariParameters& par);
@@ -32,7 +32,7 @@ private:
 public:
 
 	//试图和牌，返回点数最大的结果
-	static TryToAgariResult agari(AgariParameters par);
+	static TryToAgariResult agari(const AgariParameters& par);
 	/*type
 	自摸=0
 	荣和=1
@@ -45,7 +45,7 @@ public:
 	static int getTileIndex(Single& tile);
 	static std::vector<int> getPool(const std::vector<Single>& tiles);
 	//快速判断是否形式听牌。不允许虚听，允许空听。返回听牌种类
-	static std::vector<Single> tingpai(std::vector<Single> handTile);
+	static std::vector<Single> tingpai(const std::vector<Single>& handTile);
 	//获取所有类型的牌
 	static std::vector<Single> allKindsOfTiles();
 	//shape为压缩后的牌型参数，value为要获取个数的数字。函数对单花色牌的压缩型进行操作。

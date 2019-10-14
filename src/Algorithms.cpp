@@ -37,7 +37,7 @@ std::vector<Single> Algorithms::allKindsOfTiles()
 	}
 	return res;
 }
-std::vector<Single> Algorithms::tingpai(std::vector<Single> handTile) {
+std::vector<Single> Algorithms::tingpai(const std::vector<Single>& handTile) {
 	std::vector<Single> res;
 	for (auto i = 1; i <= 9; ++i) {
 		if (agariWithoutYaku(Single(i, 'm', false), handTile))
@@ -123,21 +123,20 @@ AgariResult Algorithms::getScore(WindType selfWind, AgariResult inp) {
 	return res;
 }
 
-TryToAgariResult Algorithms::agari(const AgariParameters par) {
+TryToAgariResult Algorithms::agari(const AgariParameters& par) {
 	//国士无双的判定
-	AgariResult res;
-	auto guoshi = guoshiwushuang(par);
+	const auto guoshi = guoshiwushuang(par);
 	if (guoshi.success)
 		return guoshi;
 	//只有国士能抢暗杠
 	if (par.state == 3)return TryToAgariResult(AgariFaildReason::CantQiangAnGang);
 	//七对型的判定(两杯口将被拆解为七对型)
-	auto qiduizi = qidui(par);
+	const auto qiduizi = qidui(par);
 	//一般型的判定
 	auto allTiles = par.handTile;
 	allTiles.push_back(par.target);
 	sort(allTiles.begin(), allTiles.end());
-	auto normal = agariSearch(par, 0, allTiles, std::vector<Group>());
+	const auto normal = agariSearch(par, 0, allTiles, std::vector<Group>());
 	return std::max(qiduizi, normal);
 }
 
@@ -161,20 +160,21 @@ state
 天地和=1
 河底/海底=2
 */
-TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, std::vector<Single> remainTiles,
+TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, const std::vector<Single>& remainTiles,
                                          std::vector<Group> mianzi) {
 	TryToAgariResult bestResult;
 	if (remainTiles.empty()) { return YakuCheckForStandard(par, mianzi); }
 	if (depth == 0) {
-		for (auto i = 0; i < remainTiles.size() - 1; ++i) {
+		std::vector<Single> newRemainTiles { remainTiles.size() - 2 };
+		for (auto i = 0u; i < remainTiles.size() - 1; ++i) {
 			if (remainTiles[i] == remainTiles[i + 1]) {
-				std::vector<Single> newRemainTiles;
-				for (auto j = 0; j < remainTiles.size(); ++j) {
+				newRemainTiles.clear();
+				for (auto j = 0u; j < remainTiles.size(); ++j) {
 					if (j != i && j != i + 1)
 						newRemainTiles.push_back(remainTiles[j]);
 				}
 				mianzi.push_back(Group::createQuetou(remainTiles[i], remainTiles[i + 1]));
-				bestResult = std::max(bestResult, agariSearch(par, depth + 1, newRemainTiles, mianzi));
+				bestResult = std::max(bestResult, agariSearch(par, depth + 1,  newRemainTiles , mianzi));
 				mianzi.pop_back();
 			}
 		}
@@ -686,9 +686,9 @@ int Algorithms::getDistanceStandard(const std::vector<Single>& handTile) {
 	int dp[5][5][2]; //a当前已经完成的花色数，b当前已经完成的面子数，c当前已经完成的雀头数,dp表示最小距离
 	//int pre[5][5][2];
 	for (auto& i : dp)
-		for (auto j = 0; j < 5; ++j)
-			for (auto k = 0; k < 2; ++k) {
-				i[j][k] = 99; //此距离最大为18，表示8向听
+		for (auto& j : i)
+			for (int& k : j) {
+				k = 99; //此距离最大为18，表示8向听
 				//pre[i][j][k] = -1;
 			}
 	dp[0][0][0] = 0; //设定边界值，0花色0面子0雀头距离为0
@@ -773,7 +773,7 @@ int Algorithms::getDistanceGuoshi(const std::vector<Single>& handTile)
 {
 	auto yaojiuTypeCount=0;
 	auto yaojiuCount = 0;
-	bool have[13] = { 0,0,0,0,0,0,0,0,0,0,0,0,0 };//1m9m1p9m1s9s1234567z;
+	bool have[13] = { false,false,false,false,false,false,false,false,false,false,false,false,false };//1m9m1p9m1s9s1234567z;
 	for (auto& item : handTile) {
 		if (item.isyaojiu()){
 			yaojiuCount++;
@@ -791,7 +791,7 @@ int Algorithms::getDistanceGuoshi(const std::vector<Single>& handTile)
 			}
 		}
 	}
-	return 12 + (int)(yaojiuCount <= yaojiuTypeCount) - yaojiuTypeCount;
+	return 12 + static_cast<int>(yaojiuCount <= yaojiuTypeCount) - yaojiuTypeCount;
 }
 //计算14张手牌的向听数(0为一向听，-1为和牌)
 int Algorithms::getDistance(const std::vector<Single>& handTile)

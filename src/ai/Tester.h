@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "MovementGenerator.hpp"
 #include "Player.hpp"
 
@@ -10,7 +10,7 @@ private:
 	std::vector<Action> getRongAction(const GameInfo& info);
 	std::vector<Action> getAllActionsMingpai(const GameInfo& info);
 	std::vector<Action> getAllActionsNormal(const GameInfo& info);
-	//×¢Òâ£¬²»¿¼ÂÇakadora
+	//æ³¨æ„ï¼Œä¸è€ƒè™‘akadora
 	std::vector<Single> getShowedTiles(const GameInfo& info);
 public:
 	Tester() { name = "No Name"; }

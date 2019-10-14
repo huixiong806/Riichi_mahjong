@@ -31,20 +31,20 @@ void test() {
 	}
 	//手牌
 	res.handTile.emplace_back(1, 's', 0);
-	res.handTile.emplace_back(9, 's', 0);
-	res.handTile.emplace_back(1, 'm', 0);
-	res.handTile.emplace_back(9, 'm', 0);
-	res.handTile.emplace_back(1, 'p', 0);
-	res.handTile.emplace_back(9, 'p', 0);
+	res.handTile.emplace_back(1, 's', 0);
+	res.handTile.emplace_back(1, 's', 0);
 	res.handTile.emplace_back(1, 's', 0);
 	res.handTile.emplace_back(2, 's', 0);
-	res.handTile.emplace_back(3, 'z', 0);
-	res.handTile.emplace_back(4, 'z', 0);
-	res.handTile.emplace_back(5, 'z', 0);
-	res.handTile.emplace_back(6, 'z', 0);
-	res.handTile.emplace_back(7, 'z', 0);
+	res.handTile.emplace_back(2, 's', 0);
+	res.handTile.emplace_back(2, 's', 0);
+	res.handTile.emplace_back(2, 's', 0);
+	res.handTile.emplace_back(3, 's', 0);
+	res.handTile.emplace_back(3, 's', 0);
+	res.handTile.emplace_back(3, 's', 0);
+	res.handTile.emplace_back(3, 's', 0);
+	res.handTile.emplace_back(9, 's', 0);
 	sort(res.handTile.begin(), res.handTile.end());
-	res.nowTile = Single(7, 'z', false);
+	res.nowTile = Single(9, 's', false);
 	res.prevailingWind = EAST; //场风
 	res.selfWind = EAST; //门风
 	res.nowWind = EAST;
@@ -53,7 +53,10 @@ void test() {
 	human->generateAction(res);
 	Player p;
 	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, false);
-	auto r = p.zimo(res.prevailingWind, res.w, {}, {});
+	TryToAgariResult r{};
+	for (int i = 1000000; i > 0; --i) {
+		r = p.zimo(res.prevailingWind, res.w, {}, {});
+	}
 	auto re = r.result;
 	cout << "Test " << (re.zimo ? "自摸" : "荣和") << endl;
 	cout << endl;
@@ -93,19 +96,14 @@ void test2() {
 	}
 }
 
-int main() {
-	push_console_locale_utf8("zh_CN");
-	cout << "预处理中..." << endl;
-	Algorithms::preprocessDistance();
-	cout << "预处理结束" << endl;
-	//test();
-	//test2();
+int main_loop() {
+
 	/*
 	种子收集
 	3 杠3z
 	233 7对子自摸，留1m和3p
 	*/
-	int seed=time(0);
+	const int seed = time(0);
 	//cout << "输入种子:" << endl;
 	//cin >> seed;
 	srand(seed);
@@ -126,7 +124,7 @@ int main() {
 				const auto action = player[i]->generateAction(game.getGameInfo(i));
 				const auto res = game.doAction(i, action);
 				if (!res.success) {
-					cout << "出现错误,输入任意内容退出,错误编码:"<<(int)res.type << endl;
+					cout << "出现错误,输入任意内容退出,错误编码:" << static_cast<int>(res.type) << endl;
 					assert(0);
 					int a;
 					cin >> a;
@@ -135,8 +133,7 @@ int main() {
 				if (game.roundOver())break;
 				//cout << (int)(res.type)<<endl;
 			}
-		}
-		while (!game.roundOver());
+		} while (!game.roundOver());
 		auto result = game.getRoundResult();
 		cout << "本局结束" << endl;
 		if (result.liuju) { cout << "流局" << endl; }
@@ -150,7 +147,7 @@ int main() {
 				}
 				cout << "宝牌" << res.dora << "   红宝牌" << res.akadora << "   里宝牌" << res.uradora << endl;
 				if (res.fan < 0) {
-					const string ykman[7] = {"", "一", "两", "三", "四", "五", "六"};
+					const string ykman[7] = { "", "一", "两", "三", "四", "五", "六" };
 					if (res.fan == -1)
 						cout << "役满 " << res.scoreAdd << "点" << endl;
 					else
@@ -160,9 +157,19 @@ int main() {
 			}
 		}
 		cout << endl;
-	}
-	while (!game.gameOver());
+	} while (!game.gameOver());
 	cout << "游戏结束！" << endl;
+	std::cin.get();
+	return 0;
+}
+
+int main() {
+	push_console_locale_utf8("zh_CN");
+	cout << "预处理中..." << endl;
+	Algorithms::preprocessDistance();
+	cout << "预处理结束" << endl;
+	test();
+	//test2();
+	//main_loop()();
 	pop_console_locale();
-	while (true);
 }

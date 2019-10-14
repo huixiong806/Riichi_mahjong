@@ -1,5 +1,6 @@
 #pragma once
-#include<string>
+
+#include <string>
 
 class Single {
 private:
@@ -7,40 +8,208 @@ private:
 	uint8_t mValue{};
 	bool mAkadora{}; //是否为红宝牌
 public:
-	Single();
-	Single(uint8_t value_, char color_, bool akadora_) : mColor(color_), mValue(value_), mAkadora(akadora_) {}
+	constexpr Single() noexcept: Single(1, 'z' + 1, true) { }
+
+	constexpr Single(const uint8_t value_, const char color_, const bool akadora) noexcept
+		: mColor(color_), mValue(value_), mAkadora(akadora) {}
+
 	//获取颜色
-	[[nodiscard]] char color() const;
+	[[nodiscard]] constexpr char color() const noexcept { return mColor; }
 	//获取值
-	[[nodiscard]] uint8_t value() const;
+	[[nodiscard]] constexpr uint8_t value() const noexcept { return mValue; }
 	//是否为红宝牌
-	[[nodiscard]] bool isAkadora() const;
+	[[nodiscard]] constexpr bool isAkadora() const noexcept { return mAkadora; }
+
 	//获取顺序上的下一张牌(默认为非红宝牌)
-	Single next();
+	[[nodiscard]] constexpr Single next() const noexcept {
+		if (mColor == 'z' && mValue == 7)return Single(1, mColor, false);
+		if (mValue == 9)return Single(1, mColor, false);
+		return Single(mValue + 1, mColor, false);
+	}
+
 	//判断两张牌是否相等，不考虑是否为红宝牌
-	[[nodiscard]] bool valueEqual(const Single& rhs) const { return mColor == rhs.mColor && mValue == rhs.mValue; }
+	[[nodiscard]] constexpr bool valueEqual(const Single& rhs) const noexcept {
+		return mColor == rhs.mColor && mValue == rhs.mValue;
+	}
+
 	//判断两张牌是否相等，考虑是否为红宝牌
-	bool operator ==(const Single& rhs) const {
+	constexpr bool operator ==(const Single& rhs) const {
 		return (mColor == rhs.mColor && mValue == rhs.mValue && rhs.mAkadora == mAkadora);
 	}
 
-	bool operator !=(const Single& rhs) const { return !(*this == rhs); }
+	constexpr bool operator !=(const Single& rhs) const noexcept { return !(*this == rhs); }
 	//判断两张牌的大小，考虑是否为红宝牌，万<饼<索<字<Null,数字相同的情况下红宝牌更大
-	bool operator <(const Single& rhs) const {
+	constexpr bool operator <(const Single& rhs) const noexcept {
 		return static_cast<int>(mColor) * 1000 + mValue * 10 + static_cast<int>(mAkadora) < static_cast<int>(rhs.mColor)
 			* 1000 + rhs.mValue * 10 + static_cast<int>(rhs.mAkadora);
 	}
 
-	//判断两张牌的大小，考虑是否为红宝牌，万<饼<索<字<Null,数字相同的情况下红宝牌更大
-	bool operator >(const Single& rhs) const {
+	constexpr //判断两张牌的大小，考虑是否为红宝牌，万<饼<索<字<Null,数字相同的情况下红宝牌更大
+	bool operator >(const Single& rhs) const noexcept {
 		return static_cast<int>(mColor) * 1000 + mValue * 10 + static_cast<int>(mAkadora) > static_cast<int>(rhs.mColor)
 			* 1000 + rhs.mValue * 10 + static_cast<int>(rhs.mAkadora);
 	}
 
+	[[nodiscard]] constexpr bool isyaojiu() const noexcept {
+		if (mColor == 'z')return true;
+		if (mValue == 1 || mValue == 9)return true;
+		return false;
+	}
+
 	[[nodiscard]] std::string getDisplay() const;
 	[[nodiscard]] std::string getString() const;
-	bool isyaojiu()const;
 };
 
 //Null永远是最大的
-extern const Single Null;
+static constexpr Single Null{};
+
+struct SparseSinglesOfColor {
+	constexpr SparseSinglesOfColor() noexcept: SparseSinglesOfColor(0) {}
+
+	template <unsigned int V, unsigned int C>
+	constexpr auto& add() noexcept { return rep += C << Offsets[V], *this; }
+
+	template <unsigned int V, unsigned int C>
+	[[nodiscard]] constexpr auto add() const noexcept { return SparseSinglesOfColor{rep + (C << Offsets[V])}; }
+
+	template <unsigned int V, unsigned int C>
+	constexpr auto& remove() noexcept { return rep -= C << Offsets[V], *this; }
+
+	template <unsigned int V, unsigned int C>
+	[[nodiscard]] constexpr auto remove() const noexcept { return SparseSinglesOfColor{rep - (C << Offsets[V])}; }
+
+	constexpr auto& add(const unsigned int v, const unsigned int c) noexcept { return rep += c << Offsets[v], *this; }
+
+	[[nodiscard]] constexpr auto add(const unsigned int v, const unsigned int c) const noexcept {
+		return SparseSinglesOfColor{rep + (c << Offsets[v])};
+	}
+
+	constexpr auto& remove(const unsigned int v, const unsigned int c) noexcept {
+		return rep -= c << Offsets[v], *this;
+	}
+
+	[[nodiscard]] constexpr auto remove(const unsigned int v, const unsigned int c) const noexcept {
+		return SparseSinglesOfColor{rep - (c << Offsets[v])};
+	}
+
+	constexpr auto& join(const SparseSinglesOfColor r) noexcept { return rep += r.rep, *this; }
+
+	[[nodiscard]] constexpr auto join(const SparseSinglesOfColor r) const noexcept {
+		return SparseSinglesOfColor{rep + r.rep };
+	}
+
+	template <unsigned int V>
+	[[nodiscard]] constexpr auto get() const noexcept { return rep >> Offsets[V] & 0b111; }
+
+	[[nodiscard]] constexpr auto get(const unsigned int v) const noexcept { return rep >> Offsets[v] & 0b111; }
+
+	[[nodiscard]] constexpr auto raw() const noexcept { return rep; }
+private:
+	uint32_t rep;
+	explicit constexpr SparseSinglesOfColor(const uint32_t r) noexcept: rep(r) {}
+	static constexpr unsigned int Offsets[] = {0u, 3u, 6u, 9u, 16u, 19u, 22u, 25u, 28u};
+};
+
+struct CompactSinglesOfColor {
+	constexpr CompactSinglesOfColor() noexcept: CompactSinglesOfColor(0) {}
+	
+	template <unsigned int V, unsigned int C>
+	constexpr auto& add() noexcept { return rep += C * Pow5[V], *this; }
+
+	template <unsigned int V, unsigned int C>
+	[[nodiscard]] constexpr auto add() const noexcept { return CompactSinglesOfColor{rep + C * Pow5[V]}; }
+
+	template <unsigned int V, unsigned int C>
+	constexpr auto& remove() noexcept { return rep -= C * Pow5[V], *this; }
+
+	template <unsigned int V, unsigned int C>
+	[[nodiscard]] constexpr auto remove() const noexcept { return CompactSinglesOfColor{rep - C * Pow5[V]}; }
+
+	constexpr auto& add(const unsigned int v, const unsigned int c) noexcept { return rep += c * Pow5[v], *this; }
+
+	[[nodiscard]] constexpr auto add(const unsigned int v, const unsigned int c) const noexcept {
+		return CompactSinglesOfColor{rep + c * Pow5[v]};
+	}
+
+	constexpr auto& remove(const unsigned int v, const unsigned int c) noexcept { return rep -= c * Pow5[v], *this; }
+
+	[[nodiscard]] constexpr auto remove(const unsigned int v, const unsigned int c) const noexcept {
+		return CompactSinglesOfColor{rep - c * Pow5[v]};
+	}
+	
+	constexpr auto& join(const CompactSinglesOfColor r) noexcept { return rep += r.rep, *this; }
+
+	[[nodiscard]] constexpr auto join(const CompactSinglesOfColor r) const noexcept {
+		return CompactSinglesOfColor{rep + r.rep };
+	}
+	
+	// This function is slow relative to the sparse versions. 
+	template <unsigned int V>
+	[[nodiscard]] constexpr auto get() const noexcept { return rep / Pow5[V] % 5; }
+
+	[[nodiscard]] constexpr auto get(const unsigned int v) const noexcept { return rep / Pow5[v] % 5; }
+
+	[[nodiscard]] constexpr auto raw() const noexcept { return rep; }
+
+	explicit constexpr CompactSinglesOfColor(const SparseSinglesOfColor r) noexcept
+	: CompactSinglesOfColor(CompactSinglesOfColor{}
+	       .add(0, r.get<0u>()).add(1, r.get<1u>()).add(2, r.get<2u>()).add(3, r.get<3u>())
+	       .add(4, r.get<4u>()).add(5, r.get<5u>()).add(6, r.get<6u>()).add(7, r.get<7u>())
+	       .add(8, r.get<8u>()))
+	{}
+	
+	[[nodiscard]] explicit constexpr operator SparseSinglesOfColor() const noexcept {
+		return SparseSinglesOfColor{}
+		       .add(0, get<0u>()).add(1, get<1u>()).add(2, get<2u>()).add(3, get<3u>())
+		       .add(4, get<4u>()).add(5, get<5u>()).add(6, get<6u>()).add(7, get<7u>())
+		       .add(8, get<8u>());
+	}
+private:
+	uint32_t rep;
+	explicit constexpr CompactSinglesOfColor(const uint32_t r) noexcept: rep(r) {}
+	static constexpr unsigned int Pow5[] = {1u, 5u, 25u, 125u, 625u, 3125u, 15625u, 78125u, 390625u, 1953125u};
+};
+
+struct alignas(std::max_align_t) SparseSingles {
+	SparseSinglesOfColor colors[4];
+};
+
+struct alignas(std::max_align_t) CompactSingles {
+	CompactSinglesOfColor colors[4];
+};
+
+template <int EM = 36>
+struct alignas(std::max_align_t) TileTypes {
+	uint8_t tileType[EM];
+	uint8_t count;
+	
+	constexpr void expandFrom(const CompactSingles pack) noexcept {
+		count = 0u;
+		for (auto i = 0u; i < 4u; ++i) {
+			const auto col = pack.colors[i];
+			for (auto j = 0u; j < 9u; ++j)
+				if (const auto val = col.get(j); val) { tileType[count++] = j << 2 | i; }
+		}
+	}
+	
+	constexpr void expandFrom(const SparseSingles pack) noexcept {
+		count = 0u;
+		for (auto i = 0u; i < 4u; ++i) {
+			const auto col = pack.colors[i];
+			const auto raw = col.raw();
+			if (const auto low = raw & 0xFFFFu; low) {
+				if (const auto val = col.get<0>; val) { tileType[count++] = 0 << 2 | i; }
+				if (const auto val = col.get<1>; val) { tileType[count++] = 1 << 2 | i; }
+				if (const auto val = col.get<2>; val) { tileType[count++] = 2 << 2 | i; }
+				if (const auto val = col.get<3>; val) { tileType[count++] = 3 << 2 | i; }
+			}
+			else {
+				if (const auto val = col.get<4>; val) { tileType[count++] = 4 << 2 | i; }
+				if (const auto val = col.get<5>; val) { tileType[count++] = 5 << 2 | i; }
+				if (const auto val = col.get<6>; val) { tileType[count++] = 6 << 2 | i; }
+				if (const auto val = col.get<7>; val) { tileType[count++] = 7 << 2 | i; }
+				if (const auto val = col.get<8>; val) { tileType[count++] = 8 << 2 | i; }
+			}
+		}
+	}
+};

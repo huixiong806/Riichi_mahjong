@@ -27,7 +27,7 @@ public:
 	static Group createGangzi(Single a, Single b, Single c, Single target, int source);
 	static Group createQuetou(Single a, Single b);
 	//是否为绿牌
-	bool isgreen()const {
+	[[nodiscard]] bool isgreen()const {
 		if (color == 'z')return value == 6;
 		if (color == 's') {
 			if (type != GroupType::Shunzi)
@@ -38,7 +38,7 @@ public:
 	}
 
 	//是否为老头牌组(非字牌19)
-	bool islaotou()const {
+	[[nodiscard]] bool islaotou()const {
 		if (type == GroupType::Shunzi)return false;
 		if (color == 'z')return true;
 		if (value == 1 || value == 9)return true;
@@ -46,7 +46,7 @@ public:
 	}
 
 	//是否为幺九牌组(允许顺子，允许字牌)
-	bool isyaojiu()const {
+	[[nodiscard]] bool isyaojiu()const {
 		if (type == GroupType::Shunzi) {
 			if (value == 7 || value == 1)return true;
 			return false;

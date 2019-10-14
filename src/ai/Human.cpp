@@ -194,7 +194,7 @@ void Human::printInfo(const GameInfo& info) {
 
 	std::cout << std::endl;
 	std::cout << "ID| ";
-	int add = info.mingpai == false && info.nowTile == Null;
+	const int add = info.mingpai == false && info.nowTile == Null;
 	for (auto j = 0; j < (13+add - info.playerInfo[info.selfWind].groupTile.size() * 3); ++j) {
 		if (j < 9)std::cout << " ";
 		std::cout << j + 1 << " ";

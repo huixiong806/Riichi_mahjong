@@ -125,6 +125,9 @@ constexpr unsigned int yakuToIndex(const Yaku yaku) noexcept {
 class Yakus {
 	static constexpr uint64_t yakuToStatusMask(const Yaku yaku) noexcept { return 1ull << yakuToIndex(yaku); }
 public:
+	template <Yaku ...Ys>
+	static constexpr Yakus Create() noexcept { Yakus ret; ret.status = (yakuToStatusMask(Ys) | ...); return ret; }
+	
 	template <Yaku Y>
 	[[nodiscard]] constexpr bool has() const noexcept {
 		static constexpr auto Msk = yakuToStatusMask(Y);
