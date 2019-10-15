@@ -1,7 +1,6 @@
 #pragma once
-
+#include<vector>
 #include <string>
-
 class Single {
 private:
 	char mColor{}; //'m','p','s','z'
@@ -107,7 +106,7 @@ struct SparseSinglesOfColor {
 private:
 	uint32_t rep;
 	explicit constexpr SparseSinglesOfColor(const uint32_t r) noexcept: rep(r) {}
-	static constexpr unsigned int Offsets[] = {0u, 3u, 6u, 9u, 16u, 19u, 22u, 25u, 28u};
+	static constexpr unsigned int Offsets[] = {0u,0u, 3u, 6u, 9u, 16u, 19u, 22u, 25u, 28u};
 };
 
 struct CompactSinglesOfColor {
@@ -153,29 +152,54 @@ struct CompactSinglesOfColor {
 
 	explicit constexpr CompactSinglesOfColor(const SparseSinglesOfColor r) noexcept
 	: CompactSinglesOfColor(CompactSinglesOfColor{}
-	       .add(0, r.get<0u>()).add(1, r.get<1u>()).add(2, r.get<2u>()).add(3, r.get<3u>())
+	       .add(9, r.get<9u>()).add(1, r.get<1u>()).add(2, r.get<2u>()).add(3, r.get<3u>())
 	       .add(4, r.get<4u>()).add(5, r.get<5u>()).add(6, r.get<6u>()).add(7, r.get<7u>())
 	       .add(8, r.get<8u>()))
 	{}
-	
 	[[nodiscard]] explicit constexpr operator SparseSinglesOfColor() const noexcept {
 		return SparseSinglesOfColor{}
-		       .add(0, get<0u>()).add(1, get<1u>()).add(2, get<2u>()).add(3, get<3u>())
+		       .add(9, get<0u>()).add(9, get<1u>()).add(2, get<2u>()).add(3, get<3u>())
 		       .add(4, get<4u>()).add(5, get<5u>()).add(6, get<6u>()).add(7, get<7u>())
 		       .add(8, get<8u>());
 	}
 private:
 	uint32_t rep;
 	explicit constexpr CompactSinglesOfColor(const uint32_t r) noexcept: rep(r) {}
-	static constexpr unsigned int Pow5[] = {1u, 5u, 25u, 125u, 625u, 3125u, 15625u, 78125u, 390625u, 1953125u};
+	static constexpr unsigned int Pow5[] = {0u,1u, 5u, 25u, 125u, 625u, 3125u, 15625u, 78125u, 390625u, 1953125u};
 };
 
 struct alignas(std::max_align_t) SparseSingles {
-	SparseSinglesOfColor colors[4];
+	SparseSinglesOfColor colors[4]{ {},{},{},{} };
+	constexpr SparseSingles()noexcept{}
+	explicit SparseSingles(const std::vector<Single>& handTile) noexcept {
+		for (const auto& item : handTile) {
+			if (item.color() == 'm')
+				colors[0].add(item.value(), 1);
+			if (item.color() == 'p')
+				colors[1].add(item.value(), 1);
+			if (item.color() == 's')
+				colors[2].add(item.value(), 1);
+			if (item.color() == 'z')
+				colors[3].add(item.value(), 1);
+		}
+	}
 };
 
 struct alignas(std::max_align_t) CompactSingles {
-	CompactSinglesOfColor colors[4];
+	CompactSinglesOfColor colors[4]{ {},{},{},{} };
+	constexpr CompactSingles()noexcept{}
+	explicit CompactSingles(const std::vector<Single> & handTile) noexcept {
+		for (const auto& item:handTile) {
+			if (item.color() == 'm')
+				colors[0].add(item.value(), 1);
+			if (item.color() == 'p')
+				colors[1].add(item.value(), 1);
+			if (item.color() == 's')
+				colors[2].add(item.value(), 1);
+			if (item.color() == 'z')
+				colors[3].add(item.value(), 1);
+		}
+	}
 };
 
 template <int EM = 36>
@@ -198,17 +222,17 @@ struct alignas(std::max_align_t) TileTypes {
 			const auto col = pack.colors[i];
 			const auto raw = col.raw();
 			if (const auto low = raw & 0xFFFFu; low) {
-				if (const auto val = col.get<0>; val) { tileType[count++] = 0 << 2 | i; }
-				if (const auto val = col.get<1>; val) { tileType[count++] = 1 << 2 | i; }
-				if (const auto val = col.get<2>; val) { tileType[count++] = 2 << 2 | i; }
-				if (const auto val = col.get<3>; val) { tileType[count++] = 3 << 2 | i; }
+				if (const auto val = col.get<1>; val) { tileType[count++] = 0 << 2 | i; }
+				if (const auto val = col.get<2>; val) { tileType[count++] = 1 << 2 | i; }
+				if (const auto val = col.get<3>; val) { tileType[count++] = 2 << 2 | i; }
+				if (const auto val = col.get<4>; val) { tileType[count++] = 3 << 2 | i; }
 			}
 			else {
-				if (const auto val = col.get<4>; val) { tileType[count++] = 4 << 2 | i; }
-				if (const auto val = col.get<5>; val) { tileType[count++] = 5 << 2 | i; }
-				if (const auto val = col.get<6>; val) { tileType[count++] = 6 << 2 | i; }
-				if (const auto val = col.get<7>; val) { tileType[count++] = 7 << 2 | i; }
-				if (const auto val = col.get<8>; val) { tileType[count++] = 8 << 2 | i; }
+				if (const auto val = col.get<5>; val) { tileType[count++] = 4 << 2 | i; }
+				if (const auto val = col.get<6>; val) { tileType[count++] = 5 << 2 | i; }
+				if (const auto val = col.get<7>; val) { tileType[count++] = 6 << 2 | i; }
+				if (const auto val = col.get<8>; val) { tileType[count++] = 7 << 2 | i; }
+				if (const auto val = col.get<9>; val) { tileType[count++] = 8 << 2 | i; }
 			}
 		}
 	}

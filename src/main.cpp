@@ -54,9 +54,9 @@ void test() {
 	Player p;
 	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, false);
 	TryToAgariResult r{};
-	for (int i = 1000000; i > 0; --i) {
+	//for (int i = 1000000; i > 0; --i) {
 		r = p.zimo(res.prevailingWind, res.w, {}, {});
-	}
+	//}
 	auto re = r.result;
 	cout << "Test " << (re.zimo ? "自摸" : "荣和") << endl;
 	cout << endl;
@@ -170,6 +170,6 @@ int main() {
 	cout << "预处理结束" << endl;
 	test();
 	//test2();
-	//main_loop()();
+	main_loop();
 	pop_console_locale();
 }

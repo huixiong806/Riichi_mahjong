@@ -4,12 +4,15 @@
 
 class Algorithms {
 private:
+	/*
+	已淘汰函数
 	//判断是否为国士无双和牌型
-	static bool guoshiWithoutYaku(const Single& target, const std::vector<Single>& handTile);
+	//static bool guoshiWithoutYaku(SparseSingles handTile);
 	//判断是否为七对和牌型
-	static bool qiduiWithoutYaku(const Single& target, const std::vector<Single>& handTile);
+	//static bool qiduiWithoutYaku(SparseSingles handTile);
 	//判断是否为标准和牌型,*************有bug，勿用！！！请用getdistance返回向听数是否为-1*****************
-	static bool agariSearchWithoutYaku(std::vector<int> pool);
+	//static bool agariSearchWithoutYaku(std::vector<int> pool);
+	*/
 	//判断是否形式和牌,不考虑役
 	static bool agariWithoutYaku(const Single& target, const std::vector<Single>& handTile);
 	//试图和牌，并计算国士无双型和牌点数
@@ -19,8 +22,8 @@ private:
 	                                    std::vector<Group> mianzi);
 	//试图和牌，并计算七对型和牌点数
 	static TryToAgariResult qidui(const AgariParameters& par);
-	//构造给定数量的雀头和面子的牌型，存到queue中
-	static void constructTarget(int quetou, int mianzi, std::queue<int>& q, int shape, int target, bool z);
+	//构造给定数量的雀头和面子的牌型，存到queue中,target表示目标雀头和面子数的压缩型
+	static void constructTarget(int quetou, int mianzi, std::queue<SparseSinglesOfColor>& q, SparseSinglesOfColor shape, int target, bool z);
 	//5的幂
 	static const int pow5[10];
 	//到给定目标的距离，参数分别为原形状、目标雀头数*5+目标面子数(雀头最多只能有一个) 原形状为9位5进制数，从低到高表示手牌中数字1~9有几个
@@ -48,20 +51,20 @@ public:
 	static std::vector<Single> tingpai(const std::vector<Single>& handTile);
 	//获取所有类型的牌
 	static std::vector<Single> allKindsOfTiles();
-	//shape为压缩后的牌型参数，value为要获取个数的数字。函数对单花色牌的压缩型进行操作。
-	static int getNumberCount(int shape, int value);
-	static void setNumberCount(int& shape, int value, int count);
-	static void addNumberCount(int& shape, int value, int count);
+	//shape为压缩后的牌型参数，value为要获取个数的数字。函数对单花色牌的压缩型进行操作。函数已废除
+	//static int getNumberCount(int shape, int value);
+	//static void setNumberCount(int& shape, int value, int count);
+	//static void addNumberCount(int& shape, int value, int count);
 	//预处理，计算单花色离目标的距离(仅允许插入和删除两个操作)
 	static void preprocessDistance();
 	//计算14张手牌的标准型向听数(0为一向听，-1为和牌)
-	static int getDistanceStandard(const std::vector<Single>& handTile);
+	static int getDistanceStandard(const CompactSingles& handTile);
 	//计算14张手牌的七对型向听数(0为一向听，-1为和牌)
-	static int getDistanceQidui(const std::vector<Single>& handTile);
+	static int getDistanceQidui(const CompactSingles& handTile);
 	//计算14张手牌的国士无双向听数(0为一向听，-1为和牌)
-	static int getDistanceGuoshi(const std::vector<Single>& handTile);
+	static int getDistanceGuoshi(const CompactSingles& handTile);
 	//计算14张手牌的向听数(0为一向听，-1为和牌)
-	static int getDistance(const std::vector<Single>& handTile);
+	static int getDistance(const CompactSingles& handTile);
 	//获得单花色向听数
 	static int getDistanceSingle(int shape, int mianzi, int quetou, bool z);
 };

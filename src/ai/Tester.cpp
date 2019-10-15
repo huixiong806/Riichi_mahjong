@@ -152,7 +152,7 @@ Action Tester::generateAction(const GameInfo& info) {
 			bool zimo = false;
 			auto templ = info.handTile;
 			templ.push_back(info.nowTile);
-			int nowXiangting = Algorithms::getDistance(templ);
+			int nowXiangting = Algorithms::getDistance(CompactSingles(templ));
 			int maxCount = -1;
 			std::vector<int>pool=Algorithms::getPool(getShowedTiles(info));
 			Action temp;
@@ -188,7 +188,7 @@ Action Tester::generateAction(const GameInfo& info) {
 							int maxXiangtingThis = -2;
 							for (auto& pai : allKindsOfTiles) {
 								item = pai;
-								int xiangting = Algorithms::getDistance(allTiles);
+								int xiangting = Algorithms::getDistance(CompactSingles(allTiles));
 								if (xiangting < minXiangtingThis)
 									minXiangtingThis =xiangting;
 								if (xiangting > maxXiangtingThis)
@@ -196,7 +196,7 @@ Action Tester::generateAction(const GameInfo& info) {
 							}
 							for (auto& pai : allKindsOfTiles) {
 								item = pai;
-								int xiangting = Algorithms::getDistance(allTiles);
+								int xiangting = Algorithms::getDistance(CompactSingles(allTiles));
 								if (xiangting == minXiangtingThis) {
 									count += 4 - pool[Algorithms::getTileIndex(pai)];
 								}

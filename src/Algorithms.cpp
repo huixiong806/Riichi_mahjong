@@ -5,7 +5,9 @@
 #include "YakuChecker.h"
 uint8_t Algorithms::distanceToTarget[1953125][10];
 uint8_t Algorithms::distanceToTargetZ[78125][10];
+
 const int Algorithms::pow5[10] = {1, 5, 25, 125, 625, 3125, 15625, 78125, 390625, 1953125};
+/*
 //shape为压缩后的牌型参数，value为要获取个数的数字
 int Algorithms::getNumberCount(int shape, int value) { return (shape / pow5[value - 1]) % 5; }
 //count不得超过4
@@ -14,7 +16,7 @@ void Algorithms::setNumberCount(int& shape, int value, int count) {
 }
 
 void Algorithms::addNumberCount(int& shape, int value, int count) { shape += pow5[value - 1]; }
-
+*/
 //0~8 万字,9~17 饼子,18~26 索子,27~33 东南西北白发中
 int Algorithms::getTileIndex(Single& tile)
 {
@@ -479,7 +481,7 @@ TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par) {
 	res = getScore(par.selfWind, res);
 	return TryToAgariResult(res);
 }
-
+/*
 bool Algorithms::guoshiWithoutYaku(const Single& target, const std::vector<Single>& handTile) {
 	auto allTiles = handTile;
 	allTiles.push_back(target);
@@ -498,7 +500,6 @@ bool Algorithms::qiduiWithoutYaku(const Single& target, const std::vector<Single
 			return false;
 	return true;
 }
-
 bool Algorithms::agariSearchWithoutYaku(std::vector<int> pool) {
 	//判断雀头
 	for (auto i = 0; i <= 33; ++i) {
@@ -529,35 +530,47 @@ bool Algorithms::agariSearchWithoutYaku(std::vector<int> pool) {
 	}
 	return false;
 }
-
+*/
 bool Algorithms::agariWithoutYaku(const Single& target, const std::vector<Single>& handTile) {
-	//国士无双型的判定
-	const auto guoshi = guoshiWithoutYaku(target, handTile);
-	if (guoshi)return true;
-	auto allTiles = handTile;
-	allTiles.push_back(target);
-	auto pool = getPool(allTiles);
+	CompactSingles state;
+	for (int i = 0; i <= handTile.size();++i) {
+		const auto& item = i == handTile.size() ? target : handTile[i];
+		if (item.color() == 'm')
+			state.colors[0].add(item.value(), 1);
+		if (item.color() == 'p')
+			state.colors[1].add(item.value(), 1);
+		if (item.color() == 's')
+			state.colors[2].add(item.value(), 1);
+		if (item.color() == 'z')
+			state.colors[3].add(item.value(), 1);
+	}
 	//判断是否虚和(一种牌拿5张)
-	for (auto i = 0; i <= 33; ++i)
-		if (pool[i] >= 5)
-			return false;
+	for (int i = 1; i <= 9; ++i) {
+		if (state.colors[0].get(i) >= 5)return false;
+		if (state.colors[1].get(i) >= 5)return false;
+		if (state.colors[2].get(i) >= 5)return false;
+		if (state.colors[3].get(i) >= 5)return false;
+	}
+	//国士无双型的判定
+	const auto guoshi = getDistanceGuoshi(state) == -1;
+	if (guoshi)return true;
 	//七对型的判定(两杯口将被拆解为七对型)
-	const auto qiduizi = getDistanceQidui(allTiles) == -1;
+	const auto qiduizi = getDistanceQidui(state) == -1;
 	if (qiduizi)
 		return true;
 	//一般型的判定
-	const auto normal = getDistanceStandard(allTiles) == -1;
+	const auto normal = getDistanceStandard(state) == -1;
 	return normal;
 }
 
-void Algorithms::constructTarget(int quetou, int mianzi, std::queue<int>& q, int shape, int target, bool z) {
-	int nextShape;
+void Algorithms::constructTarget(int quetou, int mianzi, std::queue<SparseSinglesOfColor>& q, SparseSinglesOfColor shape, int target, bool z) {
+	SparseSinglesOfColor nextShape;
 	if (quetou > 0) {
 		for (auto value = 1; value <= (z ? 7 : 9); ++value) {
 			nextShape = shape;
-			const auto count = getNumberCount(shape, value);
+			const auto count = shape.get(value); 
 			if (count <= 2) {
-				setNumberCount(nextShape, value, count + 2);
+				nextShape.add(value,2);
 				constructTarget(quetou - 1, mianzi, q, nextShape, target, z);
 			}
 		}
@@ -566,9 +579,8 @@ void Algorithms::constructTarget(int quetou, int mianzi, std::queue<int>& q, int
 		//刻子
 		for (auto value = 1; value <= (z ? 7 : 9); ++value) {
 			nextShape = shape;
-			const auto count = getNumberCount(shape, value);
-			if (count <= 1) {
-				setNumberCount(nextShape, value, count + 3);
+			if (nextShape.get(value) <= 1) {
+				nextShape.add(value, 3);
 				constructTarget(quetou, mianzi - 1, q, nextShape, target, z);
 			}
 		}
@@ -576,13 +588,13 @@ void Algorithms::constructTarget(int quetou, int mianzi, std::queue<int>& q, int
 		if (!z) {
 			for (auto value = 1; value <= 7; ++value) {
 				nextShape = shape;
-				const auto count0 = getNumberCount(shape, value);
-				const auto count1 = getNumberCount(shape, value + 1);
-				const auto count2 = getNumberCount(shape, value + 2);
+				const auto count0 = shape.get(value);
+				const auto count1 = shape.get(value+1);
+				const auto count2 = shape.get(value+2);
 				if (count0 <= 3 && count1 <= 3 && count2 <= 3) {
-					setNumberCount(nextShape, value, count0 + 1);
-					setNumberCount(nextShape, value + 1, count1 + 1);
-					setNumberCount(nextShape, value + 2, count2 + 1);
+					nextShape.add(value, 1);
+					nextShape.add(value+1, 1);
+					nextShape.add(value+2, 1);
 					constructTarget(quetou, mianzi - 1, q, nextShape, target, z);
 				}
 			}
@@ -590,8 +602,8 @@ void Algorithms::constructTarget(int quetou, int mianzi, std::queue<int>& q, int
 	}
 	if (mianzi > 0 || quetou > 0)return;
 	q.push(shape);
-	if (!z)distanceToTarget[shape][target] = 0;
-	else distanceToTargetZ[shape][target] = 0;
+	if (!z)distanceToTarget[CompactSinglesOfColor(shape).raw()][target] = 0;
+	else distanceToTargetZ[CompactSinglesOfColor(shape).raw()][target] = 0;
 }
 
 //预处理，计算单花色离目标的距离(仅允许插入和删除两个操作)
@@ -608,53 +620,53 @@ void Algorithms::preprocessDistance() {
 		const auto quetou = target / 5;
 		const auto mianzi = target % 5;
 		//构造目标(同时也是BFS的起点)
-		std::queue<int> q;
-		constructTarget(quetou, mianzi, q, 0, target, false);
+		std::queue<SparseSinglesOfColor> q;
+		constructTarget(quetou, mianzi, q, SparseSinglesOfColor(), target, false);
 		while (!q.empty()) {
 			const auto now = q.front();
 			q.pop();
 			for (auto value = 1; value <= 9; ++value) {
-				int next;
-				const auto count = getNumberCount(now, value);
+				SparseSinglesOfColor next;
+				const auto count = now.get(value);
 				if (count > 0) {
 					next = now;
-					setNumberCount(next, value, count - 1);
-					if (distanceToTarget[next][target] == 255) {
-						distanceToTarget[next][target] = distanceToTarget[now][target] + 1;
+					next.add(value, - 1);
+					if (distanceToTarget[CompactSinglesOfColor(next).raw()][target] == 255) {
+						distanceToTarget[CompactSinglesOfColor(next).raw()][target] = distanceToTarget[CompactSinglesOfColor(now).raw()][target] + 1;
 						q.push(next);
 					}
 				}
 				if (count < 4) {
 					next = now;
-					setNumberCount(next, value, count + 1);
-					if (distanceToTarget[next][target] == 255) {
-						distanceToTarget[next][target] = distanceToTarget[now][target] + 1;
+					next.add(value, +1);
+					if (distanceToTarget[CompactSinglesOfColor(next).raw()][target] == 255) {
+						distanceToTarget[CompactSinglesOfColor(next).raw()][target] = distanceToTarget[CompactSinglesOfColor(now).raw()][target] + 1;
 						q.push(next);
 					}
 				}
 			}
 		}
 		//字牌
-		constructTarget(quetou, mianzi, q, 0, target, true);
+		constructTarget(quetou, mianzi, q, SparseSinglesOfColor(), target, true);
 		while (!q.empty()) {
 			const auto now = q.front();
 			q.pop();
 			for (auto value = 1; value <= 7; ++value) {
-				int next;
-				const auto count = getNumberCount(now, value);
+				SparseSinglesOfColor next;
+				const auto count = now.get(value); 
 				if (count > 0) {
 					next = now;
-					setNumberCount(next, value, count - 1);
-					if (distanceToTargetZ[next][target] == 255) {
-						distanceToTargetZ[next][target] = distanceToTargetZ[now][target] + 1;
+					next.add(value, -1);
+					if (distanceToTargetZ[CompactSinglesOfColor(next).raw()][target] == 255) {
+						distanceToTargetZ[CompactSinglesOfColor(next).raw()][target] = distanceToTargetZ[CompactSinglesOfColor(now).raw()][target] + 1;
 						q.push(next);
 					}
 				}
 				if (count < 4) {
 					next = now;
-					setNumberCount(next, value, count + 1);
-					if (distanceToTargetZ[next][target] == 255) {
-						distanceToTargetZ[next][target] = distanceToTargetZ[now][target] + 1;
+					next.add(value, +1);
+					if (distanceToTargetZ[CompactSinglesOfColor(next).raw()][target] == 255) {
+						distanceToTargetZ[CompactSinglesOfColor(next).raw()][target] = distanceToTargetZ[CompactSinglesOfColor(now).raw()][target] + 1;
 						q.push(next);
 					}
 				}
@@ -670,18 +682,7 @@ int Algorithms::getDistanceSingle(int shape, int mianzi, int quetou, bool z) {
 }
 
 //计算14张手牌的向听数(0为一向听，-1为和牌)
-int Algorithms::getDistanceStandard(const std::vector<Single>& handTile) {
-	int shape[5] = {0, 0, 0, 0, 0}; //1~4分别表示mpsz，其中z的格式为5位16进制数,从低到高分别为出现了0,1,2,3,4张的牌共有几种,高位无意义
-	for (auto& item : handTile) {
-		if (item.color() == 'm')
-			addNumberCount(shape[1], item.value(), 1);
-		if (item.color() == 'p')
-			addNumberCount(shape[2], item.value(), 1);
-		if (item.color() == 's')
-			addNumberCount(shape[3], item.value(), 1);
-		if (item.color() == 'z')
-			addNumberCount(shape[4], item.value(), 1);
-	}
+int Algorithms::getDistanceStandard(const CompactSingles& handTile) {
 	//计算标准型向听数
 	int dp[5][5][2]; //a当前已经完成的花色数，b当前已经完成的面子数，c当前已经完成的雀头数,dp表示最小距离
 	//int pre[5][5][2];
@@ -696,9 +697,9 @@ int Algorithms::getDistanceStandard(const std::vector<Single>& handTile) {
 		for (auto b = 0; b < 5; ++b)
 			for (auto k = 0; k < 5 && b - k >= 0; ++k) //枚举这一种花色要达成的面子数
 			{
-				dp[a][b][0] = std::min(dp[a][b][0], dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 0, a == 4));
-				dp[a][b][1] = std::min(dp[a][b][1], dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 1, a == 4));
-				dp[a][b][1] = std::min(dp[a][b][1], dp[a - 1][b - k][1] + getDistanceSingle(shape[a], k, 0, a == 4));
+				dp[a][b][0] = std::min(dp[a][b][0], dp[a - 1][b - k][0] + getDistanceSingle(handTile.colors[a-1].raw(), k, 0, a == 4));
+				dp[a][b][1] = std::min(dp[a][b][1], dp[a - 1][b - k][0] + getDistanceSingle(handTile.colors[a-1].raw(), k, 1, a == 4));
+				dp[a][b][1] = std::min(dp[a][b][1], dp[a - 1][b - k][1] + getDistanceSingle(handTile.colors[a-1].raw(), k, 0, a == 4));
 				/*
 				if (dp[a][b][0] > dp[a - 1][b - k][0] + getDistanceSingle(shape[a], k, 0, a == 4))
 				{
@@ -745,56 +746,35 @@ int Algorithms::getDistanceStandard(const std::vector<Single>& handTile) {
 }
 
 //计算14张手牌的向听数(0为一向听，-1为和牌)
-int Algorithms::getDistanceQidui(const std::vector<Single>& handTile) {
-	int shape[5] = {0, 0, 0, 0, 0}; //1~4分别表示mpsz，其中z的格式为5位16进制数,从低到高分别为出现了0,1,2,3,4张的牌共有几种,高位无意义
-	for (auto& item : handTile) {
-		if (item.color() == 'm')
-			addNumberCount(shape[1], item.value(), 1);
-		if (item.color() == 'p')
-			addNumberCount(shape[2], item.value(), 1);
-		if (item.color() == 's')
-			addNumberCount(shape[3], item.value(), 1);
-		if (item.color() == 'z')
-			addNumberCount(shape[4], item.value(), 1);
-	}
+int Algorithms::getDistanceQidui(const CompactSingles& handTile) {
 	//计算七对子向听数
 	auto duiziCount = 0;
 	auto fupaiCount = 0;
-	for (auto i = 1; i <= 4; ++i)
+	for (auto i = 0; i <= 3; ++i)
 		for (auto j = 1; j <= (i == 4 ? 7 : 9); ++j)
-			if (getNumberCount(shape[i], j) >= 2)
+			if (handTile.colors[i].get(j)>= 2)
 				duiziCount++;
-			else if (getNumberCount(shape[i], j) == 1)
+			else if (handTile.colors[i].get(j) == 1)
 				fupaiCount++;
 	return 6 - duiziCount + std::max(0, 7 - duiziCount - fupaiCount);
 }
 //计算14张手牌的国士无双向听数(0为一向听，-1为和牌)
-int Algorithms::getDistanceGuoshi(const std::vector<Single>& handTile)
-{
+int Algorithms::getDistanceGuoshi(const CompactSingles& handTile){
 	auto yaojiuTypeCount=0;
 	auto yaojiuCount = 0;
-	bool have[13] = { false,false,false,false,false,false,false,false,false,false,false,false,false };//1m9m1p9m1s9s1234567z;
-	for (auto& item : handTile) {
-		if (item.isyaojiu()){
-			yaojiuCount++;
-			int index = -1;
-			if (item.color() == 'm' && item.value() == 1)index = 0;
-			else if (item.color() == 'm' && item.value() == 9)index = 1;
-			else if (item.color() == 'p' && item.value() == 1)index = 2;
-			else if (item.color() == 'p' && item.value() == 9)index = 3;
-			else if (item.color() == 's' && item.value() == 1)index = 4;
-			else if (item.color() == 's' && item.value() == 9)index = 5;
-			else if (item.color() == 'z')index = item.value() + 5;
-			if (!have[index]){
-				yaojiuTypeCount++;
-				have[index] = true;
-			}
+	for (int i = 0; i < 3;++i) {
+		for (int j = 1; j <= 9; j+=8){
+			yaojiuCount += handTile.colors[i].get(j);
+			yaojiuTypeCount += handTile.colors[i].get(j) ? 1:0;
 		}
+	}
+	for (int j = 1; j <= 7; j++) {
+		yaojiuCount += handTile.colors[3].get(j);
+		yaojiuTypeCount += handTile.colors[3].get(j) ? 1 : 0;
 	}
 	return 12 + static_cast<int>(yaojiuCount <= yaojiuTypeCount) - yaojiuTypeCount;
 }
 //计算14张手牌的向听数(0为一向听，-1为和牌)
-int Algorithms::getDistance(const std::vector<Single>& handTile)
-{
+int Algorithms::getDistance(const CompactSingles& handTile){
 	return std::min(std::min(getDistanceGuoshi(handTile), getDistanceQidui(handTile)), getDistanceStandard(handTile));
 }
