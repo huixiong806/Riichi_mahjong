@@ -41,10 +41,10 @@ void test() {
 	res.handTile.emplace_back(3, 's', 0);
 	res.handTile.emplace_back(3, 's', 0);
 	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(9, 's', 0);
+	res.handTile.emplace_back(3, 'z', 0);
+	res.handTile.emplace_back(3, 'z', 0);
 	sort(res.handTile.begin(), res.handTile.end());
-	res.nowTile = Single(9, 's', false);
+	res.nowTile = Single(3, 's', false);
 	res.prevailingWind = EAST; //场风
 	res.selfWind = EAST; //门风
 	res.nowWind = EAST;
@@ -104,6 +104,7 @@ int main_loop() {
 	233 7对子自摸，留1m和3p
 	*/
 	const int seed = time(0);
+	
 	//cout << "输入种子:" << endl;
 	//cin >> seed;
 	srand(seed);
@@ -169,6 +170,7 @@ int main() {
 	Algorithms::preprocessDistance();
 	cout << "预处理结束" << endl;
 	test();
+	system("pause");
 	//test2();
 	main_loop();
 	pop_console_locale();

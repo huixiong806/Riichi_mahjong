@@ -225,7 +225,114 @@ bool YakuChecker::chunzhengjiulianbaodeng() const noexcept {
 			return chunzhengjiulianbaodengShape() || (jiulianbaodengShape() && tianhu());
 		});
 }
-
+bool YakuChecker::hunyise() const noexcept{
+	auto color = '0';
+	bool hunyise = true;
+	//副露牌
+	for (auto& group : mianzi) {
+		if (group.color != 'z') {
+			if (color == '0')
+				color = group.color;
+			else if (color != group.color) { hunyise = false; }
+		}
+	}
+	if (qingyise())hunyise = false;
+	return hunyise && menqing;
+}
+bool YakuChecker::hunyiseF() const noexcept {
+	auto color = '0';
+	bool hunyiseF = true;
+	//副露牌
+	for (auto& group : mianzi) {
+		if (group.color != 'z') {
+			if (color == '0')
+				color = group.color;
+			else if (color != group.color) { hunyiseF = false; }
+		}
+	}
+	if (qingyiseF())hunyiseF = false;
+	return hunyiseF && !menqing;
+}
+//平和和符数计算
+std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
+	auto meetTheCounditions = false;
+	auto fu = 20;
+	auto pinghu = true;
+	//首先判断雀头是否为役牌
+	if (mianzi[0].color == 'z') {
+		if (mianzi[0].value >= 5) {
+			pinghu = false;
+			fu += 2;
+		}
+		if (mianzi[0].value == par.prevailingWind + 1) {
+			fu += 2;
+			pinghu = false;
+		}
+		if (mianzi[0].value == par.selfWind + 1) {
+			fu += 2;
+			pinghu = false;
+		}
+	}
+	//判断是否有刻子
+	for (auto i = 1; i <= 4; ++i) {
+		if (mianzi[i].type != GroupType::Shunzi) {
+			pinghu = false;
+			if (mianzi[i].type == GroupType::Kezi)
+				fu += 2 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
+			if (mianzi[i].type == GroupType::Gang)
+				fu += 8 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
+		}
+	}
+	//和牌方式是否为两面
+	auto liangmianOnly = true; //是否只能被看成两面
+	auto liangmian = false; //是否可以被看成两面
+	for (auto i = 1; i <= menqingCount; ++i) {
+		if (mianzi[i].type == GroupType::Shunzi) {
+			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
+				liangmian = true;
+			if (par.target.valueEqual(Single(mianzi[i].value + 2, mianzi[i].color, false)))
+				liangmian = true;
+		}
+		if (mianzi[i].type == GroupType::Quetou) {
+			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
+				liangmianOnly = false;
+		}
+		if (mianzi[i].type == GroupType::Kezi || mianzi[i].type == GroupType::Gang) {
+			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
+				liangmianOnly = false;
+		}
+	}
+	if (liangmian == false)
+		pinghu = false;
+	//为平和型
+	if (pinghu) {
+		//门清，附加平和一役
+		if (menqing) {
+			if (par.type == 1)fu += 10;
+			meetTheCounditions = true;
+			//assert(res.result.fu == 20);
+		}
+		else //非门清,30符固定
+			fu = 30;
+	}
+	else {
+		if (liangmianOnly == false)
+			fu += 2;
+		//门清荣和+10符,自摸+2符
+		if (menqing) {
+			if (par.type >= 1)
+				fu += 10;
+			else fu += 2;
+		}
+		else //副露自摸+2符
+		{
+			if (par.type == 0)
+				fu += 2;
+		}
+	}
+	if (fu % 10 != 0)fu = fu - fu % 10 + 10;
+	return { meetTheCounditions ,fu };
+}
 TryToAgariResult YakuChecker::getResult() {
 	auto result = AgariResult();
 	if (mianzi.size() != 5)return TryToAgariResult(AgariFaildReason::ShapeWrong);
@@ -277,96 +384,28 @@ TryToAgariResult YakuChecker::getResult() {
 	for (auto& item : myHandTile)
 		if (item.isAkadora())
 			result.akadora++;
-	//平和和符数计算
-	result.fu = 20;
-	auto pinghu = true;
-	//首先判断雀头是否为役牌
-	if (mianzi[0].color == 'z') {
-		if (mianzi[0].value >= 5) {
-			pinghu = false;
-			result.fu += 2;
-		}
-		if (mianzi[0].value == par.prevailingWind + 1) {
-			result.fu += 2;
-			pinghu = false;
-		}
-		if (mianzi[0].value == par.selfWind + 1) {
-			result.fu += 2;
-			pinghu = false;
-		}
+	//平和
+	auto pinghuResult = pinghuAndFuCount();
+	if (pinghuResult.first){
+		addYaku<Yaku::Pinghu>(result);
 	}
-	//判断是否有刻子
-	for (auto i = 1; i <= 4; ++i) {
-		if (mianzi[i].type != GroupType::Shunzi) {
-			pinghu = false;
-			if (mianzi[i].type == GroupType::Kezi)
-				result.fu += 2 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
-			if (mianzi[i].type == GroupType::Gang)
-				result.fu += 8 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
-		}
-	}
-	//和牌方式是否为两面
-	auto liangmianOnly = true; //是否只能被看成两面
-	auto liangmian = false; //是否可以被看成两面
-	for (auto i = 1; i <= menqingCount; ++i) {
-		if (mianzi[i].type == GroupType::Shunzi) {
-			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
-				liangmian = true;
-			if (par.target.valueEqual(Single(mianzi[i].value + 2, mianzi[i].color, false)))
-				liangmian = true;
-		}
-		if (mianzi[i].type == GroupType::Quetou) {
-			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
-				liangmianOnly = false;
-		}
-		if (mianzi[i].type == GroupType::Kezi || mianzi[i].type == GroupType::Gang) {
-			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
-				liangmianOnly = false;
-		}
-	}
-	if (liangmian == false)
-		pinghu = false;
-	//为平和型
-	if (pinghu) {
-		//门清，附加平和一役
-		if (menqing) {
-			result.fan++;
-			result.yaku.add<Yaku::Pinghu>();
-			if (par.type == 1)result.fu += 10;
-			//assert(res.result.fu == 20);
-		}
-		else //非门清,30符固定
-			result.fu = 30;
-	}
-	else {
-		if (liangmianOnly == false)
-			result.fu += 2;
-		//门清荣和+10符,自摸+2符
-		if (menqing) {
-			if (par.type >= 1)
-				result.fu += 10;
-			else result.fu += 2;
-		}
-		else //副露自摸+2符
-		{
-			if (par.type == 0)
-				result.fu += 2;
-		}
-	}
-	if (result.fu % 10 != 0)result.fu = result.fu - result.fu % 10 + 10;
+	result.fu = pinghuResult.second;
+	if (qingyise())
+		addYaku<Yaku::Qingyise>(result);
+	else if (qingyiseF())
+		addYaku<Yaku::QingyiseF>(result);
+	else if (hunyise())
+		addYaku<Yaku::Hunyise>(result);
+	else if (hunyiseF())
+		addYaku<Yaku::HunyiseF>(result);
 	//清一色，混一色，断幺九，混老头，纯全带幺九，混全带幺九的判断
-	auto hunyise = true, duanyao = true, hunlaotou = true, chunquan = true, hunquan = true;
+	auto duanyao = true, hunlaotou = true, chunquan = true, hunquan = true;
 	auto color = '0';
-	//副露牌
+	//枚举面子
 	for (auto& group : mianzi) {
 		if (!group.isyaojiu()) {
 			hunquan = false;
 			chunquan = false;
-		}
-		if (group.color != 'z') {
-			if (color == '0')
-				color = group.color;
-			else if (color != group.color) { hunyise = false; }
 		}
 		else { chunquan = false; }
 		if (group.type == GroupType::Shunzi) {
@@ -379,27 +418,6 @@ TryToAgariResult YakuChecker::getResult() {
 			if (group.isyaojiu())
 				duanyao = false;
 			else hunlaotou = false;
-		}
-	}
-	if (qingyise())hunyise = false;
-	if (qingyise()) {
-		if (menqing) {
-			result.fan += 6;
-			result.yaku.add<Yaku::Qingyise>();
-		}
-		else {
-			result.fan += 5;
-			result.yaku.add<Yaku::QingyiseF>();
-		}
-	}
-	else if (hunyise) {
-		if (menqing) {
-			result.fan += 3;
-			result.yaku.add<Yaku::Hunyise>();
-		}
-		else {
-			result.fan += 2;
-			result.yaku.add<Yaku::HunyiseF>();
 		}
 	}
 	if (duanyao) {

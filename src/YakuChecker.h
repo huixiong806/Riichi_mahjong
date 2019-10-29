@@ -66,6 +66,10 @@ public:
 	//非役满型
 	[[nodiscard]] bool qingyise() const noexcept;
 	[[nodiscard]] bool qingyiseF() const noexcept;
+	[[nodiscard]] bool hunyise() const noexcept;
+	[[nodiscard]] bool hunyiseF() const noexcept;
+	//返回值第一项为是否满足平和，第二项为符数
+	[[nodiscard]] std::pair<bool,int> pinghuAndFuCount() const noexcept;
 	[[nodiscard]] TryToAgariResult getResult();
 
 	template <Yaku Y>
