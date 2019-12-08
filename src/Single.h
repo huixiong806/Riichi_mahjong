@@ -158,7 +158,7 @@ struct CompactSinglesOfColor {
 	{}
 	[[nodiscard]] explicit constexpr operator SparseSinglesOfColor() const noexcept {
 		return SparseSinglesOfColor{}
-		       .add(9, get<0u>()).add(9, get<1u>()).add(2, get<2u>()).add(3, get<3u>())
+		       .add(9, get<0u>()).add(1, get<1u>()).add(2, get<2u>()).add(3, get<3u>())
 		       .add(4, get<4u>()).add(5, get<5u>()).add(6, get<6u>()).add(7, get<7u>())
 		       .add(8, get<8u>());
 	}

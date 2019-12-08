@@ -25,6 +25,6 @@ public:
 	Single getUraIndicator(int index); //获取里宝牌指示牌,下标范围0~4
 	Single nextLingshang(); //获取下一张岭上牌(自动移海底牌)
 	Single nextHand(); //获取下一张手牌
-	int remainCount(); //获取剩余牌数
+	int remainCount()const; //获取剩余牌数
 	std::string getMountainString(); //获得牌山序列
 };

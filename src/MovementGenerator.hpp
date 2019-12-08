@@ -23,15 +23,12 @@ enum class ActionType {
 };
 
 enum class ErrorType {
-	None,
-	//成功了，没有error
+	None,//成功了，没有error
 	NotYourTurn,
 	AlreadyActed,
 	ActionRejected,
-	TileNotExist,
-	//打牌时不存在要打的东西
-	CannotChooseNull,
-	//不准给空指令
+	TileNotExist,//打牌时不存在要打的东西
+	CannotChooseNull,//不准给空指令
 };
 
 struct Action {

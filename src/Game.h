@@ -43,28 +43,9 @@ private:
 	//开始新局
 	void startNewRound();
 	//开始下一人摸牌
-	void newTurn(int who, bool lingShang) {
-		waitMingpai = false;
-		turn = who;
-		for (auto i = 0; i < 4; ++i) { player[i].setNowTile(Null, false); }
-		//mLastTurn = -1;
-		if (mountain.zimo != Null) {
-			player[who].setNowTile(mountain.zimo, false); //开局给东家设置自摸牌
-			mountain.zimo = Null;
-		}
-		else {
-			//正常摸牌
-			if (lingShang) { player[who].setNowTile(mountain.nextLingshang(), true); }
-			else { player[who].setNowTile(mountain.nextHand(), false); }
-		}
-		//std::cout << "***********" << std::endl;
-		//巡数+1
-		player[who].subround++;
-		if (player[who].subround > 0)
-			w = false;
-	}
-
-	//鸣牌后打牌
+	void newTurn(int who, bool lingShang);
+	
+	//鸣牌(除了杠)后打牌
 	void newTurnAfterMingpai(int who) {
 		waitMingpai = false;
 		turn = who;
@@ -299,10 +280,15 @@ public:
 	}
 
 	//玩家获取游戏信息
-	GameInfo getGameInfo(int index);
-	bool roundOver() { return roundIsOver; }
-	bool gameOver() { return gameIsOver; }
+	GameInfo getGameInfo(int index)const;
+	bool roundOver()const { return roundIsOver; }
+	bool gameOver()const { return gameIsOver; }
 	RoundResult getRoundResult() { return result; }
+	/*
+	    Action分为两类
+		1.轮到自己时的action
+		2.别人打出牌后的action
+	*/
 	//下一步(返回操作的状态)(TODO)
 	//注意:改mTurn,mLast,player的disabledHandTile等
 	ActionResult doAction(int index, Action act);

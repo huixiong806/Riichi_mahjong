@@ -29,7 +29,7 @@ Single Mountain::nextHand() //获取下一张手牌
 	return mA[mHandPtr++];
 }
 
-int Mountain::remainCount() //获取剩余牌数
+int Mountain::remainCount()const //获取剩余牌数
 {
 	return mA.size() - mHandPtr;
 }

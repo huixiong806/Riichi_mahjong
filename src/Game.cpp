@@ -23,6 +23,26 @@ void Game::startNewRound() {
 	waitMingpai = false;
 	newTurn(east, false);
 }
+void Game::newTurn(int who, bool lingShang) {
+	waitMingpai = false;
+	turn = who;
+	for (auto i = 0; i < 4; ++i) { player[i].setNowTile(Null, false); }
+	//mLastTurn = -1;
+	if (mountain.zimo != Null) {
+		player[who].setNowTile(mountain.zimo, false); //开局给东家设置自摸牌
+		mountain.zimo = Null;
+	}
+	else {
+		//正常摸牌
+		if (lingShang) { player[who].setNowTile(mountain.nextLingshang(), true); }
+		else { player[who].setNowTile(mountain.nextHand(), false); }
+	}
+	//std::cout << "***********" << std::endl;
+	//巡数+1
+	player[who].subround++;
+	if (player[who].subround > 0)
+		w = false;
+}
 
 ActionResult Game::doAction(int index, Action act) {
 	ActionResult res{};
@@ -211,7 +231,7 @@ ActionResult Game::doAction(int index, Action act) {
 }
 
 //玩家获取游戏信息
-GameInfo Game::getGameInfo(int index) {
+GameInfo Game::getGameInfo(int index)const {
 	GameInfo res;
 	res.rule = rule; //规则
 	//每个玩家的牌河，是否立直，以及副露牌组
