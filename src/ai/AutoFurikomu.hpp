@@ -1,7 +1,7 @@
 #pragma once
 #include<string>
 #include<iostream>
-#include"MovementGenerator.hpp"
+#include"ActionGenerator.hpp"
 
 class AutoFurikomu : public ActionGenerator {
 private:

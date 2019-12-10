@@ -6,15 +6,12 @@
 #include <vector>
 
 enum class ActionType {
-	Null,
-	//空指令
+	Null,//空指令
 	Skip,
-	Dapai,
-	//正常打牌
+	Dapai,//正常打牌
 	Chi,
 	Peng,
-	Gang,
-	//杠
+	Gang,//杠
 	Rong,
 	Lizhi,
 	Zimo,
@@ -28,6 +25,7 @@ enum class ErrorType {
 	AlreadyActed,
 	ActionRejected,
 	TileNotExist,//打牌时不存在要打的东西
+	CantLizhi,//不能立直
 	CannotChooseNull,//不准给空指令
 };
 
@@ -80,7 +78,7 @@ struct PlayerInfo {
 	int yifa{}; //是否处于一发巡
 	int score{};
 };
-
+//游戏状态数据包，传递给决策器来决策
 struct GameInfo {
 	Rule rule;  //规则
 	std::vector<PlayerInfo> playerInfo; //按顺序分别为东南西北四家

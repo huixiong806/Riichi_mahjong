@@ -59,9 +59,9 @@ public:
 	}
 
 	//relativePosition 0,1,2,3分别表示下对上自
-	bool canChi(Single target, Group result, int relativePosition) { return false; }
+	bool canChi(Single target, Group result, int relativePosition)const { return false; }
 
-	bool canPeng(Single target, Group result, int relativePosition) {
+	bool canPeng(Single target, Group result, int relativePosition)const {
 		//检查类型
 		if (result.type != GroupType::Kezi)
 			return false;
@@ -99,7 +99,7 @@ public:
 	}
 
 	//仅限荣杠
-	bool canGang(Single target, Group result, int relativePosition) {
+	bool canGang(Single target, Group result, int relativePosition)const {
 		//检查类型
 		if (result.type != GroupType::Gang)
 			return false;
@@ -180,18 +180,28 @@ public:
 	}
 
 	void chi(Group result) { }
-	//返回false时不应变动私有变量
-	bool dapai(Single target) //打牌
-	{
+	bool canDapai(Single target)const{
 		if (target == Null)return false;
+		if (nowTile == target)
+			return true;
+		//立直必须摸切
+		if (lizhiXunmu != -1)return false;
+		for (auto i = 0; i < handTile.size(); ++i)
+			if (target == handTile[i])
+				return true;
+		return false;
+	}
+	//返回false时不应变动私有变量
+	void dapai(Single target) //打牌
+	{
+		if(target== Null)
+			return throw("打牌失败-Null是能打的牌？");
 		if (nowTile == target) {
 			discardTile.push_back(nowTile);
 			moqie = true;
 			nowTile = Null;
-			return true;
+			return;
 		}
-		//立直必须摸切
-		if (lizhiXunmu != -1)return false;
 		for (auto i = 0; i < handTile.size(); ++i) {
 			if (target == handTile[i]) {
 				discardTile.push_back(target);
@@ -201,10 +211,10 @@ public:
 					handTile.pop_back();
 				nowTile = Null;
 				moqie = false;
-				return true;
+				return;
 			}
 		}
-		return false;
+		throw("打牌失败-要打的牌不存在");
 	}
 
 	//返回false时不应变动私有变量
@@ -219,6 +229,11 @@ public:
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, lizhiXunmu, yifa, state, 0, nowTile,
 		                                         handTile, groupTile, dora, ura));
 	}
+	bool canZimo(WindType prevailingWind, int state, const std::vector<Single>& dora,
+		const std::vector<Single>& ura)const {
+		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, lizhiXunmu, yifa, state, 0, nowTile,
+			handTile, groupTile, dora, ura)).success;
+	}
 
 	AgariResult rong(Single target, WindType prevailingWind, int type, int state, const std::vector<Single>& dora,
 	                 const std::vector<Single>& ura) {
@@ -227,16 +242,21 @@ public:
 	}
 
 	bool canRong(Single target, WindType prevailingWind, int type, int state, const std::vector<Single>& dora,
-	             const std::vector<Single>& ura) {
+	             const std::vector<Single>& ura)const {
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, lizhiXunmu, yifa, state, type, target,
 		                                         handTile, groupTile, dora, ura)).success;
 	}
 
 	//返回false时不应变动私有变量
-	bool liuju() { return false; }
-	bool tingpai() { return !Algorithms::tingpai(handTile).empty(); }
-	//返回false时不应变动私有变量
-	bool doLizhi(int state, Single target) {
+	bool liuju()const { return false; }
+	bool tingpai()const { return !Algorithms::tingpai(handTile).empty(); }
+	/*
+	state
+	正常=0
+	天地和,w立=1
+	河底/海底=2
+	*/
+	bool canLizhi(int state, Single target)const {
 		//要打的牌是否存在?
 		if (target == Null)return false;
 		auto myTile = handTile;
@@ -267,6 +287,50 @@ public:
 		if (score < 1000)
 			return false;
 		//是否听牌?
+		return !Algorithms::tingpai(myTile).empty();
+	}
+	void doLizhi(int state, Single target) {
+		//要打的牌是否存在?
+		if (target == Null)
+		{
+			throw("立直失败-Null是能打的牌？");
+			return;
+		}
+		auto myTile = handTile;
+		myTile.push_back(nowTile);
+		auto success = false;
+		for (auto i = 0; i < myTile.size(); ++i) {
+			if (target == myTile[i]) {
+				myTile[i] = Null;
+				std::sort(myTile.begin(), myTile.end()); //从小到大排序,Null一定被排到最大一个
+				myTile.pop_back();
+				success = true;
+				break;
+			}
+		}
+		if (!success)
+		{
+			throw("立直失败-要打的牌不存在");
+			return;
+		}
+		//是否非暗杠副露？
+		if (!groupTile.empty()) {
+			for (auto& item : groupTile) {
+				//暗杠必须满足type=Gang且state=0
+				if (item.type != GroupType::Gang || item.state != 0)
+				{
+					throw("立直失败-有非暗杠副露");
+					return;
+				}
+			}
+		}
+		//是否已经立直过了？
+		if (lizhiXunmu != -1)
+			return throw("立直失败-已经立直过了");
+		//点棒够不够?
+		if (score < 1000)
+			return throw("立直失败-点棒不够");
+		//是否听牌?
 		const auto backup = handTile;
 		handTile = myTile;
 		const auto isTingpai = tingpai();
@@ -277,15 +341,15 @@ public:
 		*/
 		handTile = backup;
 		if (isTingpai) {
-			assert(dapai(target));
+			dapai(target);
 			lizhiXunmu = subround;
 			yifa = true;
 			lizhi = discardTile.size() - 1;
 			if (state == 1)
 				lizhiXunmu = -2;
 			score -= 1000;
-			return true;
+			return;
 		}
-		return false;
+		return throw("立直失败-没听牌");
 	}
 };

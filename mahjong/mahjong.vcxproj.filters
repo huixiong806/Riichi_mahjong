@@ -52,9 +52,6 @@
     <ClInclude Include="..\src\ResultInspector.hpp">
       <Filter>src\hppFiles</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\MovementGenerator.hpp">
-      <Filter>src\hppFiles</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\Player.hpp">
       <Filter>src\hppFiles</Filter>
     </ClInclude>
@@ -66,6 +63,9 @@
     </ClInclude>
     <ClInclude Include="..\src\ai\Tester.h">
       <Filter>src\ai</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\ActionGenerator.hpp">
+      <Filter>src\hppFiles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

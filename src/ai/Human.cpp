@@ -107,7 +107,7 @@ std::vector<Action> Human::getLizhiAction(const GameInfo& info) {
 		auto state = 0;
 		if (info.w)state = 1;
 		else if (info.remainTiles == 0)state = 2;
-		if (player.doLizhi(state, target)) { res.insert(Action(ActionType::Lizhi, target)); }
+		if (player.canLizhi(state, target)) { res.insert(Action(ActionType::Lizhi, target)); }
 	}
 	std::vector<Action> ret;
 	for (auto& item : res)

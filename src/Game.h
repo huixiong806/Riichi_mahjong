@@ -1,7 +1,7 @@
 #pragma once
 #include"Mountain.h"
 #include"Player.hpp"
-#include"MovementGenerator.hpp"
+#include"ActionGenerator.hpp"
 #include<vector>
 
 //返回一局的结果
@@ -15,9 +15,12 @@ struct ActionResult {
 	bool success;
 	ErrorType type;
 };
-
+enum GameState:bool
+{
+	GAME_STATE_NORMAL,
+	GAME_STATE_WAITING_FOR_MINGPAI
+};
 class Game {
-
 private:
 	//int mIndex;//表示本局的编号
 	Rule rule; //规则
@@ -36,9 +39,9 @@ private:
 	//Single mLast=Null;//最后打出的牌
 	//int mLastTurn;//最后打出的牌是谁打的。
 	int doraIndicatorCount = 0; //已翻开的宝牌指示牌数量
-	bool waitMingpai = false; //是否等待鸣牌
-	bool haveMingpai[4] = {}; //4人是否已经发出了关于鸣牌的抉择
-	Action mingpaiAction[4]; //鸣牌的操作暂存
+	GameState gameState = GAME_STATE_NORMAL; //游戏状态
+	bool isReady[4] = {}; //玩家是否已经做出了决策
+	Action playerAction[4]; //玩家决策暂存
 	bool w; //是否处于w立,天和,地和可成立的状态
 	//开始新局
 	void startNewRound();
@@ -46,250 +49,48 @@ private:
 	void newTurn(int who, bool lingShang);
 	
 	//鸣牌(除了杠)后打牌
-	void newTurnAfterMingpai(int who) {
-		waitMingpai = false;
-		turn = who;
-		for (auto i = 0; i < 4; ++i) { player[i].setNowTile(Null, false); }
-		//巡数+1
-		player[who].subround++;
-	}
+	void newTurnAfterMingpai(int who);
 
 	//途中流局连庄
-	void endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
-		result = RoundResult();
-		roundIsOver = true;
-		gameIsOver = false;
-		auto top = 0;
-		for (auto i = 1; i < 4; ++i) {
-			if (player[top].score < player[i].score || (player[top].score == player[i].score && ((player[top].selfWind +
-				4 - 1) % 4 > (player[i].selfWind + 4 - 1) % 4)))
-				top = i;
-		}
-		//有人和牌
-		//TODO:分数计算 
-		if (!res.empty()) {
-			result.liuju = false;
-			result.lianzhuang = false;
-			result.agariResult = res;
-			//立直棒和本场费计算，按照头跳规则
-			int targetPlayer; //获取点棒的人 
-			if (res.size() == 1)
-				targetPlayer = res[0].hupaiID;
-			else {
-				targetPlayer = res[0].fangchongID;
-				auto minSpace = 4; //最小间距先调整为4
-				const int a = player[res[0].fangchongID].selfWind;
-				for (auto& item : res) {
-					int b = player[item.hupaiID].selfWind;
-					if (b < a)b += 4;
-					const auto space = b - a;
-					if (space < minSpace) {
-						minSpace = space;
-						targetPlayer = item.hupaiID;
-					}
-				}
-			}
-			player[targetPlayer].score += lizhibang;
-			player[targetPlayer].score += benchang * 300;
-			//荣和的本场费计算 
-			if (!res[0].zimo)
-				player[res[0].fangchongID].score -= benchang * 300;
-			else //自摸的本场费计算 
-			{
-				for (auto i = 0; i < 4; ++i)
-					if (targetPlayer != i)
-						player[i].score -= benchang * 100;
-			}
-			//分数计算 
-			for (auto& item : res) {
-				//和牌得失点 
-				player[item.hupaiID].score += item.scoreAdd;
-				if (player[item.hupaiID].selfWind == EAST)
-					result.lianzhuang = true;
-				if (item.zimo) {
-					for (auto i = 0; i < 4; ++i) {
-						if (item.hupaiID != i) {
-							//std::cout<<item.scoreDecXian<<std::endl;
-							if (player[i].selfWind == EAST)
-								player[i].score -= item.scoreDecZhuang;
-							else
-								player[i].score -= item.scoreDecXian;
-						}
-					}
-				}
-				else player[item.fangchongID].score -= item.scoreDecFangchong;
-			}
-			if (prevailingWind == rule.gameType && round == 4) {
-				//庄家没和牌或者和牌后是1位,游戏结束
-				auto zhuangjiaHupai = false;
-				for (auto& item : res)
-					if (player[item.hupaiID].selfWind == EAST)
-						zhuangjiaHupai = true;
-				if (!zhuangjiaHupai || (zhuangjiaHupai && top == east))
-					gameIsOver = true;
-				//但如果top的点数不足就要继续
-				if (player[top].score < rule.endPoint)
-					gameIsOver = false;
-			}
-			else if (prevailingWind == rule.gameType + 1) //北4局不考虑东入
-			{
-				//4局强制结束，分数超过返点也强制结束
-				if (round == 4)gameIsOver = true;
-				if (player[top].score >= rule.endPoint)
-					gameIsOver = true;
-			}
-			return;
-		}
-		//*****以下为流局****** 
-		//TODO：流局满贯结算 
-		result.liuju = true;
-		if (tuzhongLiuju) {
-			result.lianzhuang = true;
-			return;
-		}
-		result.lianzhuang = player[east].tingpai();
-		auto bonus = 0, deBonus = 0;
-		auto tingpaiCount = 0;
-		for (auto i = 0; i < 4; ++i)
-			if (player[i].tingpai())
-				tingpaiCount++;
-		if (tingpaiCount == 1)bonus = 3000, deBonus = -1000;
-		else if (tingpaiCount == 2)bonus = 1500, deBonus = -1500;
-		else if (tingpaiCount == 3)bonus = 1000, deBonus = -3000;
-		for (auto i = 0; i < 4; ++i) {
-			if (player[i].tingpai())player[i].score += bonus;
-			else player[i].score += deBonus;
-		}
-		//游戏结束判断
-		if (prevailingWind == rule.gameType && round == 4) {
-			//庄家没听牌或者收罚符后是1位,游戏结束
-			const auto zhuangjiaTingpai = result.lianzhuang;
-			if (!zhuangjiaTingpai || (zhuangjiaTingpai && top == east))
-				gameIsOver = true;
-			//但如果top的点数不足就要继续
-			if (player[top].score < rule.endPoint)
-				gameIsOver = false;
-		}
-		else if (prevailingWind == rule.gameType + 1) //北4局不考虑东入
-		{
-			//4局强制结束，分数超过返点也强制结束
-			if (round == 4)gameIsOver = true;
-			if (player[top].score >= rule.endPoint)
-				gameIsOver = true;
-		}
-		if (gameIsOver)
-			player[top].score += lizhibang;
-	}
+	void endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju);
 
 	//消去w立,一发,地和
-	void resetBounusYaku() {
-		w = false;
-		for (auto i = 0; i < 4; ++i)
-			player[i].yifa = false;
-	}
+	void resetBounusYaku();
 
 	//处理鸣牌
-	void processMingpai() {
-		std::vector<AgariResult> result;
-		auto overflag = false;
-		//荣
-		for (auto i = 0; i < 4; ++i) {
-			if (mingpaiAction[i].type == ActionType::Rong) {
-				std::vector<Single> allDora;
-				std::vector<Single> allUra;
-				for (auto i = 0; i < doraIndicatorCount; ++i) {
-					allDora.push_back(mountain.getDora(i));
-					allUra.push_back(mountain.getUra(i));
-				}
-				auto tmp = player[i].rong(*player[turn].discardTile.rbegin(), prevailingWind, 1, w, allDora, allUra);
-				tmp.hupaiID = i;
-				tmp.fangchongID = turn;
-				result.push_back(tmp);
-				overflag = true;
-				//std::cout << "*" << std::endl;
-			}
-		}
-		if (overflag) {
-			endThisRound(result, false);
-			return;
-		}
-		//杠和碰
-		for (auto i = 0; i < 4; ++i) {
-			if (mingpaiAction[i].type == ActionType::Gang) {
-				player[i].ronggang(mingpaiAction[i].group);
-				player[turn].discardTile.pop_back();
-
-				resetBounusYaku();
-				newTurn(i, true);
-				return;
-			}
-			if (mingpaiAction[i].type == ActionType::Peng) {
-				player[i].peng(mingpaiAction[i].group);
-				player[turn].discardTile.pop_back();
-				resetBounusYaku();
-				newTurnAfterMingpai(i);
-				return;
-			}
-		}
-		//吃
-		for (auto i = (turn + 1) % 4, j = 0; j < 3; ++j, i = (i + 1) % 4) {
-			if (mingpaiAction[i].type == ActionType::Chi) {
-				player[i].chi(mingpaiAction[i].group);
-				player[turn].discardTile.pop_back();
-				resetBounusYaku();
-				newTurnAfterMingpai(i);
-				return;
-			}
-		}
-		//全部放弃鸣牌或者没法鸣牌
-		if (mountain.remainCount() == 0) { endThisRound(std::vector<AgariResult>(), false); }
-		else { this->newTurn((turn + 1) % 4, false); }
-	}
+	void processMingpai();
 
 public:
+	/*
+	  结束本turn，进入下一个
+	  gameState == GAME_STATE_WATING_FOR_MINGPAI  处理鸣牌
+	  gameState == GAME_STATE_NORMAL              处理玩家打牌/立直/自摸等操作
+	  如果某玩家没有设置好本轮的操作，返回false
+	*/
+	bool endThisTurn();
+
 	//新游戏
-	void startNewGame(Rule rule_ = DefualtRule) {
-		player.resize(4);
-		rule = rule_; //设置规则
-		prevailingWind = EAST; //东场
-		round = 1; //1局
-		east = rand() % 4; //随机庄家
-		benchang = 0; //0本场
-		doraIndicatorCount = 0;
-		gameIsOver = false;
-		for (auto i = 0; i < 4; ++i)
-			player[i].score = rule.startPoint;
-		startNewRound();
-	}
+	void startNewGame(Rule rule_ = DefualtRule);
 
 	//开始下一局
-	void startNextRound() {
-		//连庄，本场数+1，局数不变
-		if (result.lianzhuang) { benchang++; }
-		else //不连庄，进入下一局
-		{
-			east = (east + 1) % 4; //东家换成其下家
-			if (round == 4) //4局的话换场风,局数重置
-			{
-				prevailingWind = static_cast<WindType>((prevailingWind + 1) % 4);
-				round = 1;
-			}
-			else { round++; }
-		}
-		startNewRound();
-	}
+	void startNextRound();
 
-	//玩家获取游戏信息
+	//获取某个玩家能看到的游戏信息
 	GameInfo getGameInfo(int index)const;
+
+	//一轮是否结束？
 	bool roundOver()const { return roundIsOver; }
+
+	//游戏是否结束？
 	bool gameOver()const { return gameIsOver; }
+
 	RoundResult getRoundResult() { return result; }
 	/*
 	    Action分为两类
-		1.轮到自己时的action
-		2.别人打出牌后的action
+		gameState == GAME_STATE_NORMAL             轮到自己时的action
+		gameState == GAME_STATE_WATING_FOR_MINGPAI 别人打出牌后的action
+		返回值为设置Action是否成功，以及失败的话失败的原因
 	*/
-	//下一步(返回操作的状态)(TODO)
 	//注意:改mTurn,mLast,player的disabledHandTile等
-	ActionResult doAction(int index, Action act);
+	ActionResult setPlayerAction(int index, Action act);
 };

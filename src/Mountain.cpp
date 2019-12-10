@@ -4,8 +4,7 @@
 
 Mountain::Mountain() { mHandPtr = mLingshangPtr = 0; }
 
-std::string Mountain::getMountainString() //获得牌山序列
-{
+std::string Mountain::getMountainString() {//获得牌山序列
 	std::string res;
 	for (auto& item : mMountain) {
 		int value = item.value();
@@ -16,42 +15,63 @@ std::string Mountain::getMountainString() //获得牌山序列
 	return res;
 }
 
-Single Mountain::nextLingshang() //获取下一张岭上牌(自动移海底牌)
-{
+Single Mountain::nextLingshang() {//获取下一张岭上牌(自动移海底牌)
 	const auto res = mB[mLingshangPtr++];
 	mB.push_back(mA[mA.size() - 1]);
 	mA.pop_back();
 	return res;
 }
 
-Single Mountain::nextHand() //获取下一张手牌
-{
+Single Mountain::nextHand() {//获取下一张手牌
 	return mA[mHandPtr++];
 }
 
-int Mountain::remainCount()const //获取剩余牌数
-{
+int Mountain::remainCount()const {//获取剩余牌数
 	return mA.size() - mHandPtr;
 }
 
-Single Mountain::getDora(int index) //获取宝牌
-{
+Single Mountain::getDora(int index)const { //获取宝牌
 	return getDoraIndicator(index).next();
 }
 
-Single Mountain::getUra(int index) //获取里宝牌
-{
+Single Mountain::getUra(int index)const { //获取里宝牌
 	return getUraIndicator(index).next();
 }
 
-Single Mountain::getDoraIndicator(int index) //获取宝牌指示牌,下标范围0~4
-{
+std::vector<Single> Mountain::getDoras(int count) const{
+	std::vector<Single> res;
+	for (int i = 0; i < count; ++i)
+		res.push_back(getDora(i));
+	return res;
+}
+
+std::vector<Single> Mountain::getUras(int count) const{
+	std::vector<Single> res;
+	for (int i = 0; i < count; ++i)
+		res.push_back(getUra(i));
+	return res;
+}
+
+Single Mountain::getDoraIndicator(int index)const{//获取宝牌指示牌,下标范围0~4
 	return mB[4 + index * 2];
 }
 
-Single Mountain::getUraIndicator(int index) //获取里宝牌指示牌,下标范围0~4
-{
+Single Mountain::getUraIndicator(int index)const{//获取里宝牌指示牌,下标范围0~4
 	return mB[5 + index * 2];
+}
+
+std::vector<Single> Mountain::getDoraIndicators(int count)const{
+	std::vector<Single> res;
+	for (int i = 0; i < count;++i)
+		res.push_back(getDoraIndicator(i));
+	return res;
+}
+
+std::vector<Single> Mountain::getUraIndicators(int count)const{
+	std::vector<Single> res;
+	for (int i = 0; i < count; ++i)
+		res.push_back(getUraIndicator(i));
+	return res;
 }
 
 void Mountain::reset(const Rule& rule) {

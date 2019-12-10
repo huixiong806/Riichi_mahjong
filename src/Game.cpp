@@ -20,11 +20,10 @@ void Game::startNewRound() {
 	}
 	//mLastTurn = -1;
 	doraIndicatorCount = 1;
-	waitMingpai = false;
+	gameState = GAME_STATE_NORMAL;
 	newTurn(east, false);
 }
 void Game::newTurn(int who, bool lingShang) {
-	waitMingpai = false;
 	turn = who;
 	for (auto i = 0; i < 4; ++i) { player[i].setNowTile(Null, false); }
 	//mLastTurn = -1;
@@ -44,42 +43,96 @@ void Game::newTurn(int who, bool lingShang) {
 		w = false;
 }
 
-ActionResult Game::doAction(int index, Action act) {
+//鸣牌(除了杠)后打牌
+
+void Game::newTurnAfterMingpai(int who) {
+	turn = who;
+	for (auto i = 0; i < 4; ++i) { player[i].setNowTile(Null, false); }
+	//巡数+1
+	player[who].subround++;
+}
+bool Game::endThisTurn()
+{
+	for (int i = 0; i < 4; ++i)
+		if (!isReady[i])
+			return false;
+	if (gameState == GAME_STATE_WAITING_FOR_MINGPAI){
+		processMingpai();
+		gameState = GAME_STATE_NORMAL;
+	}
+	else{
+		Action act = playerAction[turn];
+		if (act.type == ActionType::Lizhi) {
+			player[turn].doLizhi(w,act.target);
+			lizhibang += 1000;
+			if (player[turn].lingshang == true) {
+				doraIndicatorCount++;
+				player[turn].lingshang = false;
+				//todo:判断四杠散了
+			}
+		}
+		else if (act.type == ActionType::Dapai){
+			player[turn].dapai(act.target);
+			player[turn].yifa = false;
+			if (player[turn].lingshang == true) {
+				doraIndicatorCount++;
+				player[turn].lingshang = false;
+				//todo:判断四杠散了
+			}
+		}
+		else if (act.type == ActionType::Zimo){
+			std::vector<Single> allDora = mountain.getDoras(doraIndicatorCount);
+			std::vector<Single> allUra = mountain.getUras(doraIndicatorCount);
+			auto result= player[turn].zimo(prevailingWind, w, allDora, allUra);
+			if (result.success) {
+				result.result.fangchongID = -1;
+				result.result.hupaiID = turn;
+				endThisRound(std::vector<AgariResult>({ result.result }), false);
+			}
+			else
+			{
+				throw("不具备自摸条件");
+			}
+		}
+		gameState = GAME_STATE_WAITING_FOR_MINGPAI;
+	}
+	for (auto i = 0; i < 4; ++i) {
+		isReady[i] = false;
+		playerAction[i] = Action();
+	}
+	return true;
+}
+ActionResult Game::setPlayerAction(int index, Action act) {
 	ActionResult res{};
 	res.success = true;
 	res.type = ErrorType::None;
-	if (waitMingpai) {
-		Single target;
-		target = *player[turn].discardTile.rbegin();
+	if (gameState == GAME_STATE_WAITING_FOR_MINGPAI) {
+		Single target = *player[turn].discardTile.rbegin();
 		if (index == turn) {
-			haveMingpai[index] = true;
-			mingpaiAction[index] = Action();
+			isReady[index] = true;
+			playerAction[index] = Action();
 		}
-		if (haveMingpai[index] == false) {
+		if (isReady[index] == false) {
 			switch (act.type) {
 			case ActionType::Null:
 				res.success = false;
 				res.type = ErrorType::CannotChooseNull;
 				return res;
 			case ActionType::Skip:
-				haveMingpai[index] = true;
-				mingpaiAction[index] = act;
+				isReady[index] = true;
+				playerAction[index] = act;
 				break;
 			case ActionType::Rong: {
-				std::vector<Single> allDora;
-				std::vector<Single> allUra;
+				std::vector<Single> allDora = mountain.getDoras(doraIndicatorCount);
+				std::vector<Single> allUra = mountain.getUras(doraIndicatorCount);
 				TryToAgariResult result;
-				for (auto i = 0; i < doraIndicatorCount; ++i) {
-					allDora.push_back(mountain.getDora(i));
-					allUra.push_back(mountain.getUra(i));
-				}
 				if (!player[index].canRong(target, prevailingWind, 1, w, allDora, allUra)) {
 					res.success = false;
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				haveMingpai[index] = true;
-				mingpaiAction[index] = act;
+				isReady[index] = true;
+				playerAction[index] = act;
 				break;
 			}
 			case ActionType::Chi:
@@ -95,8 +148,8 @@ ActionResult Game::doAction(int index, Action act) {
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				haveMingpai[index] = true;
-				mingpaiAction[index] = act;
+				isReady[index] = true;
+				playerAction[index] = act;
 				break;
 			case ActionType::Peng:
 				if (!player[index].canPeng(target, act.group,
@@ -113,8 +166,8 @@ ActionResult Game::doAction(int index, Action act) {
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				haveMingpai[index] = true;
-				mingpaiAction[index] = act;
+				isReady[index] = true;
+				playerAction[index] = act;
 				break;
 			case ActionType::Gang:
 				if (!player[index].canGang(target, act.group,
@@ -130,8 +183,8 @@ ActionResult Game::doAction(int index, Action act) {
 					res.type = ErrorType::ActionRejected;
 					return res;
 				}
-				haveMingpai[index] = true;
-				mingpaiAction[index] = act;
+				isReady[index] = true;
+				playerAction[index] = act;
 				break;
 			default:
 				res.success = false;
@@ -139,78 +192,46 @@ ActionResult Game::doAction(int index, Action act) {
 				return res;
 			}
 		}
-		auto allActedFlag = true;
-		for (auto i : haveMingpai) {
-			if (!i) {
-				allActedFlag = false;
-				break;
-			}
-		}
-		//std::cout << "***********" << std::endl;
-		if (allActedFlag) { this->processMingpai(); }
 	}
 	else {
-		if (act.type == ActionType::Null) return res;
+		if (act.type == ActionType::Null){
+			//重构提示:这里可以多加一个ActionType，表示我不是决策者，但是我成功收到了局面信息。
+			if (index != turn)
+				isReady[index] = true;
+			return res;
+		}
 		if (index != turn) {
 			res.success = false;
 			res.type = ErrorType::NotYourTurn;
 			return res;
 		}
-
 		switch (act.type) {
 		case ActionType::Dapai:
-		case ActionType::Lizhi: {
-			if (act.type == ActionType::Lizhi && mountain.remainCount() < 4) {
+			if (!player[index].canDapai(act.target)){
 				res.success = false;
 				res.type = ErrorType::ActionRejected;
-			}
-			if (act.type == ActionType::Lizhi) {
-				if (!player[index].doLizhi(w, act.target)) {
-					res.success = false;
-					res.type = ErrorType::ActionRejected;
-					return res;
-				}
-				lizhibang += 1000;
-			}
-			else if (!player[index].dapai(act.target)) {
-				res.success = false;
-				res.type = ErrorType::TileNotExist;
-				//std::cout << "***********" << std::endl;
 				return res;
 			}
-			if (act.type == ActionType::Dapai) { player[index].yifa = false; }
-			if (player[index].lingshang == true) {
-				doraIndicatorCount++;
-				player[index].lingshang = false;
-				//todo:判断四杠散了
+			playerAction[index] = act;
+			break;
+		case ActionType::Lizhi: {
+			if (mountain.remainCount() < 4 ||!player[index].canLizhi(w,act.target)){
+				res.success = false;
+				res.type = ErrorType::CantLizhi;
+				return res;
 			}
-			waitMingpai = true;
-			for (auto i = 0; i < 4; ++i) {
-				haveMingpai[i] = false;
-				mingpaiAction[i] = Action();
-			}
-			return res;
+			playerAction[index] = act;
+			break;
 		}
 		case ActionType::Zimo: {
-			std::vector<Single> allDora;
-			std::vector<Single> allUra;
-			TryToAgariResult result;
-			for (auto i = 0; i < doraIndicatorCount; ++i) {
-				allDora.push_back(mountain.getDora(i));
-				allUra.push_back(mountain.getUra(i));
-			}
-			result = player[index].zimo(prevailingWind, w, allDora, allUra);
-			if (result.success) {
-				result.result.fangchongID = -1;
-				result.result.hupaiID = index;
-				endThisRound(std::vector<AgariResult>({result.result}), false);
-			}
-			else {
+			std::vector<Single> allDora=mountain.getDoras(doraIndicatorCount);
+			std::vector<Single> allUra = mountain.getUras(doraIndicatorCount);
+			if (!player[index].canZimo(prevailingWind, w, allDora, allUra)){
 				res.success = false;
 				res.type = ErrorType::ActionRejected;
-				//std::cout << "***********" << std::endl;
 				return res;
 			}
+			playerAction[index] = act;
 			break;
 		}
 		default:
@@ -218,16 +239,237 @@ ActionResult Game::doAction(int index, Action act) {
 			res.type = ErrorType::ActionRejected;
 			return res;
 		}
+		isReady[index] = true;
 		//暂时不考虑鸣牌
-		//一局结束判断
-		//std::cout << "***********" << std::endl;
-		if (mountain.remainCount() == 0) { endThisRound(std::vector<AgariResult>(), false); }
-		else {
-			//std::cout << "***********" << std::endl;
-			this->newTurn((turn + 1) % 4, false);
-		}
 	}
 	return res;
+}
+
+//途中流局连庄
+void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
+	result = RoundResult();
+	roundIsOver = true;
+	gameIsOver = false;
+	auto top = 0;
+	for (auto i = 1; i < 4; ++i) {
+		if (player[top].score < player[i].score || (player[top].score == player[i].score && ((player[top].selfWind +
+			4 - 1) % 4 >(player[i].selfWind + 4 - 1) % 4)))
+			top = i;
+	}
+	//有人和牌
+	//TODO:分数计算 
+	if (!res.empty()) {
+		result.liuju = false;
+		result.lianzhuang = false;
+		result.agariResult = res;
+		//立直棒和本场费计算，按照头跳规则
+		int targetPlayer; //获取点棒的人 
+		if (res.size() == 1)
+			targetPlayer = res[0].hupaiID;
+		else {
+			targetPlayer = res[0].fangchongID;
+			auto minSpace = 4; //最小间距先调整为4
+			const int a = player[res[0].fangchongID].selfWind;
+			for (auto& item : res) {
+				int b = player[item.hupaiID].selfWind;
+				if (b < a)b += 4;
+				const auto space = b - a;
+				if (space < minSpace) {
+					minSpace = space;
+					targetPlayer = item.hupaiID;
+				}
+			}
+		}
+		player[targetPlayer].score += lizhibang;
+		player[targetPlayer].score += benchang * 300;
+		//荣和的本场费计算 
+		if (!res[0].zimo)
+			player[res[0].fangchongID].score -= benchang * 300;
+		else //自摸的本场费计算 
+		{
+			for (auto i = 0; i < 4; ++i)
+				if (targetPlayer != i)
+					player[i].score -= benchang * 100;
+		}
+		//分数计算 
+		for (auto& item : res) {
+			//和牌得失点 
+			player[item.hupaiID].score += item.scoreAdd;
+			if (player[item.hupaiID].selfWind == EAST)
+				result.lianzhuang = true;
+			if (item.zimo) {
+				for (auto i = 0; i < 4; ++i) {
+					if (item.hupaiID != i) {
+						//std::cout<<item.scoreDecXian<<std::endl;
+						if (player[i].selfWind == EAST)
+							player[i].score -= item.scoreDecZhuang;
+						else
+							player[i].score -= item.scoreDecXian;
+					}
+				}
+			}
+			else player[item.fangchongID].score -= item.scoreDecFangchong;
+		}
+		if (prevailingWind == rule.gameType && round == 4) {
+			//庄家没和牌或者和牌后是1位,游戏结束
+			auto zhuangjiaHupai = false;
+			for (auto& item : res)
+				if (player[item.hupaiID].selfWind == EAST)
+					zhuangjiaHupai = true;
+			if (!zhuangjiaHupai || (zhuangjiaHupai && top == east))
+				gameIsOver = true;
+			//但如果top的点数不足就要继续
+			if (player[top].score < rule.endPoint)
+				gameIsOver = false;
+		}
+		else if (prevailingWind == rule.gameType + 1) //北4局不考虑东入
+		{
+			//4局强制结束，分数超过返点也强制结束
+			if (round == 4)gameIsOver = true;
+			if (player[top].score >= rule.endPoint)
+				gameIsOver = true;
+		}
+		return;
+	}
+	//*****以下为流局****** 
+	//TODO：流局满贯结算 
+	result.liuju = true;
+	if (tuzhongLiuju) {
+		result.lianzhuang = true;
+		return;
+	}
+	result.lianzhuang = player[east].tingpai();
+	auto bonus = 0, deBonus = 0;
+	auto tingpaiCount = 0;
+	for (auto i = 0; i < 4; ++i)
+		if (player[i].tingpai())
+			tingpaiCount++;
+	if (tingpaiCount == 1)bonus = 3000, deBonus = -1000;
+	else if (tingpaiCount == 2)bonus = 1500, deBonus = -1500;
+	else if (tingpaiCount == 3)bonus = 1000, deBonus = -3000;
+	for (auto i = 0; i < 4; ++i) {
+		if (player[i].tingpai())player[i].score += bonus;
+		else player[i].score += deBonus;
+	}
+	//游戏结束判断
+	if (prevailingWind == rule.gameType && round == 4) {
+		//庄家没听牌或者收罚符后是1位,游戏结束
+		const auto zhuangjiaTingpai = result.lianzhuang;
+		if (!zhuangjiaTingpai || (zhuangjiaTingpai && top == east))
+			gameIsOver = true;
+		//但如果top的点数不足就要继续
+		if (player[top].score < rule.endPoint)
+			gameIsOver = false;
+	}
+	else if (prevailingWind == rule.gameType + 1) //北4局不考虑东入
+	{
+		//4局强制结束，分数超过返点也强制结束
+		if (round == 4)gameIsOver = true;
+		if (player[top].score >= rule.endPoint)
+			gameIsOver = true;
+	}
+	if (gameIsOver)
+		player[top].score += lizhibang;
+}
+
+//消去w立,一发,地和
+
+void Game::resetBounusYaku() {
+	w = false;
+	for (auto i = 0; i < 4; ++i)
+		player[i].yifa = false;
+}
+
+//处理鸣牌
+void Game::processMingpai() {
+	std::vector<AgariResult> result;
+	auto overflag = false;
+	//荣
+	for (auto i = 0; i < 4; ++i) {
+		if (playerAction[i].type == ActionType::Rong) {
+			std::vector<Single> allDora;
+			std::vector<Single> allUra;
+			for (auto i = 0; i < doraIndicatorCount; ++i) {
+				allDora.push_back(mountain.getDora(i));
+				allUra.push_back(mountain.getUra(i));
+			}
+			auto tmp = player[i].rong(*player[turn].discardTile.rbegin(), prevailingWind, 1, w, allDora, allUra);
+			tmp.hupaiID = i;
+			tmp.fangchongID = turn;
+			result.push_back(tmp);
+			overflag = true;
+			//std::cout << "*" << std::endl;
+		}
+	}
+	if (overflag) {
+		endThisRound(result, false);
+		return;
+	}
+	//杠和碰
+	for (auto i = 0; i < 4; ++i) {
+		if (playerAction[i].type == ActionType::Gang) {
+			player[i].ronggang(playerAction[i].group);
+			player[turn].discardTile.pop_back();
+
+			resetBounusYaku();
+			newTurn(i, true);
+			return;
+		}
+		if (playerAction[i].type == ActionType::Peng) {
+			player[i].peng(playerAction[i].group);
+			player[turn].discardTile.pop_back();
+			resetBounusYaku();
+			newTurnAfterMingpai(i);
+			return;
+		}
+	}
+	//吃
+	for (auto i = (turn + 1) % 4, j = 0; j < 3; ++j, i = (i + 1) % 4) {
+		if (playerAction[i].type == ActionType::Chi) {
+			player[i].chi(playerAction[i].group);
+			player[turn].discardTile.pop_back();
+			resetBounusYaku();
+			newTurnAfterMingpai(i);
+			return;
+		}
+	}
+	//全部放弃鸣牌或者没法鸣牌
+	if (mountain.remainCount() == 0) { endThisRound(std::vector<AgariResult>(), false); }
+	else { this->newTurn((turn + 1) % 4, false); }
+}
+
+//新游戏
+
+void Game::startNewGame(Rule rule_) {
+	player.resize(4);
+	rule = rule_; //设置规则
+	prevailingWind = EAST; //东场
+	round = 1; //1局
+	east = rand() % 4; //随机庄家
+	benchang = 0; //0本场
+	doraIndicatorCount = 0;
+	gameIsOver = false;
+	for (auto i = 0; i < 4; ++i)
+		player[i].score = rule.startPoint;
+	startNewRound();
+}
+
+//开始下一局
+
+void Game::startNextRound() {
+	//连庄，本场数+1，局数不变
+	if (result.lianzhuang) { benchang++; }
+	else //不连庄，进入下一局
+	{
+		east = (east + 1) % 4; //东家换成其下家
+		if (round == 4) //4局的话换场风,局数重置
+		{
+			prevailingWind = static_cast<WindType>((prevailingWind + 1) % 4);
+			round = 1;
+		}
+		else { round++; }
+	}
+	startNewRound();
 }
 
 //玩家获取游戏信息
@@ -250,10 +492,10 @@ GameInfo Game::getGameInfo(int index)const {
 	//剩余牌数
 	res.remainTiles = mountain.remainCount();
 	//宝牌指示牌
-	for (auto i = 0; i < doraIndicatorCount; i++) { res.doraIndicator.push_back(mountain.getDoraIndicator(i)); }
+	res.doraIndicator = mountain.getDoraIndicators(doraIndicatorCount);
 	res.prevailingWind = prevailingWind; //场风
 	res.selfWind = player[index].selfWind; //门风
-	if (waitMingpai) {
+	if (gameState == GAME_STATE_WAITING_FOR_MINGPAI) {
 		res.nowWind = player[turn].selfWind;
 		res.nowTile = *player[turn].discardTile.rbegin();
 	}
@@ -267,7 +509,7 @@ GameInfo Game::getGameInfo(int index)const {
 	res.remainTiles = mountain.remainCount();
 	res.lizhibangCount = lizhibang; //额外立直棒数量
 	res.benchang = benchang; //本场
-	res.mingpai = waitMingpai;
+	res.mingpai = gameState;
 	res.round = round;
 	res.w = w;
 	return res;

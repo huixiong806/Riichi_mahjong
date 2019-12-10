@@ -230,7 +230,7 @@
     <ClInclude Include="..\src\Group.h" />
     <ClInclude Include="..\src\ai\Human.h" />
     <ClInclude Include="..\src\Mountain.h" />
-    <ClInclude Include="..\src\MovementGenerator.hpp" />
+    <ClInclude Include="..\src\ActionGenerator.hpp" />
     <ClInclude Include="..\src\Player.hpp" />
     <ClInclude Include="..\src\ResultInspector.hpp" />
     <ClInclude Include="..\src\Single.h" />

@@ -19,10 +19,14 @@ public:
 	Single zimo; //庄家0巡的自摸牌
 	Mountain(); //构造函数
 	virtual void reset(const Rule& rule); //产生新牌山
-	Single getDora(int index); //获取宝牌
-	Single getUra(int index); //获取里宝牌
-	Single getDoraIndicator(int index); //获取宝牌指示牌,下标范围0~4
-	Single getUraIndicator(int index); //获取里宝牌指示牌,下标范围0~4
+	Single getDora(int index)const; //获取宝牌
+	Single getUra(int index)const; //获取里宝牌
+	std::vector<Single> getDoras(int count)const; //获取宝牌组,count表示获得前几个
+	std::vector<Single> getUras(int count)const; //获取里宝牌组,count表示获得前几个
+	Single getDoraIndicator(int index)const; //获取宝牌指示牌,下标范围0~4
+	Single getUraIndicator(int index)const; //获取里宝牌指示牌,下标范围0~4
+	std::vector<Single> getDoraIndicators(int count)const; //获取宝牌指示牌组,count表示获得前几个
+	std::vector<Single> getUraIndicators(int count)const; //获取里宝牌指示牌组,count表示获得前几个
 	Single nextLingshang(); //获取下一张岭上牌(自动移海底牌)
 	Single nextHand(); //获取下一张手牌
 	int remainCount()const; //获取剩余牌数

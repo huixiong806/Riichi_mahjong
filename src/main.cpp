@@ -102,6 +102,10 @@ int main_loop() {
 	种子收集
 	3 杠3z
 	233 7对子自摸，留1m和3p
+
+	已知bug:
+	红宝牌碰的时候会出问题
+	副露牌向听数判断有错
 	*/
 	const int seed = time(0);
 	
@@ -123,7 +127,7 @@ int main_loop() {
 		do {
 			for (auto i = 0; i < 4; ++i) {
 				const auto action = player[i]->generateAction(game.getGameInfo(i));
-				const auto res = game.doAction(i, action);
+				const auto res = game.setPlayerAction(i, action);
 				if (!res.success) {
 					cout << "出现错误,输入任意内容退出,错误编码:" << static_cast<int>(res.type) << endl;
 					assert(0);
@@ -131,9 +135,8 @@ int main_loop() {
 					cin >> a;
 					return 0;
 				}
-				if (game.roundOver())break;
-				//cout << (int)(res.type)<<endl;
 			}
+			assert(game.endThisTurn());
 		} while (!game.roundOver());
 		auto result = game.getRoundResult();
 		cout << "本局结束" << endl;
@@ -169,8 +172,8 @@ int main() {
 	cout << "预处理中..." << endl;
 	Algorithms::preprocessDistance();
 	cout << "预处理结束" << endl;
-	test();
-	system("pause");
+	//test();
+	//system("pause");
 	//test2();
 	main_loop();
 	pop_console_locale();

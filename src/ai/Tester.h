@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include "MovementGenerator.hpp"
+#include "ActionGenerator.hpp"
 #include "Player.hpp"
 
 class Tester : public ActionGenerator {
