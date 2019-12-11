@@ -160,8 +160,7 @@ bool Player::canDapai(Single target) const {
 
 //返回false时不应变动私有变量
 
-void Player::dapai(Single target) //打牌
-{
+void Player::dapai(Single target) {//打牌
 	if (target == Null)
 		return throw("打牌失败-Null是能打的牌？");
 	if (nowTile == target) {

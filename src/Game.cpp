@@ -18,6 +18,8 @@ void Game::startNewRound() {
 		player[i].setNowTile(Null, false);
 		player[i].subround = -1;
 	}
+	for (auto& item : isReady)
+		item = false;
 	//mLastTurn = -1;
 	doraIndicatorCount = 1;
 	gameState = GAME_STATE_NORMAL;
@@ -448,6 +450,7 @@ void Game::startNewGame(Rule rule_) {
 	round = 1; //1局
 	east = rand() % 4; //随机庄家
 	honba = 0; //0本场
+	riichibouValue = 0;//场上立直棒清空
 	doraIndicatorCount = 0;
 	gameIsOver = false;
 	for (auto i = 0; i < 4; ++i)

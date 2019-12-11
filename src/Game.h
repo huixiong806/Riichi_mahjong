@@ -25,22 +25,22 @@ private:
 	//int mIndex;//表示本局的编号
 	Rule rule; //规则
 	Mountain mountain; //牌山
-	WindType prevailingWind {}; //场风
+	WindType prevailingWind; //场风
 	std::vector<Player> player; //0,1,2,3分别对应四个玩家。
-	int east = 0; //表示庄家的编号,庄家为1则东南西北玩家编号分别为1,2,3,0,以此类推。
-	int riichibouValue = 0; //额外立直棒的点数价值 
-	int round = 0; //局数(1~4)
-	int honba = 0; //本场
-	int turn = 0; //表示正常顺序该谁摸牌了。
+	int east; //表示庄家的编号,庄家为1则东南西北玩家编号分别为1,2,3,0,以此类推。
+	int riichibouValue; //额外立直棒的点数价值 
+	int round; //局数(1~4)
+	int honba; //本场
+	int turn; //表示正常顺序该谁摸牌了。
 	//int mIndex;//表示该谁决策了(吃碰情况下mTurn和mIndex会不同)。
 	RoundResult result; //一局的结果,调用next函数时如果本局结束则更新
-	bool roundIsOver = false; //本局是否结束
-	bool gameIsOver = false; //整个游戏是否结束
+	bool roundIsOver; //本局是否结束
+	bool gameIsOver; //整个游戏是否结束
 	//Single mLast=Null;//最后打出的牌
 	//int mLastTurn;//最后打出的牌是谁打的。
-	int doraIndicatorCount = 0; //已翻开的宝牌指示牌数量
-	GameState gameState = GAME_STATE_NORMAL; //游戏状态
-	bool isReady[4] = {}; //玩家是否已经做出了决策
+	int doraIndicatorCount; //已翻开的宝牌指示牌数量
+	GameState gameState; //游戏状态
+	bool isReady[4]; //玩家是否已经做出了决策
 	Action playerAction[4]; //玩家决策暂存
 	bool w; //是否处于w立,天和,地和可成立的状态
 	//开始新局
