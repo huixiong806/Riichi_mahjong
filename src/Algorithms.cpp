@@ -39,7 +39,7 @@ std::vector<Single> Algorithms::allKindsOfTiles()
 	}
 	return res;
 }
-std::vector<Single> Algorithms::tingpai(const std::vector<Single>& handTile) {
+std::vector<Single> Algorithms::tenpai(const std::vector<Single>& handTile) {
 	std::vector<Single> res;
 	for (auto i = 1; i <= 9; ++i) {
 		if (agariWithoutYaku(Single(i, 'm', false), handTile))
@@ -73,7 +73,7 @@ AgariResult Algorithms::getScore(WindType selfWind, AgariResult inp) {
 	//役满型 ***暂时不考虑包牌*** 
 	if (inp.fan < 0) {
 		res.scoreAdd = (-inp.fan) * 16000 * (2 + east);
-		if (!inp.zimo)
+		if (!inp.tsumo)
 			res.scoreDecFangchong = res.scoreAdd;
 		else if (east)
 			res.scoreDecXian = (-inp.fan) * 16000;
@@ -110,7 +110,7 @@ AgariResult Algorithms::getScore(WindType selfWind, AgariResult inp) {
 		res.scoreDecZhuang = 4000;
 		res.scoreDecXian = 2000 * (1 + east);
 	}
-	else if (!inp.zimo)res.scoreAdd = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) * (2 + east) / 200 + 1) * 100;
+	else if (!inp.tsumo)res.scoreAdd = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) * (2 + east) / 200 + 1) * 100;
 	else if (east) {
 		res.scoreAdd = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) / 200 + 1) * 300;
 		res.scoreDecXian = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) / 200 + 1) * 100;
@@ -175,7 +175,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 					if (j != i && j != i + 1)
 						newRemainTiles.push_back(remainTiles[j]);
 				}
-				mianzi.push_back(Group::createQuetou(remainTiles[i], remainTiles[i + 1]));
+				mianzi.push_back(Group::createToitsu(remainTiles[i], remainTiles[i + 1]));
 				bestResult = std::max(bestResult, agariSearch(par, depth + 1,  newRemainTiles , mianzi));
 				mianzi.pop_back();
 			}
@@ -220,17 +220,17 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 						newRemainTiles.push_back(item);
 				}
 				//三连刻
-				mianzi.push_back(Group::createKezi(group[0][0], group[0][1], group[0][2], 0));
-				mianzi.push_back(Group::createKezi(group[1][0], group[1][1], group[1][2], 0));
-				mianzi.push_back(Group::createKezi(group[2][0], group[2][1], group[2][2], 0));
+				mianzi.push_back(Group::createKoutsu(group[0][0], group[0][1], group[0][2], 0));
+				mianzi.push_back(Group::createKoutsu(group[1][0], group[1][1], group[1][2], 0));
+				mianzi.push_back(Group::createKoutsu(group[2][0], group[2][1], group[2][2], 0));
 				bestResult = std::max(bestResult, agariSearch(par, depth + 3, newRemainTiles, mianzi));
 				mianzi.pop_back();
 				mianzi.pop_back();
 				mianzi.pop_back();
 				//三同顺
-				mianzi.push_back(Group::createShunzi(group[0][0], group[1][0], group[2][0], 0));
-				mianzi.push_back(Group::createShunzi(group[0][1], group[1][1], group[2][1], 0));
-				mianzi.push_back(Group::createShunzi(group[0][2], group[1][2], group[2][2], 0));
+				mianzi.push_back(Group::createShuntsu(group[0][0], group[1][0], group[2][0], 0));
+				mianzi.push_back(Group::createShuntsu(group[0][1], group[1][1], group[2][1], 0));
+				mianzi.push_back(Group::createShuntsu(group[0][2], group[1][2], group[2][2], 0));
 				bestResult = std::max(bestResult, agariSearch(par, depth + 3, newRemainTiles, mianzi));
 				return bestResult;
 			}
@@ -253,7 +253,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 				}
 				newRemainTiles.push_back(item);
 			}
-			mianzi.push_back(Group::createKezi(kezi[0], kezi[1], kezi[2], 0));
+			mianzi.push_back(Group::createKoutsu(kezi[0], kezi[1], kezi[2], 0));
 			bestResult = agariSearch(par, depth + 1, newRemainTiles, mianzi);
 			return bestResult;
 		}
@@ -293,7 +293,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 						newRemainTiles.push_back(item);
 				}
 				//顺子
-				mianzi.push_back(Group::createShunzi(group[0], group[1], group[2], 0));
+				mianzi.push_back(Group::createShuntsu(group[0], group[1], group[2], 0));
 				bestResult = agariSearch(par, depth + 1, newRemainTiles, mianzi);
 				return bestResult;
 			}
@@ -335,7 +335,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 		res.fan -= 1;
 		res.yaku.add<Yaku::Ziyise>();
 	}
-	res.zimo = par.type == 0;
+	res.tsumo = par.type == 0;
 	//满足役满型
 	if (res.fan < 0) {
 		res = getScore(par.selfWind, res);
@@ -361,9 +361,9 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 			res.akadora++;
 	res.fan += res.dora + res.akadora + res.uradora;
 	//检查立直,两立直和一发
-	if (par.lizhiXunmu != -1) {
+	if (par.riichiJunme != -1) {
 		//w立
-		if (par.lizhiXunmu == -2) {
+		if (par.riichiJunme == -2) {
 			res.fan += 2;
 			res.yaku.add<Yaku::Lianglizhi>();
 		}
@@ -371,7 +371,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 			res.fan += 1;
 			res.yaku.add<Yaku::Lizhi>();
 		}
-		if (par.yifa == true) {
+		if (par.ippatsu == true) {
 			res.fan += 1;
 			res.yaku.add<Yaku::Yifa>();
 		}
@@ -477,7 +477,7 @@ TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par) {
 		res.fan -= 2;
 	}
 	else { return TryToAgariResult(AgariFaildReason::ShapeWrong); }
-	res.zimo = (par.type == 0);
+	res.tsumo = (par.type == 0);
 	res = getScore(par.selfWind, res);
 	return TryToAgariResult(res);
 }

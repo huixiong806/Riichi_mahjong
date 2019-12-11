@@ -3,13 +3,13 @@
 #include"Single.h"
 
 enum class GroupType {
-	Quetou,
+	Toitsu,
 	//雀头
-	Shunzi,
+	Shuntsu,
 	//顺子
-	Kezi,
+	Koutsu,
 	//刻子
-	Gang,
+	Kantsu,
 	//杠
 };
 
@@ -22,15 +22,15 @@ public:
 	uint8_t state{};
 	//低位表示吃/碰/杠的那张牌的来源(0,1,2,3对应吃、碰、荣杠、暗杠的自下对上,4,5,6,7对应加杠的自下对上(4无效))，高位0，10，20分别表示第一张，第二张，第三张。(刻子，杠子默认为0)
 	//source表示碰的那张牌的来源(0,1,2,3对应自下对上,4,5,6,7也对应自下对上，并且为加杠(4无效))
-	static Group createKezi(Single a, Single b, Single target, int source);
-	static Group createShunzi(Single a, Single b, Single target, int source);
-	static Group createGangzi(Single a, Single b, Single c, Single target, int source);
-	static Group createQuetou(Single a, Single b);
+	static Group createKoutsu(Single a, Single b, Single target, int source);
+	static Group createShuntsu(Single a, Single b, Single target, int source);
+	static Group createKantsu(Single a, Single b, Single c, Single target, int source);
+	static Group createToitsu(Single a, Single b);
 	//是否为绿牌
 	[[nodiscard]] bool isgreen()const {
 		if (color == 'z')return value == 6;
 		if (color == 's') {
-			if (type != GroupType::Shunzi)
+			if (type != GroupType::Shuntsu)
 				return value == 2 || value == 3 || value == 4 || value == 6 || value == 8;
 			return value == 2;
 		}
@@ -39,7 +39,7 @@ public:
 
 	//是否为老头牌组(非字牌19)
 	[[nodiscard]] bool islaotou()const {
-		if (type == GroupType::Shunzi)return false;
+		if (type == GroupType::Shuntsu)return false;
 		if (color == 'z')return true;
 		if (value == 1 || value == 9)return true;
 		return false;
@@ -47,7 +47,7 @@ public:
 
 	//是否为幺九牌组(允许顺子，允许字牌)
 	[[nodiscard]] bool isyaojiu()const {
-		if (type == GroupType::Shunzi) {
+		if (type == GroupType::Shuntsu) {
 			if (value == 7 || value == 1)return true;
 			return false;
 		}
@@ -58,13 +58,13 @@ public:
 
 	[[nodiscard]] std::string getString() const {
 		std::string res;
-		if (state % 10 == 0 && type != GroupType::Gang) {
-			if (type == GroupType::Shunzi) {
+		if (state % 10 == 0 && type != GroupType::Kantsu) {
+			if (type == GroupType::Shuntsu) {
 				res.push_back(value + '0');
 				res.push_back(value + '1');
 				res.push_back(value + '2');
 			}
-			else if (type == GroupType::Quetou) {
+			else if (type == GroupType::Toitsu) {
 				res.push_back(value + '0');
 				res.push_back(value + '0');
 			}
@@ -76,7 +76,7 @@ public:
 			res.push_back(color);
 			return res;
 		}
-		if (type == GroupType::Shunzi) {
+		if (type == GroupType::Shuntsu) {
 			if (state / 10 == 0) {
 				if (state % 10 == 3) {
 					res.push_back('(');
@@ -137,7 +137,7 @@ public:
 			//if (state / 10 == 1 || state / 10 == 2)res.push_back(' ');
 			//if (state / 10 == 3 || state / 10 == 2)res.push_back(' ');
 		}
-		else if (type == GroupType::Gang) {
+		else if (type == GroupType::Kantsu) {
 			//暗杠
 			if (state % 10 == 0) {
 				res.push_back('O');
@@ -172,7 +172,7 @@ public:
 				else res.push_back(((akadora & 8) ? 0 : value) + '0');
 			}
 		}
-		else if (type == GroupType::Kezi) {
+		else if (type == GroupType::Koutsu) {
 			if (state % 10 == 3) {
 				res.push_back('(');
 				res.push_back(((akadora & 1) ? 0 : value) + '0');

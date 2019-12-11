@@ -1,6 +1,6 @@
 #pragma once
 #include "ActionGenerator.hpp"
-#include "Player.hpp"
+#include "Player.h"
 
 class Human : public ActionGenerator {
 private:

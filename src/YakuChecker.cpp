@@ -50,7 +50,7 @@ bool YakuChecker::ziyise() const noexcept {
 bool YakuChecker::sigangzi() const noexcept {
 	auto gangziCount = 0;
 	for (auto& group : mianzi) {
-		if (group.type == GroupType::Gang)
+		if (group.type == GroupType::Kantsu)
 			gangziCount++;
 	}
 	return gangziCount == 4;
@@ -117,7 +117,7 @@ bool YakuChecker::xiaosixi() const noexcept {
 		if (group.color == 'z') {
 			if (group.value <= 4) {
 				fengCount++;
-				if (group.type == GroupType::Quetou)
+				if (group.type == GroupType::Toitsu)
 					fengQuetou = true;
 			}
 		}
@@ -132,7 +132,7 @@ bool YakuChecker::dasixi() const noexcept {
 		if (group.color == 'z') {
 			if (group.value <= 4) {
 				fengCount++;
-				if (group.type == GroupType::Quetou)
+				if (group.type == GroupType::Toitsu)
 					return false;
 			}
 		}
@@ -147,7 +147,7 @@ bool YakuChecker::dasanyuan() const noexcept {
 		if (group.color == 'z') {
 			if (group.value > 4) {
 				sanyuanCount++;
-				if (group.type == GroupType::Quetou)
+				if (group.type == GroupType::Toitsu)
 					return false;
 			}
 		}
@@ -160,9 +160,9 @@ bool YakuChecker::sianke() const noexcept {
 	auto keziCount = 0;
 	Single quetou;
 	for (auto& group : mianzi) {
-		if (group.type == GroupType::Kezi)
+		if (group.type == GroupType::Koutsu)
 			keziCount++;
-		if (group.type == GroupType::Quetou)
+		if (group.type == GroupType::Toitsu)
 			quetou = Single(group.value, group.color, false);
 	}
 	return keziCount == 4 && par.type == 0 && !par.target.valueEqual(quetou) && !tianhu();
@@ -173,9 +173,9 @@ bool YakuChecker::siankedanqi() const noexcept {
 	auto keziCount = 0;
 	Single quetou;
 	for (auto& group : mianzi) {
-		if (group.type == GroupType::Kezi)
+		if (group.type == GroupType::Koutsu)
 			keziCount++;
-		if (group.type == GroupType::Quetou)
+		if (group.type == GroupType::Toitsu)
 			quetou = Single(group.value, group.color, false);
 	}
 	return keziCount == 4 && (par.target.valueEqual(quetou) || tianhu());
@@ -275,11 +275,11 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 	}
 	//判断是否有刻子
 	for (auto i = 1; i <= 4; ++i) {
-		if (mianzi[i].type != GroupType::Shunzi) {
+		if (mianzi[i].type != GroupType::Shuntsu) {
 			pinghu = false;
-			if (mianzi[i].type == GroupType::Kezi)
+			if (mianzi[i].type == GroupType::Koutsu)
 				fu += 2 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
-			if (mianzi[i].type == GroupType::Gang)
+			if (mianzi[i].type == GroupType::Kantsu)
 				fu += 8 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
 		}
 	}
@@ -287,17 +287,17 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 	auto liangmianOnly = true; //是否只能被看成两面
 	auto liangmian = false; //是否可以被看成两面
 	for (auto i = 1; i <= menqingCount; ++i) {
-		if (mianzi[i].type == GroupType::Shunzi) {
+		if (mianzi[i].type == GroupType::Shuntsu) {
 			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
 				liangmian = true;
 			if (par.target.valueEqual(Single(mianzi[i].value + 2, mianzi[i].color, false)))
 				liangmian = true;
 		}
-		if (mianzi[i].type == GroupType::Quetou) {
+		if (mianzi[i].type == GroupType::Toitsu) {
 			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
 				liangmianOnly = false;
 		}
-		if (mianzi[i].type == GroupType::Kezi || mianzi[i].type == GroupType::Gang) {
+		if (mianzi[i].type == GroupType::Koutsu || mianzi[i].type == GroupType::Kantsu) {
 			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
 				liangmianOnly = false;
 		}
@@ -336,7 +336,7 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 TryToAgariResult YakuChecker::getResult() {
 	auto result = AgariResult();
 	if (mianzi.size() != 5)return TryToAgariResult(AgariFaildReason::ShapeWrong);
-	result.zimo = par.type == 0;
+	result.tsumo = par.type == 0;
 	//役满型 
 	//天地和
 	if (tianhu())
@@ -408,7 +408,7 @@ TryToAgariResult YakuChecker::getResult() {
 			chunquan = false;
 		}
 		else { chunquan = false; }
-		if (group.type == GroupType::Shunzi) {
+		if (group.type == GroupType::Shuntsu) {
 			hunlaotou = false;
 			if (group.value == 7 || group.value == 1)
 				duanyao = false;
@@ -473,9 +473,9 @@ TryToAgariResult YakuChecker::getResult() {
 		}
 	}*/
 	//立直,两立直和一发
-	if (par.lizhiXunmu != -1) {
+	if (par.riichiJunme != -1) {
 		//w立
-		if (par.lizhiXunmu == -2) {
+		if (par.riichiJunme == -2) {
 			result.fan += 2;
 			result.yaku.add<Yaku::Lianglizhi>();
 		}
@@ -483,7 +483,7 @@ TryToAgariResult YakuChecker::getResult() {
 			result.fan += 1;
 			result.yaku.add<Yaku::Lizhi>();
 		}
-		if (par.yifa == true) {
+		if (par.ippatsu == true) {
 			result.fan += 1;
 			result.yaku.add<Yaku::Yifa>();
 		}

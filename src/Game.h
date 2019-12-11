@@ -1,17 +1,17 @@
 #pragma once
 #include"Mountain.h"
-#include"Player.hpp"
+#include"Player.h"
 #include"ActionGenerator.hpp"
 #include<vector>
 
 //返回一局的结果
 struct RoundResult {
-	bool liuju{}; //是否流局
-	bool lianzhuang{}; //庄家是否连庄
+	bool ryuukyoku{}; //是否流局
+	bool renchan{}; //庄家是否连庄
 	std::vector<AgariResult> agariResult;
 };
 
-struct ActionResult {
+struct SetActionResult {
 	bool success;
 	ErrorType type;
 };
@@ -28,9 +28,9 @@ private:
 	WindType prevailingWind {}; //场风
 	std::vector<Player> player; //0,1,2,3分别对应四个玩家。
 	int east = 0; //表示庄家的编号,庄家为1则东南西北玩家编号分别为1,2,3,0,以此类推。
-	int lizhibang = 0; //额外立直棒的点数价值 
+	int riichibouValue = 0; //额外立直棒的点数价值 
 	int round = 0; //局数(1~4)
-	int benchang = 0; //本场
+	int honba = 0; //本场
 	int turn = 0; //表示正常顺序该谁摸牌了。
 	//int mIndex;//表示该谁决策了(吃碰情况下mTurn和mIndex会不同)。
 	RoundResult result; //一局的结果,调用next函数时如果本局结束则更新
@@ -49,7 +49,7 @@ private:
 	void newTurn(int who, bool lingShang);
 	
 	//鸣牌(除了杠)后打牌
-	void newTurnAfterMingpai(int who);
+	void newTurnAfterNari(int who);
 
 	//途中流局连庄
 	void endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju);
@@ -58,7 +58,7 @@ private:
 	void resetBounusYaku();
 
 	//处理鸣牌
-	void processMingpai();
+	void processNari();
 
 public:
 	/*
@@ -92,5 +92,5 @@ public:
 		返回值为设置Action是否成功，以及失败的话失败的原因
 	*/
 	//注意:改mTurn,mLast,player的disabledHandTile等
-	ActionResult setPlayerAction(int index, Action act);
+	SetActionResult setPlayerAction(int index, Action act);
 };

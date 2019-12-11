@@ -231,7 +231,7 @@
     <ClInclude Include="..\src\ai\Human.h" />
     <ClInclude Include="..\src\Mountain.h" />
     <ClInclude Include="..\src\ActionGenerator.hpp" />
-    <ClInclude Include="..\src\Player.hpp" />
+    <ClInclude Include="..\src\Player.h" />
     <ClInclude Include="..\src\ResultInspector.hpp" />
     <ClInclude Include="..\src\Single.h" />
     <ClInclude Include="..\src\Rules.h" />
@@ -247,6 +247,7 @@
     <ClCompile Include="..\src\Group.cpp" />
     <ClCompile Include="..\src\main.cpp" />
     <ClCompile Include="..\src\Mountain.cpp" />
+    <ClCompile Include="..\src\Player.cpp" />
     <ClCompile Include="..\src\Rules.cpp" />
     <ClCompile Include="..\src\Single.cpp" />
     <ClCompile Include="..\src\utils\console.cpp" />

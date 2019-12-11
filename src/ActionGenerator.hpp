@@ -4,6 +4,11 @@
 #include "Group.h"
 #include "Rules.h"
 #include <vector>
+enum BonusYakuState {
+	Normal,//普通
+	FirstTurn,//天地和、W立
+	LastTurn,//河底、海底
+};
 
 enum class ActionType {
 	Null,//空指令
@@ -11,7 +16,7 @@ enum class ActionType {
 	Dapai,//正常打牌
 	Chi,
 	Peng,
-	Gang,//杠
+	Kantsu,//杠
 	Rong,
 	Lizhi,
 	Zimo,
@@ -73,9 +78,9 @@ struct Action {
 struct PlayerInfo {
 	std::vector<Group> groupTile; //副露牌组
 	std::vector<Single> discardTile; //牌河
-	int lizhi{}; //立直宣言牌是牌河中的第几张，-1为未立直
-	int lizhiXunmu{}; //立直的巡目，-1为未立直，-2为w立
-	int yifa{}; //是否处于一发巡
+	int riichi{}; //立直宣言牌是牌河中的第几张，-1为未立直
+	int riichiJunme{}; //立直的巡目，-1为未立直，-2为w立
+	int ippatsu{}; //是否处于一发巡
 	int score{};
 };
 //游戏状态数据包，传递给决策器来决策
@@ -95,10 +100,10 @@ struct GameInfo {
 	std::vector<Single> doraIndicator; //宝牌指示牌
 	Single nowTile; //决策者的自摸牌或是可以鸣牌/荣和的对象
 	bool mingpai{}; //为true表示别人刚打完牌，你可以选择鸣牌、荣和或者跳过
-	bool lingshang{}; //当前自摸牌是否为岭上牌(仅mingpai=false时有效)
-	bool moqie{}; //表示打出去这张牌是否为摸切(仅mingpai=true时有效)
+	bool rinshan{}; //当前自摸牌是否为岭上牌(仅mingpai=false时有效)
+	bool tsumogiri{}; //表示打出去这张牌是否为摸切(仅mingpai=true时有效)
 	int lizhibangCount{}; //额外立直棒数量
-	int benchang{}; //本场数
+	int honba{}; //本场数
 	int subround{}; //巡数
 	int remainTiles{}; //剩余牌数
 	int round{}; //局数(如东2局就是2)

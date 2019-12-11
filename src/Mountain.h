@@ -16,7 +16,7 @@ protected:
 public:
 	virtual ~Mountain() noexcept = default;
 	std::vector<Single> hand[4]; //四家初始手牌
-	Single zimo; //庄家0巡的自摸牌
+	Single tsumohai; //庄家0巡的自摸牌
 	Mountain(); //构造函数
 	virtual void reset(const Rule& rule); //产生新牌山
 	Single getDora(int index)const; //获取宝牌
@@ -27,7 +27,7 @@ public:
 	Single getUraIndicator(int index)const; //获取里宝牌指示牌,下标范围0~4
 	std::vector<Single> getDoraIndicators(int count)const; //获取宝牌指示牌组,count表示获得前几个
 	std::vector<Single> getUraIndicators(int count)const; //获取里宝牌指示牌组,count表示获得前几个
-	Single nextLingshang(); //获取下一张岭上牌(自动移海底牌)
+	Single nextRinshan(); //获取下一张岭上牌(自动移海底牌)
 	Single nextHand(); //获取下一张手牌
 	int remainCount()const; //获取剩余牌数
 	std::string getMountainString(); //获得牌山序列

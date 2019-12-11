@@ -52,9 +52,6 @@
     <ClInclude Include="..\src\ResultInspector.hpp">
       <Filter>src\hppFiles</Filter>
     </ClInclude>
-    <ClInclude Include="..\src\Player.hpp">
-      <Filter>src\hppFiles</Filter>
-    </ClInclude>
     <ClInclude Include="..\src\utils\console.h">
       <Filter>src\utils</Filter>
     </ClInclude>
@@ -66,6 +63,9 @@
     </ClInclude>
     <ClInclude Include="..\src\ActionGenerator.hpp">
       <Filter>src\hppFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\Player.h">
+      <Filter>src\headFiles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -104,6 +104,9 @@
     </ClCompile>
     <ClCompile Include="..\src\ai\Tester.cpp">
       <Filter>src\ai</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Player.cpp">
+      <Filter>src\sourceFiles</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

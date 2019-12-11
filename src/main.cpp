@@ -24,8 +24,8 @@ void test() {
 	//每个玩家的牌河，是否立直，以及副露牌组
 	for (auto i = 0; i <= 3; ++i) {
 		PlayerInfo info;
-		info.lizhi = false;
-		info.lizhiXunmu = -1;
+		info.riichi = false;
+		info.riichiJunme = -1;
 		info.score = 99999;
 		res.playerInfo.push_back(info);
 	}
@@ -55,10 +55,10 @@ void test() {
 	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, false);
 	TryToAgariResult r{};
 	//for (int i = 1000000; i > 0; --i) {
-		r = p.zimo(res.prevailingWind, res.w, {}, {});
+		r = p.tsumo(res.prevailingWind, static_cast<BonusYakuState>(res.w), {}, {});
 	//}
 	auto re = r.result;
-	cout << "Test " << (re.zimo ? "自摸" : "荣和") << endl;
+	cout << "Test " << (re.tsumo ? "自摸" : "荣和") << endl;
 	cout << endl;
 	for (auto&& yk : re.yaku) {
 		cout << getYakuName(yk) << " ";
@@ -140,10 +140,10 @@ int main_loop() {
 		} while (!game.roundOver());
 		auto result = game.getRoundResult();
 		cout << "本局结束" << endl;
-		if (result.liuju) { cout << "流局" << endl; }
+		if (result.ryuukyoku) { cout << "流局" << endl; }
 		else if (!result.agariResult.empty()) {
 			for (auto& res : result.agariResult) {
-				cout << player[res.hupaiID]->getName() << " " << (res.zimo ? "自摸" : "荣和") << endl;
+				cout << player[res.hupaiID]->getName() << " " << (res.tsumo ? "自摸" : "荣和") << endl;
 				cout << "役种:" << endl;
 				for (auto&& yk : res.yaku) {
 					cout << getYakuName(yk) << " ";

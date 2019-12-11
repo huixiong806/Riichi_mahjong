@@ -15,7 +15,7 @@ std::string Mountain::getMountainString() {//获得牌山序列
 	return res;
 }
 
-Single Mountain::nextLingshang() {//获取下一张岭上牌(自动移海底牌)
+Single Mountain::nextRinshan() {//获取下一张岭上牌(自动移海底牌)
 	const auto res = mB[mLingshangPtr++];
 	mB.push_back(mA[mA.size() - 1]);
 	mA.pop_back();
@@ -112,7 +112,7 @@ void Mountain::reset(const Rule& rule) {
 	for (auto i = 1; i <= 13; ++i)
 		for (auto& j : hand)
 			j.push_back(all[ptr++]);
-	zimo = all[ptr++];
+	tsumohai = all[ptr++];
 	for (auto i = ptr; i < all.size(); ++i)
 		mMountain.push_back(all[i]);
 	for (auto i = 1; i <= 69; ++i)

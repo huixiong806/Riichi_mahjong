@@ -6,7 +6,7 @@
 #include"Yaku.h"
 
 struct AgariResult {
-	bool zimo;
+	bool tsumo;
 	int fangchongID{}; //放铳人ID 
 	int hupaiID{}; //和牌人ID 
 	int fan; //-1=役满，-2=两倍役满，-3=三倍役满，以此类推,13番累计役满
@@ -20,7 +20,7 @@ struct AgariResult {
 	int scoreDecXian; //荣和无效 
 	//int nukidora;
 	AgariResult() {
-		zimo = fan = fu = dora = akadora = uradora = scoreAdd = scoreDecFangchong = scoreDecZhuang = scoreDecXian = 0;
+		tsumo = fan = fu = dora = akadora = uradora = scoreAdd = scoreDecFangchong = scoreDecZhuang = scoreDecXian = 0;
 	}
 
 	Yakus yaku;
@@ -85,8 +85,8 @@ struct TryToAgariResult {
 struct AgariParameters {
 	WindType selfWind;
 	WindType prevailingWind;
-	int lizhiXunmu;
-	bool yifa;
+	int riichiJunme;
+	bool ippatsu;
 	int state;
 	int type;
 	Single target;
@@ -110,8 +110,8 @@ struct AgariParameters {
 	) {
 		selfWind = selfWind_;
 		prevailingWind = prevailingWind_;
-		lizhiXunmu = lizhiXunmu_;
-		yifa = yifa_;
+		riichiJunme = lizhiXunmu_;
+		ippatsu = yifa_;
 		state = state_;
 		type = type_;
 		target = target_;

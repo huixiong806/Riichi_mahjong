@@ -1,12 +1,12 @@
 #include"Group.h"
 #include <vector>
 #include <algorithm>
-Group Group_Null = {255, static_cast<char>('z' + 1), GroupType::Gang, 255, 255};
+Group Group_Null = {255, static_cast<char>('z' + 1), GroupType::Kantsu, 255, 255};
 
-Group Group::createGangzi(Single a, Single b, Single c, Single target, int source) {
+Group Group::createKantsu(Single a, Single b, Single c, Single target, int source) {
 	if (!a.valueEqual(b) || !a.valueEqual(c) || !a.valueEqual(target))return Group_Null;
 	Group res;
-	res.type = GroupType::Gang;
+	res.type = GroupType::Kantsu;
 	res.color = target.color();
 	res.value = target.value();
 	res.state = source;
@@ -24,10 +24,10 @@ Group Group::createGangzi(Single a, Single b, Single c, Single target, int sourc
 	return res;
 }
 
-Group Group::createKezi(Single a, Single b, Single target, int source) {
+Group Group::createKoutsu(Single a, Single b, Single target, int source) {
 	if (!a.valueEqual(b) || !b.valueEqual(target))return Group_Null;
 	Group res;
-	res.type = GroupType::Kezi;
+	res.type = GroupType::Koutsu;
 	res.color = target.color();
 	res.value = target.value();
 	res.state = source;
@@ -39,12 +39,12 @@ Group Group::createKezi(Single a, Single b, Single target, int source) {
 	return res;
 }
 
-Group Group::createQuetou(Single a, Single b) {
+Group Group::createToitsu(Single a, Single b) {
 	if (!a.valueEqual(b))return Group_Null;
 	if (b.isAkadora() > a.isAkadora())
 		std::swap(a, b);
 	Group res;
-	res.type = GroupType::Quetou;
+	res.type = GroupType::Toitsu;
 	res.color = a.color();
 	res.value = a.value();
 	res.akadora = static_cast<uint8_t>(a.isAkadora()) | static_cast<uint8_t>(b.isAkadora()) << 1;
@@ -52,11 +52,11 @@ Group Group::createQuetou(Single a, Single b) {
 	return res;
 }
 
-Group Group::createShunzi(Single a, Single b, Single target, int source) {
+Group Group::createShuntsu(Single a, Single b, Single target, int source) {
 	if (!a.color() == b.color() || !b.color() == target.color())return Group_Null; // TODO: verify this
 	if (b < a)std::swap(a, b);
 	Group res;
-	res.type = GroupType::Shunzi;
+	res.type = GroupType::Shuntsu;
 	res.color = a.color();
 	res.state = source;
 	res.akadora = 0;

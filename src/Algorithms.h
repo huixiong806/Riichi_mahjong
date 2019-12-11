@@ -48,7 +48,7 @@ public:
 	static int getTileIndex(Single& tile);
 	static std::vector<int> getPool(const std::vector<Single>& tiles);
 	//快速判断是否形式听牌。不允许虚听，允许空听。返回听牌种类
-	static std::vector<Single> tingpai(const std::vector<Single>& handTile);
+	static std::vector<Single> tenpai(const std::vector<Single>& handTile);
 	//获取所有类型的牌
 	static std::vector<Single> allKindsOfTiles();
 	//shape为压缩后的牌型参数，value为要获取个数的数字。函数对单花色牌的压缩型进行操作。函数已废除
