@@ -17,7 +17,7 @@ public:
 		if (info.nowWind == info.selfWind && info.mingpai == true)return res;
 		if (info.mingpai) { res.type = ActionType::Skip; }
 		else {
-			res.type = ActionType::Dapai;
+			res.type = ActionType::DiscardTile;
 			res.target = info.nowTile;
 		}
 

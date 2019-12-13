@@ -48,8 +48,8 @@ private:
 public:
 	YakuChecker(const AgariParameters& i_par, const std::vector<Group>& i_menqingMianzi) noexcept;
 	//役满型
-	[[nodiscard]] bool tianhu() const noexcept;
-	[[nodiscard]] bool dihu() const noexcept;
+	[[nodiscard]] bool tenhu() const noexcept;
+	[[nodiscard]] bool chihu() const noexcept;
 	[[nodiscard]] bool ziyise() const noexcept;
 	[[nodiscard]] bool sigangzi() const noexcept;
 	[[nodiscard]] bool xiaosixi() const noexcept;

@@ -20,10 +20,10 @@ std::vector<Action> Tester::getAllActionsNormal(const GameInfo& info) {
 	std::vector<Action> res;
 	auto temp = getZimoAction(info);
 	if (info.nowTile != Null)
-		res.emplace_back(ActionType::Dapai, info.nowTile);
+		res.emplace_back(ActionType::DiscardTile, info.nowTile);
 	if (info.playerInfo[static_cast<int>(info.selfWind)].riichiJunme == -1)
 		for (auto i : info.handTile)
-			res.emplace_back(ActionType::Dapai, i);
+			res.emplace_back(ActionType::DiscardTile, i);
 	res.insert(res.end(), temp.begin(), temp.end());
 	temp = getLizhiAction(info);
 	res.insert(res.end(), temp.begin(), temp.end());
@@ -33,16 +33,16 @@ std::vector<Action> Tester::getAllActionsNormal(const GameInfo& info) {
 void Tester::printActions(std::vector<Action> actions) {
 	auto num = 0;
 	for (auto i = 0; i < actions.size(); ++i) {
-		if (actions[i].type == ActionType::Dapai)
+		if (actions[i].type == ActionType::DiscardTile)
 			std::cout << num << " ";
 		else {
-			if (i > 0 && actions[i - 1].type == ActionType::Dapai) { std::cout << "打牌(0摸切)" << std::endl; }
-			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Peng || actions[i].type ==
-				ActionType::Kantsu)
+			if (i > 0 && actions[i - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
+			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Pon || actions[i].type ==
+				ActionType::Kan)
 				std::cout << num << "." << actionName[static_cast<int>(actions[i].type)] << " " << actions[i]
 				                                                                                   .group.getString() <<
 					std::endl;
-			else if (actions[i].type == ActionType::Lizhi) {
+			else if (actions[i].type == ActionType::Riichi) {
 				std::cout << num << ".切" << actions[i].target.getDisplay() << "立直" << std::endl;
 			}
 			else
@@ -50,36 +50,36 @@ void Tester::printActions(std::vector<Action> actions) {
 		}
 		num++;
 	}
-	if (actions[actions.size() - 1].type == ActionType::Dapai) { std::cout << "打牌(0摸切)" << std::endl; }
+	if (actions[actions.size() - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
 }
 
 std::vector<Action> Tester::getRongAction(const GameInfo& info) {
 	std::vector<Action> res;
-	auto state = 0;
-	if (info.w)state = 1;
-	else if (info.remainTiles == 0)state = 2;
+	BonusYakuState state = BonusYakuState::Normal;
+	if (info.w)BonusYakuState::FirstTurn;
+	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
 	                                                      info.playerInfo[info.selfWind].ippatsu, state, 1, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
-		res.emplace_back(ActionType::Rong);
+		res.emplace_back(ActionType::Ron);
 	return res;
 }
 
 std::vector<Action> Tester::getZimoAction(const GameInfo& info) {
 	std::vector<Action> res;
-	auto state = 0;
-	if (info.w)state = 1;
-	else if (info.remainTiles == 0)state = 2;
+	BonusYakuState state = BonusYakuState::Normal;
+	if (info.w)BonusYakuState::FirstTurn;
+	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
 	                                                      info.playerInfo[info.selfWind].ippatsu, state, 0, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
-		res.emplace_back(ActionType::Zimo);
+		res.emplace_back(ActionType::Tsumo);
 	return res;
 }
 
@@ -103,7 +103,7 @@ std::vector<Action> Tester::getLizhiAction(const GameInfo& info) {
 		BonusYakuState state = BonusYakuState::Normal;
 		if (info.w)state = BonusYakuState::FirstTurn;
 		else if (info.remainTiles == 0)state = BonusYakuState::LastTurn;
-		if (player.canLizhi(state, target)) { res.insert(Action(ActionType::Lizhi, target)); }
+		if (player.canLizhi(state, target)) { res.insert(Action(ActionType::Riichi, target)); }
 	}
 	std::vector<Action> ret;
 	for (auto& item : res)
@@ -164,18 +164,18 @@ Action Tester::generateAction(const GameInfo& info) {
 			std::cout << std::endl;*/
 			for (auto& act : actions) {
 				int count = 0;
-				if (act.type == ActionType::Zimo) {
+				if (act.type == ActionType::Tsumo) {
 					res = act;
 					tsumohai = true;
 					break;
 				}
-				else if (act.type == ActionType::Lizhi) {
+				else if (act.type == ActionType::Riichi) {
 					if (!riichi) {
 						riichi = true;
 						res = act;
 					}
 				}
-				else if (act.type == ActionType::Dapai) {
+				else if (act.type == ActionType::DiscardTile) {
 					//std::cout << "打" << act.target.getDisplay() << ",";
 					auto allTiles = info.handTile;
 					allTiles.push_back(info.nowTile);

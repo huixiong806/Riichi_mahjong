@@ -64,7 +64,7 @@ bool Game::endThisTurn()
 	}
 	else{
 		Action action = playerAction[turn];
-		if (action.type == ActionType::Lizhi) {
+		if (action.type == ActionType::Riichi) {
 			player[turn].doLizhi(static_cast<BonusYakuState>(w), action.target);
 			riichibouValue += 1000;
 			if (player[turn].rinshan == true) {
@@ -73,7 +73,7 @@ bool Game::endThisTurn()
 				//todo:判断四杠散了
 			}
 		}
-		else if (action.type == ActionType::Dapai){
+		else if (action.type == ActionType::DiscardTile){
 			player[turn].dapai(action.target);
 			player[turn].ippatsu = false;
 			if (player[turn].rinshan == true) {
@@ -82,13 +82,13 @@ bool Game::endThisTurn()
 				//todo:判断四杠散了
 			}
 		}
-		else if (action.type == ActionType::Zimo){
+		else if (action.type == ActionType::Tsumo){
 			std::vector<Single> allDora = mountain.getDoras(doraIndicatorCount);
 			std::vector<Single> allUra = mountain.getUras(doraIndicatorCount);
 			auto result= player[turn].tsumo(prevailingWind, static_cast<BonusYakuState>(w), allDora, allUra);
 			if (result.success) {
-				result.result.fangchongID = -1;
-				result.result.hupaiID = turn;
+				result.result.furikomiID = -1;
+				result.result.agariID = turn;
 				endThisRound(std::vector<AgariResult>({ result.result }), false);
 			}
 			else
@@ -122,7 +122,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				isReady[playerID] = true;
 				playerAction[playerID] = action;
 				break;
-			case ActionType::Rong: {
+			case ActionType::Ron: {
 				std::vector<Single> allDora = mountain.getDoras(doraIndicatorCount);
 				std::vector<Single> allUra = mountain.getUras(doraIndicatorCount);
 				TryToAgariResult result;
@@ -152,7 +152,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				isReady[playerID] = true;
 				playerAction[playerID] = action;
 				break;
-			case ActionType::Peng:
+			case ActionType::Pon:
 				if (!player[playerID].canPeng(target, action.group,
 				                           (static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4)
 				) {
@@ -170,7 +170,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				isReady[playerID] = true;
 				playerAction[playerID] = action;
 				break;
-			case ActionType::Kantsu:
+			case ActionType::Kan:
 				if (!player[playerID].canGang(target, action.group,
 				                           (static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4)
 				) {
@@ -207,7 +207,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 			return setActionResult;
 		}
 		switch (action.type) {
-		case ActionType::Dapai:
+		case ActionType::DiscardTile:
 			if (!player[playerID].canDapai(action.target)){
 				setActionResult.success = false;
 				setActionResult.type = ErrorType::ActionRejected;
@@ -215,17 +215,17 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 			}
 			playerAction[playerID] = action;
 			break;
-		case ActionType::Lizhi: {
+		case ActionType::Riichi: {
 			if (mountain.remainCount() < 4 ||
 				!player[playerID].canLizhi(static_cast<BonusYakuState>(w),action.target)){
 				setActionResult.success = false;
-				setActionResult.type = ErrorType::CantLizhi;
+				setActionResult.type = ErrorType::CantRiichi;
 				return setActionResult;
 			}
 			playerAction[playerID] = action;
 			break;
 		}
-		case ActionType::Zimo: {
+		case ActionType::Tsumo: {
 			std::vector<Single> allDora=mountain.getDoras(doraIndicatorCount);
 			std::vector<Single> allUra = mountain.getUras(doraIndicatorCount);
 			if (!player[playerID].canTsumo(prevailingWind, static_cast<BonusYakuState>(w), allDora, allUra)){
@@ -267,18 +267,18 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 		//立直棒和本场费计算，按照头跳规则
 		int targetPlayer; //获取点棒的人 
 		if (res.size() == 1)
-			targetPlayer = res[0].hupaiID;
+			targetPlayer = res[0].agariID;
 		else {
-			targetPlayer = res[0].fangchongID;
+			targetPlayer = res[0].furikomiID;
 			auto minSpace = 4; //最小间距先调整为4
-			const int a = player[res[0].fangchongID].selfWind;
+			const int a = player[res[0].furikomiID].selfWind;
 			for (auto& item : res) {
-				int b = player[item.hupaiID].selfWind;
+				int b = player[item.agariID].selfWind;
 				if (b < a)b += 4;
 				const auto space = b - a;
 				if (space < minSpace) {
 					minSpace = space;
-					targetPlayer = item.hupaiID;
+					targetPlayer = item.agariID;
 				}
 			}
 		}
@@ -286,7 +286,7 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 		player[targetPlayer].score += honba * 300;
 		//荣和的本场费计算 
 		if (!res[0].tsumo)
-			player[res[0].fangchongID].score -= honba * 300;
+			player[res[0].furikomiID].score -= honba * 300;
 		else //自摸的本场费计算 
 		{
 			for (auto i = 0; i < 4; ++i)
@@ -296,27 +296,27 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 		//分数计算 
 		for (auto& item : res) {
 			//和牌得失点 
-			player[item.hupaiID].score += item.scoreAdd;
-			if (player[item.hupaiID].selfWind == EAST)
+			player[item.agariID].score += item.scoreAdd;
+			if (player[item.agariID].selfWind == EAST)
 				result.renchan = true;
 			if (item.tsumo) {
 				for (auto i = 0; i < 4; ++i) {
-					if (item.hupaiID != i) {
+					if (item.agariID != i) {
 						//std::cout<<item.scoreDecXian<<std::endl;
 						if (player[i].selfWind == EAST)
-							player[i].score -= item.scoreDecZhuang;
+							player[i].score -= item.scoreDecOya;
 						else
-							player[i].score -= item.scoreDecXian;
+							player[i].score -= item.scoreDecKodomo;
 					}
 				}
 			}
-			else player[item.fangchongID].score -= item.scoreDecFangchong;
+			else player[item.furikomiID].score -= item.scoreDecFurikomi;
 		}
 		if (prevailingWind == rule.gameType && round == 4) {
 			//庄家没和牌或者和牌后是1位,游戏结束
 			auto zhuangjiaHupai = false;
 			for (auto& item : res)
-				if (player[item.hupaiID].selfWind == EAST)
+				if (player[item.agariID].selfWind == EAST)
 					zhuangjiaHupai = true;
 			if (!zhuangjiaHupai || (zhuangjiaHupai && top == east))
 				gameIsOver = true;
@@ -388,7 +388,7 @@ void Game::processNari() {
 	auto overflag = false;
 	//荣
 	for (auto i = 0; i < 4; ++i) {
-		if (playerAction[i].type == ActionType::Rong) {
+		if (playerAction[i].type == ActionType::Ron) {
 			std::vector<Single> allDora;
 			std::vector<Single> allUra;
 			for (auto i = 0; i < doraIndicatorCount; ++i) {
@@ -397,8 +397,8 @@ void Game::processNari() {
 			}
 			auto tmp = player[i].rong(*player[turn].discardTile.rbegin(), prevailingWind, 1,
 									  static_cast<BonusYakuState>(w), allDora, allUra);
-			tmp.hupaiID = i;
-			tmp.fangchongID = turn;
+			tmp.agariID = i;
+			tmp.furikomiID = turn;
 			result.push_back(tmp);
 			overflag = true;
 			//std::cout << "*" << std::endl;
@@ -410,7 +410,7 @@ void Game::processNari() {
 	}
 	//杠和碰
 	for (auto i = 0; i < 4; ++i) {
-		if (playerAction[i].type == ActionType::Kantsu) {
+		if (playerAction[i].type == ActionType::Kan) {
 			player[i].ronggang(playerAction[i].group);
 			player[turn].discardTile.pop_back();
 
@@ -418,7 +418,7 @@ void Game::processNari() {
 			newTurn(i, true);
 			return;
 		}
-		if (playerAction[i].type == ActionType::Peng) {
+		if (playerAction[i].type == ActionType::Pon) {
 			player[i].peng(playerAction[i].group);
 			player[turn].discardTile.pop_back();
 			resetBounusYaku();

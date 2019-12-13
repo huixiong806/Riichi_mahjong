@@ -65,17 +65,17 @@ void test() {
 		cout << endl;
 	}
 	cout << "宝牌" << re.dora << "   红宝牌" << re.akadora << "   里宝牌" << re.uradora << endl;
-	if (re.fan < 0) {
+	if (re.han < 0) {
 		const string ykman[7] = {"", "一", "两", "三", "四", "五", "六"};
-		if (re.fan == -1)
+		if (re.han == -1)
 			cout << "役满 " << re.scoreAdd << "点" << endl;
 		else
-			cout << ykman[-re.fan] << "倍役满 " << re.scoreAdd << "点" << endl;
-		cout << "庄家失点" << re.scoreDecZhuang << "  闲家失点" << re.scoreDecXian << endl;
+			cout << ykman[-re.han] << "倍役满 " << re.scoreAdd << "点" << endl;
+		cout << "庄家失点" << re.scoreDecOya << "  闲家失点" << re.scoreDecKodomo << endl;
 	}
 	else {
-		cout << re.fan << "番" << re.fu << "符   " << re.scoreAdd << "点" << endl;
-		cout << "庄家失点" << re.scoreDecZhuang << "  闲家失点" << re.scoreDecXian << endl;
+		cout << re.han << "番" << re.fu << "符   " << re.scoreAdd << "点" << endl;
+		cout << "庄家失点" << re.scoreDecOya << "  闲家失点" << re.scoreDecKodomo << endl;
 	}
 
 }
@@ -143,21 +143,21 @@ int main_loop() {
 		if (result.ryuukyoku) { cout << "流局" << endl; }
 		else if (!result.agariResult.empty()) {
 			for (auto& res : result.agariResult) {
-				cout << player[res.hupaiID]->getName() << " " << (res.tsumo ? "自摸" : "荣和") << endl;
+				cout << player[res.agariID]->getName() << " " << (res.tsumo ? "自摸" : "荣和") << endl;
 				cout << "役种:" << endl;
 				for (auto&& yk : res.yaku) {
 					cout << getYakuName(yk) << " ";
 					cout << endl;
 				}
 				cout << "宝牌" << res.dora << "   红宝牌" << res.akadora << "   里宝牌" << res.uradora << endl;
-				if (res.fan < 0) {
+				if (res.han < 0) {
 					const string ykman[7] = { "", "一", "两", "三", "四", "五", "六" };
-					if (res.fan == -1)
+					if (res.han == -1)
 						cout << "役满 " << res.scoreAdd << "点" << endl;
 					else
-						cout << ykman[-res.fan] << "倍役满 " << res.scoreAdd << "点" << endl;
+						cout << ykman[-res.han] << "倍役满 " << res.scoreAdd << "点" << endl;
 				}
-				else { cout << res.fan << "番" << res.fu << "符   " << res.scoreAdd << "点" << endl; }
+				else { cout << res.han << "番" << res.fu << "符   " << res.scoreAdd << "点" << endl; }
 			}
 		}
 		cout << endl;

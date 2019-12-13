@@ -13,15 +13,15 @@ enum BonusYakuState {
 enum class ActionType {
 	Null,//空指令
 	Skip,
-	Dapai,//正常打牌
+	DiscardTile,//正常打牌
 	Chi,
-	Peng,
-	Kantsu,//杠
-	Rong,
-	Lizhi,
-	Zimo,
-	Liuju,
-	BaBei,
+	Pon,
+	Kan,//杠
+	Ron,
+	Riichi,
+	Tsumo,
+	Ryuukyoku,
+	Peinuki,
 };
 
 enum class ErrorType {
@@ -30,7 +30,7 @@ enum class ErrorType {
 	AlreadyActed,
 	ActionRejected,
 	TileNotExist,//打牌时不存在要打的东西
-	CantLizhi,//不能立直
+	CantRiichi,//不能立直
 	CannotChooseNull,//不准给空指令
 };
 

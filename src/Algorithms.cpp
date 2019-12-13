@@ -71,57 +71,57 @@ AgariResult Algorithms::getScore(WindType selfWind, AgariResult inp) {
 	const int east = selfWind == EAST;
 	auto res = inp;
 	//役满型 ***暂时不考虑包牌*** 
-	if (inp.fan < 0) {
-		res.scoreAdd = (-inp.fan) * 16000 * (2 + east);
+	if (inp.han < 0) {
+		res.scoreAdd = (-inp.han) * 16000 * (2 + east);
 		if (!inp.tsumo)
-			res.scoreDecFangchong = res.scoreAdd;
+			res.scoreDecFurikomi = res.scoreAdd;
 		else if (east)
-			res.scoreDecXian = (-inp.fan) * 16000;
+			res.scoreDecKodomo = (-inp.han) * 16000;
 		else {
-			res.scoreDecXian = (-inp.fan) * 8000;
-			res.scoreDecZhuang = (-inp.fan) * 16000;
+			res.scoreDecKodomo = (-inp.han) * 8000;
+			res.scoreDecOya = (-inp.han) * 16000;
 		}
 		return res;
 	}
 	//非役满型
-	if (inp.fan < 1)res.scoreAdd = 0;
-	if (inp.fan >= 13) {
+	if (inp.han < 1)res.scoreAdd = 0;
+	if (inp.han >= 13) {
 		res.scoreAdd = 16000 * (2 + east);
-		res.scoreDecZhuang = 16000;
-		res.scoreDecXian = 8000 * (1 + east);
+		res.scoreDecOya = 16000;
+		res.scoreDecKodomo = 8000 * (1 + east);
 	}
-	else if (inp.fan >= 11) {
+	else if (inp.han >= 11) {
 		res.scoreAdd = 12000 * (2 + east);
-		res.scoreDecZhuang = 12000;
-		res.scoreDecXian = 6000 * (1 + east);
+		res.scoreDecOya = 12000;
+		res.scoreDecKodomo = 6000 * (1 + east);
 	}
-	else if (inp.fan >= 8) {
+	else if (inp.han >= 8) {
 		res.scoreAdd = 8000 * (2 + east);
-		res.scoreDecZhuang = 8000;
-		res.scoreDecXian = 4000 * (1 + east);
+		res.scoreDecOya = 8000;
+		res.scoreDecKodomo = 4000 * (1 + east);
 	}
-	else if (inp.fan >= 6) {
+	else if (inp.han >= 6) {
 		res.scoreAdd = 6000 * (2 + east);
-		res.scoreDecZhuang = 6000;
-		res.scoreDecXian = 3000 * (1 + east);
+		res.scoreDecOya = 6000;
+		res.scoreDecKodomo = 3000 * (1 + east);
 	}
-	else if (inp.fan == 5) {
+	else if (inp.han == 5) {
 		res.scoreAdd = 4000 * (2 + east);
-		res.scoreDecZhuang = 4000;
-		res.scoreDecXian = 2000 * (1 + east);
+		res.scoreDecOya = 4000;
+		res.scoreDecKodomo = 2000 * (1 + east);
 	}
-	else if (!inp.tsumo)res.scoreAdd = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) * (2 + east) / 200 + 1) * 100;
+	else if (!inp.tsumo)res.scoreAdd = (std::min(((inp.fu << (inp.han + 4)) - 10), 7999) * (2 + east) / 200 + 1) * 100;
 	else if (east) {
-		res.scoreAdd = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) / 200 + 1) * 300;
-		res.scoreDecXian = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) / 200 + 1) * 100;
+		res.scoreAdd = (std::min(((inp.fu << (inp.han + 4)) - 10), 7999) / 200 + 1) * 300;
+		res.scoreDecKodomo = (std::min(((inp.fu << (inp.han + 4)) - 10), 7999) / 200 + 1) * 100;
 	}
 	else {
-		res.scoreAdd = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) / 200 + 1) * 100 + (std::min(
-			((inp.fu << (inp.fan + 4)) - 10), 7999) / 400 + 1) * 200;
-		res.scoreDecXian = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) / 400 + 1) * 100;
-		res.scoreDecZhuang = (std::min(((inp.fu << (inp.fan + 4)) - 10), 7999) / 200 + 1) * 100;
+		res.scoreAdd = (std::min(((inp.fu << (inp.han + 4)) - 10), 7999) / 200 + 1) * 100 + (std::min(
+			((inp.fu << (inp.han + 4)) - 10), 7999) / 400 + 1) * 200;
+		res.scoreDecKodomo = (std::min(((inp.fu << (inp.han + 4)) - 10), 7999) / 400 + 1) * 100;
+		res.scoreDecOya = (std::min(((inp.fu << (inp.han + 4)) - 10), 7999) / 200 + 1) * 100;
 	}
-	res.scoreDecFangchong = res.scoreAdd; //放铳失点等于和牌得点 
+	res.scoreDecFurikomi = res.scoreAdd; //放铳失点等于和牌得点 
 	return res;
 }
 
@@ -320,7 +320,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 			res.yaku.add<Yaku::Tianhu>();
 		else
 			res.yaku.add<Yaku::Dihu>();
-		res.fan -= 1;
+		res.han -= 1;
 	}
 	auto ziyise = true;
 	for (auto& item : par.handTile) {
@@ -332,17 +332,17 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	if (par.target.color() != 'z')
 		ziyise = false;
 	if (ziyise == true) {
-		res.fan -= 1;
+		res.han -= 1;
 		res.yaku.add<Yaku::Ziyise>();
 	}
 	res.tsumo = par.type == 0;
 	//满足役满型
-	if (res.fan < 0) {
+	if (res.han < 0) {
 		res = getScore(par.selfWind, res);
 		return TryToAgariResult(res);
 	}
 	//不满足役满型，则一定需要计算七对型
-	res.fan += 2;
+	res.han += 2;
 	res.fu = 25;
 	res.yaku.add<Yaku::Qiduizi>();
 	//检查dora，akadora和uradora
@@ -359,32 +359,32 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	for (auto& item : myHandTile)
 		if (item.isAkadora())
 			res.akadora++;
-	res.fan += res.dora + res.akadora + res.uradora;
+	res.han += res.dora + res.akadora + res.uradora;
 	//检查立直,两立直和一发
 	if (par.riichiJunme != -1) {
 		//w立
 		if (par.riichiJunme == -2) {
-			res.fan += 2;
+			res.han += 2;
 			res.yaku.add<Yaku::Lianglizhi>();
 		}
 		else {
-			res.fan += 1;
-			res.yaku.add<Yaku::Lizhi>();
+			res.han += 1;
+			res.yaku.add<Yaku::Riichi>();
 		}
 		if (par.ippatsu == true) {
-			res.fan += 1;
-			res.yaku.add<Yaku::Yifa>();
+			res.han += 1;
+			res.yaku.add<Yaku::Ippatsu>();
 		}
 	}
 	//检查抢杠
 	if (par.type == 2) {
-		res.fan += 1;
+		res.han += 1;
 		res.yaku.add<Yaku::Qianggang>();
 	}
 	//检查门清自摸
 	if (par.type == 0) {
-		res.fan += 1;
-		res.yaku.add<Yaku::Menqianqingzimo>();
+		res.han += 1;
+		res.yaku.add<Yaku::Menzenchintsumo>();
 	}
 	//检查河底/海底
 	if (par.state == 2) {
@@ -414,19 +414,19 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 			hunlaotou = false;
 	}
 	if (qingyise) {
-		res.fan += 6;
+		res.han += 6;
 		res.yaku.add<Yaku::Qingyise>();
 	}
 	else if (hunyise) {
-		res.fan += 3;
+		res.han += 3;
 		res.yaku.add<Yaku::Hunyise>();
 	}
 	if (duanyao) {
-		res.fan += 1;
-		res.yaku.add<Yaku::Duanyaojiu>();
+		res.han += 1;
+		res.yaku.add<Yaku::Tanyao>();
 	}
 	if (hunlaotou) {
-		res.fan += 2;
+		res.han += 2;
 		res.yaku.add<Yaku::Hunlaotou>();
 	}
 	res = getScore(par.selfWind, res);
@@ -466,15 +466,15 @@ TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par) {
 		else
 			res.yaku.add<Yaku::Dihu>();
 		if (guoshi > 0)
-			res.fan -= 1;
+			res.han -= 1;
 	}
 	if (guoshi == 1) {
 		res.yaku.add<Yaku::Guoshiwushuang>();
-		res.fan -= 1;
+		res.han -= 1;
 	}
 	else if (guoshi == 2) {
 		res.yaku.add<Yaku::Guoshiwushuangshisanmian>();
-		res.fan -= 2;
+		res.han -= 2;
 	}
 	else { return TryToAgariResult(AgariFaildReason::ShapeWrong); }
 	res.tsumo = (par.type == 0);

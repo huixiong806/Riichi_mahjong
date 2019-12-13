@@ -24,10 +24,10 @@ std::vector<Action> Human::getAllActionsNormal(const GameInfo& info) {
 	std::vector<Action> res;
 	auto temp = getZimoAction(info);
 	if (info.nowTile != Null)
-		res.emplace_back(ActionType::Dapai, info.nowTile);
+		res.emplace_back(ActionType::DiscardTile, info.nowTile);
 	if (info.playerInfo[static_cast<int>(info.selfWind)].riichiJunme == -1)
 		for (auto i : info.handTile)
-			res.emplace_back(ActionType::Dapai, i);
+			res.emplace_back(ActionType::DiscardTile, i);
 	res.insert(res.end(), temp.begin(), temp.end());
 	temp = getLizhiAction(info);
 	res.insert(res.end(), temp.begin(), temp.end());
@@ -37,16 +37,16 @@ std::vector<Action> Human::getAllActionsNormal(const GameInfo& info) {
 void Human::printActions(std::vector<Action> actions) {
 	auto num = 0;
 	for (auto i = 0; i < actions.size(); ++i) {
-		if (actions[i].type == ActionType::Dapai)
+		if (actions[i].type == ActionType::DiscardTile)
 			std::cout << num << " ";
 		else {
-			if (i > 0 && actions[i - 1].type == ActionType::Dapai) { std::cout << "打牌(0摸切)" << std::endl; }
-			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Peng || actions[i].type ==
-				ActionType::Kantsu)
+			if (i > 0 && actions[i - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
+			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Pon || actions[i].type ==
+				ActionType::Kan)
 				std::cout << num << "." << actionName[static_cast<int>(actions[i].type)] << " " << actions[i]
 				                                                                                   .group.getString() <<
 					std::endl;
-			else if (actions[i].type == ActionType::Lizhi) {
+			else if (actions[i].type == ActionType::Riichi) {
 				std::cout << num << ".切" << actions[i].target.getDisplay() << "立直" << std::endl;
 			}
 			else
@@ -54,36 +54,36 @@ void Human::printActions(std::vector<Action> actions) {
 		}
 		num++;
 	}
-	if (actions[actions.size() - 1].type == ActionType::Dapai) { std::cout << "打牌(0摸切)" << std::endl; }
+	if (actions[actions.size() - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
 }
 
 std::vector<Action> Human::getRongAction(const GameInfo& info) {
 	std::vector<Action> res;
-	auto state = 0;
-	if (info.w)state = 1;
-	else if (info.remainTiles == 0)state = 2;
+	BonusYakuState state = BonusYakuState::Normal;
+	if (info.w)BonusYakuState::FirstTurn;
+	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
 	                                                      info.playerInfo[info.selfWind].ippatsu, state, 1, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
-		res.emplace_back(ActionType::Rong);
+		res.emplace_back(ActionType::Ron);
 	return res;
 }
 
 std::vector<Action> Human::getZimoAction(const GameInfo& info) {
 	std::vector<Action> res;
-	auto state = 0;
-	if (info.w)state = 1;
-	else if (info.remainTiles == 0)state = 2;
+	BonusYakuState state = BonusYakuState::Normal;
+	if (info.w)BonusYakuState::FirstTurn;
+	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
 	                                                      info.playerInfo[info.selfWind].ippatsu, state, 0, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
-		res.emplace_back(ActionType::Zimo);
+		res.emplace_back(ActionType::Tsumo);
 	return res;
 }
 
@@ -107,7 +107,7 @@ std::vector<Action> Human::getLizhiAction(const GameInfo& info) {
 		BonusYakuState state = BonusYakuState::Normal;
 		if (info.w)state = BonusYakuState::FirstTurn;
 		else if (info.remainTiles == 0)state = BonusYakuState::LastTurn;
-		if (player.canLizhi(state, target)) { res.insert(Action(ActionType::Lizhi, target)); }
+		if (player.canLizhi(state, target)) { res.insert(Action(ActionType::Riichi, target)); }
 	}
 	std::vector<Action> ret;
 	for (auto& item : res)
@@ -134,7 +134,7 @@ std::vector<Action> Human::getRongGangActions(const GameInfo& info) {
 			candidate.push_back(target);
 	if (candidate.size() < 3)return res;
 	assert(candidate.size() == 3);
-	res.emplace_back(ActionType::Kantsu,
+	res.emplace_back(ActionType::Kan,
 	                 Group::createKantsu(candidate[0], candidate[1], candidate[2], target,
 	                                     (info.nowWind - info.selfWind + 4) % 4));
 	return res;
@@ -151,7 +151,7 @@ std::vector<Action> Human::getPengActions(const GameInfo& info) {
 			candidate.push_back(target);
 	if (candidate.size() < 2)return res;
 	if (candidate.size() == 2) {
-		res.emplace_back(ActionType::Peng,
+		res.emplace_back(ActionType::Pon,
 		                 Group::createKoutsu(candidate[0], candidate[1], target, (info.nowWind - info.selfWind + 4) % 4));
 		return res;
 	}
@@ -160,7 +160,7 @@ std::vector<Action> Human::getPengActions(const GameInfo& info) {
 	temp.emplace(Group::createKoutsu(candidate[0], candidate[1], target, (info.nowWind - info.selfWind + 4) % 4));
 	temp.emplace(Group::createKoutsu(candidate[1], candidate[2], target, (info.nowWind - info.selfWind + 4) % 4));
 	temp.emplace(Group::createKoutsu(candidate[0], candidate[2], target, (info.nowWind - info.selfWind + 4) % 4));
-	for (const auto item : temp) { res.emplace_back(Action(ActionType::Peng, item)); }
+	for (const auto item : temp) { res.emplace_back(Action(ActionType::Pon, item)); }
 	return res;
 }
 
@@ -224,7 +224,7 @@ Action Human::generateAction(const GameInfo& info) {
 			int index;
 			std::cin >> index;
 			if (index <= info.handTile.size()) {
-				res.type = ActionType::Dapai;
+				res.type = ActionType::DiscardTile;
 				res.target = info.handTile[index - 1];
 			}
 		}

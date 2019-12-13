@@ -3,14 +3,14 @@
 
 //三位16进制数，第一位为番数(役满记d,两倍役满记f,食下役按照应有的番数算)，第二位:0=非食下役/食下役的门清版，1=门清限定，2=食下役的非门清版,第三位为编号
 enum class Yaku {
-	Lizhi = 0x110,
-	Yifa = 0x111,
-	Menqianqingzimo = 0x112,
-	Duanyaojiu = 0x100,
-	Yipaizifeng = 0x101,
+	Riichi = 0x110,
+	Ippatsu = 0x111,
+	Menzenchintsumo = 0x112,
+	Tanyao = 0x100,
+	YakuhaiJifuu = 0x101,
 	Yipaichangfeng = 0x102,
-	Yipaibai = 0x103,
-	Yipaifa = 0x104,
+	YakuhaiHaku = 0x103,
+	YakuhaiHatsu = 0x104,
 	Yipaizhong = 0x105,
 	Pinghu = 0x113,
 	Yibeikou = 0x114,
@@ -66,14 +66,14 @@ enum class Yaku {
 
 constexpr unsigned int yakuToIndex(const Yaku yaku) noexcept {
 	switch (yaku) {
-	case Yaku::Lizhi: return 0;
-	case Yaku::Yifa: return 1;
-	case Yaku::Menqianqingzimo: return 2;
-	case Yaku::Duanyaojiu: return 3;
-	case Yaku::Yipaizifeng: return 4;
+	case Yaku::Riichi: return 0;
+	case Yaku::Ippatsu: return 1;
+	case Yaku::Menzenchintsumo: return 2;
+	case Yaku::Tanyao: return 3;
+	case Yaku::YakuhaiJifuu: return 4;
 	case Yaku::Yipaichangfeng: return 5;
-	case Yaku::Yipaibai: return 6;
-	case Yaku::Yipaifa: return 7;
+	case Yaku::YakuhaiHaku: return 6;
+	case Yaku::YakuhaiHatsu: return 7;
 	case Yaku::Yipaizhong: return 8;
 	case Yaku::Pinghu: return 9;
 	case Yaku::Yibeikou: return 10;
@@ -234,8 +234,8 @@ private:
 	}
 
 	static constexpr Yaku reverse_table[] = {
-		Yaku::Lizhi, Yaku::Yifa, Yaku::Menqianqingzimo, Yaku::Duanyaojiu, Yaku::Yipaizifeng,
-		Yaku::Yipaichangfeng, Yaku::Yipaibai, Yaku::Yipaifa, Yaku::Yipaizhong, Yaku::Pinghu,
+		Yaku::Riichi, Yaku::Ippatsu, Yaku::Menzenchintsumo, Yaku::Tanyao, Yaku::YakuhaiJifuu,
+		Yaku::Yipaichangfeng, Yaku::YakuhaiHaku, Yaku::YakuhaiHatsu, Yaku::Yipaizhong, Yaku::Pinghu,
 		Yaku::Yibeikou, Yaku::Qianggang, Yaku::Lingshangkaihua, Yaku::Haidilaoyue, Yaku::Hedilaoyu,
 		Yaku::Lianglizhi, Yaku::Sansetongke, Yaku::Sangangzi, Yaku::Duiduihu, Yaku::Sananke,
 		Yaku::Xiaosanyuan, Yaku::Hunlaotou, Yaku::Qiduizi, Yaku::Hunquandaiyaojiu,
