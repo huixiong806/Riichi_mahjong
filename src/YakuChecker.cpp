@@ -4,10 +4,10 @@ namespace {
 	class S_Init : public YakuChecker {
 	public:
 		S_Init() noexcept {
-			Set<Yaku::Chinitsu>(&YakuChecker::qingyise);
-			Set<Yaku::ChinitsuF>(&YakuChecker::qingyiseF);
-			Set<Yaku::Chuurenpoutou>(&YakuChecker::jiulianbaodeng);
-			Set<Yaku::Chuurenkyuumenmachi>(&YakuChecker::chunzhengjiulianbaodeng);
+			Set<Yaku::Chinitsu>(&YakuChecker::chinitsu);
+			Set<Yaku::ChinitsuF>(&YakuChecker::chinitsuF);
+			Set<Yaku::Chuurenpoutou>(&YakuChecker::chuurenpoutou);
+			Set<Yaku::Chuurenkyuumenmachi>(&YakuChecker::chuurenkyuumenmachi);
 		}
 
 	private:
@@ -34,20 +34,24 @@ YakuChecker::YakuChecker(
 	: menchinCount(i_menqingMianzi.size() - 1), //非副露的面子数
 	  menchin(menchinCount == 4), //是否门清
 	  par(i_par), mentsu(i_menqingMianzi) {}
-
-bool YakuChecker::tenhu() const noexcept { return par.state == 1 && par.type == 0 && par.selfWind == EAST; }
-
-bool YakuChecker::chihu() const noexcept { return par.state == 1 && par.type == 0 && par.selfWind != EAST; }
-
-bool YakuChecker::ziyise() const noexcept {
+//判断天和
+bool YakuChecker::tenhou() const noexcept { return par.state == BonusYakuState::FirstTurn && 
+												   par.type == AgariWays::Tsumo && 
+												   par.selfWind == EAST; }
+//判断地和
+bool YakuChecker::chihou() const noexcept { return par.state == BonusYakuState::FirstTurn && 
+												   par.type == AgariWays::Tsumo &&
+												   par.selfWind != EAST; }
+//判断字一色
+bool YakuChecker::tsuuiisou() const noexcept {
 	for (auto& group : mentsu) {
 		if (group.color != 'z')
 			return false;
 	}
 	return true;
 }
-
-bool YakuChecker::sigangzi() const noexcept {
+//判断四杠子
+bool YakuChecker::suukantsu() const noexcept {
 	auto gangziCount = 0;
 	for (auto& group : mentsu) {
 		if (group.type == GroupType::Kantsu)
@@ -55,52 +59,52 @@ bool YakuChecker::sigangzi() const noexcept {
 	}
 	return gangziCount == 4;
 }
-
-bool YakuChecker::qingyise() const noexcept {
+//判断清一色
+bool YakuChecker::chinitsu() const noexcept {
 	return UnSyncCacheInvoke<Yaku::Chinitsu>(
 		[this]() noexcept {
-			auto qingyise = true;
+			auto chinitsu = true;
 			auto color = '0';
 			for (auto& group : mentsu) {
-				if (group.color == 'z') { qingyise = false; }
+				if (group.color == 'z') { chinitsu = false; }
 				else {
 					if (color == '0')
 						color = group.color;
 					else if (color != group.color)
-						qingyise = false;
+						chinitsu = false;
 				}
 			}
-			return qingyise && menchin;
+			return chinitsu && menchin;
 		});
 }
-
-bool YakuChecker::qingyiseF() const noexcept {
+//判断清一色（副露版）
+bool YakuChecker::chinitsuF() const noexcept {
 	return UnSyncCacheInvoke<Yaku::ChinitsuF>(
 		[this]() noexcept {
-			auto qingyise = true;
+			auto chinitsu = true;
 			auto color = '0';
 			for (auto& group : mentsu) {
-				if (group.color == 'z') { qingyise = false; }
+				if (group.color == 'z') { chinitsu = false; }
 				else {
 					if (color == '0')
 						color = group.color;
 					else if (color != group.color)
-						qingyise = false;
+						chinitsu = false;
 				}
 			}
-			return qingyise && !menchin;
+			return chinitsu && !menchin;
 		});
 }
-
-bool YakuChecker::qinglaotou() const noexcept {
+//判断清老头
+bool YakuChecker::chinroutou() const noexcept {
 	for (auto& group : mentsu) {
-		if (!group.islaotou())
+		if (!group.is19AndNotZ())
 			return false;
 	}
 	return true;
 }
-
-bool YakuChecker::lvyise() const noexcept {
+//判断绿一色
+bool YakuChecker::ryuuiisou() const noexcept {
 	for (auto& group : mentsu) {
 		if (!group.isgreen())
 			return false;
@@ -108,80 +112,81 @@ bool YakuChecker::lvyise() const noexcept {
 	return true;
 }
 
-//小四喜
-bool YakuChecker::xiaosixi() const noexcept {
+//判断小四喜
+bool YakuChecker::shousuushi() const noexcept {
 
-	auto fengCount = 0; //风面子/雀头计数
-	auto fengQuetou = false;
+	auto fuuCount = 0; //风面子/雀头计数
+	auto fuuJyantou = false;
 	for (auto& group : mentsu) {
 		if (group.color == 'z') {
 			if (group.value <= 4) {
-				fengCount++;
+				fuuCount++;
 				if (group.type == GroupType::Toitsu)
-					fengQuetou = true;
+					fuuJyantou = true;
 			}
 		}
 	}
-	return fengCount == 4 && fengQuetou;
+	return fuuCount == 4 && fuuJyantou;
 }
 
 //大四喜
-bool YakuChecker::dasixi() const noexcept {
-	auto fengCount = 0; //风面子/雀头计数
+bool YakuChecker::daisuushi() const noexcept {
+	auto fuuCount = 0; //风面子/雀头计数
 	for (auto& group : mentsu) {
 		if (group.color == 'z') {
 			if (group.value <= 4) {
-				fengCount++;
+				fuuCount++;
 				if (group.type == GroupType::Toitsu)
 					return false;
 			}
 		}
 	}
-	return fengCount == 4;
+	return fuuCount == 4;
 }
 
 //大三元
-bool YakuChecker::dasanyuan() const noexcept {
-	auto sanyuanCount = 0;
+bool YakuChecker::daisangen() const noexcept {
+	auto sangenCount = 0;
 	for (auto& group : mentsu) {
 		if (group.color == 'z') {
 			if (group.value > 4) {
-				sanyuanCount++;
+				sangenCount++;
 				if (group.type == GroupType::Toitsu)
 					return false;
 			}
 		}
 	}
-	return sanyuanCount == 3;
+	return sangenCount == 3;
 }
-
-bool YakuChecker::sianke() const noexcept {
+//判断四暗刻
+bool YakuChecker::suuankou() const noexcept {
 	if (!menchin)return false;
-	auto keziCount = 0;
-	Single quetou;
+	auto koutsuCount = 0;
+	Single jyantou;
 	for (auto& group : mentsu) {
 		if (group.type == GroupType::Koutsu)
-			keziCount++;
+			koutsuCount++;
 		if (group.type == GroupType::Toitsu)
-			quetou = Single(group.value, group.color, false);
+			jyantou = Single(group.value, group.color, false);
 	}
-	return keziCount == 4 && par.type == 0 && !par.target.valueEqual(quetou) && !tenhu();
+	return koutsuCount == 4 && par.type == 0 && !par.target.valueEqual(jyantou) && !tenhou();
 }
-
-bool YakuChecker::siankedanqi() const noexcept {
+//判断四暗刻单骑
+bool YakuChecker::suuankoutanki() const noexcept {
 	if (!menchin)return false;
-	auto keziCount = 0;
-	Single quetou;
+	auto koutsuCount = 0;
+	Single jyantou;
 	for (auto& group : mentsu) {
 		if (group.type == GroupType::Koutsu)
-			keziCount++;
+			koutsuCount++;
 		if (group.type == GroupType::Toitsu)
-			quetou = Single(group.value, group.color, false);
+			jyantou = Single(group.value, group.color, false);
 	}
-	return keziCount == 4 && (par.target.valueEqual(quetou) || tenhu());
+	return koutsuCount == 4 && (par.target.valueEqual(jyantou) || tenhou());
 }
-bool YakuChecker::jiulianbaodengShape()const noexcept{
-	if (!qingyise())return false;
+//判断是否为九莲宝灯的牌型
+bool YakuChecker::chuurenpoutouShape()const noexcept{
+	if (!chinitsu())return false;
 	int ct[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	for (auto& item : par.handTile)
 		ct[item.value()]++;
@@ -200,8 +205,9 @@ bool YakuChecker::jiulianbaodengShape()const noexcept{
 	}
 	return true;
 }
-bool YakuChecker::chunzhengjiulianbaodengShape()const noexcept {
-	if (!qingyise())return false;
+//判断是否为纯九莲的牌型
+bool YakuChecker::chuurenkyuumenmachiShape()const noexcept {
+	if (!chinitsu())return false;
 	int ct[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 	for (auto& item : par.handTile)
 		ct[item.value()]++;
@@ -211,101 +217,104 @@ bool YakuChecker::chunzhengjiulianbaodengShape()const noexcept {
 	}
 	return true;
 }
-bool YakuChecker::jiulianbaodeng() const noexcept {
+//判断九莲宝灯
+bool YakuChecker::chuurenpoutou() const noexcept {
 	return UnSyncCacheInvoke<Yaku::Chuurenpoutou>(
 		[this]() noexcept {
-			if (tenhu()|| chunzhengjiulianbaodengShape()) return false;
-			return jiulianbaodengShape();
+			if (tenhou()|| chuurenkyuumenmachiShape()) return false;
+			return chuurenpoutouShape();
 		});
 }
-
-bool YakuChecker::chunzhengjiulianbaodeng() const noexcept {
+//判断纯九莲
+bool YakuChecker::chuurenkyuumenmachi() const noexcept {
 	return UnSyncCacheInvoke<Yaku::Chuurenkyuumenmachi>(
 		[this]() noexcept {
-			return chunzhengjiulianbaodengShape() || (jiulianbaodengShape() && tenhu());
+			return chuurenkyuumenmachiShape() || (chuurenpoutouShape() && tenhou());
 		});
 }
-bool YakuChecker::hunyise() const noexcept{
+//判断混一色
+bool YakuChecker::honitsu() const noexcept{
 	auto color = '0';
-	bool hunyise = true;
+	bool honitsu = true;
 	//副露牌
 	for (auto& group : mentsu) {
 		if (group.color != 'z') {
 			if (color == '0')
 				color = group.color;
-			else if (color != group.color) { hunyise = false; }
+			else if (color != group.color) { honitsu = false; }
 		}
 	}
-	if (qingyise())hunyise = false;
-	return hunyise && menchin;
+	if (chinitsu())honitsu = false;
+	return honitsu && menchin;
 }
-bool YakuChecker::hunyiseF() const noexcept {
+//判断混一色(副露版)
+bool YakuChecker::honitsuF() const noexcept {
 	auto color = '0';
-	bool hunyiseF = true;
+	bool honitsuF = true;
 	//副露牌
 	for (auto& group : mentsu) {
 		if (group.color != 'z') {
 			if (color == '0')
 				color = group.color;
-			else if (color != group.color) { hunyiseF = false; }
+			else if (color != group.color) { honitsuF = false; }
 		}
 	}
-	if (qingyiseF())hunyiseF = false;
-	return hunyiseF && !menchin;
+	if (chinitsuF())honitsuF = false;
+	return honitsuF && !menchin;
 }
 //平和和符数计算
 std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 	auto meetTheCounditions = false;
 	auto fu = 20;
-	auto pinghu = true;
+	auto pinhu = true;
 	//首先判断雀头是否为役牌
 	if (mentsu[0].color == 'z') {
 		if (mentsu[0].value >= 5) {
-			pinghu = false;
+			pinhu = false;
 			fu += 2;
 		}
 		if (mentsu[0].value == par.prevailingWind + 1) {
 			fu += 2;
-			pinghu = false;
+			pinhu = false;
 		}
 		if (mentsu[0].value == par.selfWind + 1) {
 			fu += 2;
-			pinghu = false;
+			pinhu = false;
 		}
 	}
 	//判断是否有刻子
 	for (auto i = 1; i <= 4; ++i) {
 		if (mentsu[i].type != GroupType::Shuntsu) {
-			pinghu = false;
+			pinhu = false;
 			if (mentsu[i].type == GroupType::Koutsu)
-				fu += 2 * (mentsu[i].isyaojiu() ? 2 : 1) * (i <= menchinCount ? 2 : 1);
+				fu += 2 * (mentsu[i].is19Z() ? 2 : 1) * (i <= menchinCount ? 2 : 1);
 			if (mentsu[i].type == GroupType::Kantsu)
-				fu += 8 * (mentsu[i].isyaojiu() ? 2 : 1) * (i <= menchinCount ? 2 : 1);
+				fu += 8 * (mentsu[i].is19Z() ? 2 : 1) * (i <= menchinCount ? 2 : 1);
 		}
 	}
 	//和牌方式是否为两面
-	auto liangmianOnly = true; //是否只能被看成两面
-	auto liangmian = false; //是否可以被看成两面
+	auto ryanmenOnly = true; //是否只能被看成两面
+	auto ryanmen = false; //是否可以被看成两面
 	for (auto i = 1; i <= menchinCount; ++i) {
 		if (mentsu[i].type == GroupType::Shuntsu) {
 			if (par.target.valueEqual(Single(mentsu[i].value, mentsu[i].color, false)))
-				liangmian = true;
+				ryanmen = true;
 			if (par.target.valueEqual(Single(mentsu[i].value + 2, mentsu[i].color, false)))
-				liangmian = true;
+				ryanmen = true;
 		}
 		if (mentsu[i].type == GroupType::Toitsu) {
 			if (par.target.valueEqual(Single(mentsu[i].value, mentsu[i].color, false)))
-				liangmianOnly = false;
+				ryanmenOnly = false;
 		}
 		if (mentsu[i].type == GroupType::Koutsu || mentsu[i].type == GroupType::Kantsu) {
 			if (par.target.valueEqual(Single(mentsu[i].value, mentsu[i].color, false)))
-				liangmianOnly = false;
+				ryanmenOnly = false;
 		}
 	}
-	if (liangmian == false)
-		pinghu = false;
+	if (ryanmen == false)
+		pinhu = false;
 	//为平和型
-	if (pinghu) {
+	if (pinhu) {
 		//门清，附加平和一役
 		if (menchin) {
 			if (par.type == 1)fu += 10;
@@ -316,7 +325,7 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 			fu = 30;
 	}
 	else {
-		if (liangmianOnly == false)
+		if (ryanmenOnly == false)
 			fu += 2;
 		//门清荣和+10符,自摸+2符
 		if (menchin) {
@@ -339,34 +348,34 @@ TryToAgariResult YakuChecker::getResult() {
 	result.tsumo = par.type == 0;
 	//役满型 
 	//天地和
-	if (tenhu())
+	if (tenhou())
 		addYaku<Yaku::Tenhou>(result);
-	if (chihu())
+	if (chihou())
 		addYaku<Yaku::Chihou>(result);
 	//字一色、四杠子
-	if (ziyise())
+	if (tsuuiisou())
 		addYaku<Yaku::Tsuuiisou>(result);
-	if (sigangzi())
+	if (suukantsu())
 		addYaku<Yaku::Suukantsu>(result);
 	//清老头，绿一色，小四喜，大四喜，大三元
-	if (qinglaotou())
+	if (chinroutou())
 		addYaku<Yaku::Chinroutou>(result);
-	if (lvyise())
+	if (ryuuiisou())
 		addYaku<Yaku::Ryuuiisou>(result);
-	if (xiaosixi())
+	if (shousuushi())
 		addYaku<Yaku::Shousuushi>(result);
-	if (dasixi())
+	if (daisuushi())
 		addYaku<Yaku::Daisuushi>(result);
-	if (dasanyuan())
+	if (daisangen())
 		addYaku<Yaku::Daisangen>(result);
-	if (sianke())
+	if (suuankou())
 		addYaku<Yaku::Suuankou>(result);
-	if (siankedanqi())
+	if (suuankoutanki())
 		addYaku<Yaku::Suuankoutanki>(result);
 	//九莲宝灯，纯正九莲宝灯
-	if (jiulianbaodeng())
+	if (chuurenpoutou())
 		addYaku<Yaku::Chuurenpoutou>(result);
-	if (chunzhengjiulianbaodeng())
+	if (chuurenkyuumenmachi())
 		addYaku<Yaku::Chuurenkyuumenmachi>(result);
 	//满足役满型
 	if (result.han < 0) { return AgariResult(Algorithms::getScore(par.selfWind, result)); }
@@ -385,50 +394,50 @@ TryToAgariResult YakuChecker::getResult() {
 		if (item.isAkadora())
 			result.akadora++;
 	//平和
-	auto pinghuResult = pinghuAndFuCount();
-	if (pinghuResult.first){
+	auto pinhuResult = pinghuAndFuCount();
+	if (pinhuResult.first){
 		addYaku<Yaku::Pinhu>(result);
 	}
-	result.fu = pinghuResult.second;
-	if (qingyise())
+	result.fu = pinhuResult.second;
+	if (chinitsu())
 		addYaku<Yaku::Chinitsu>(result);
-	else if (qingyiseF())
+	else if (chinitsuF())
 		addYaku<Yaku::ChinitsuF>(result);
-	else if (hunyise())
+	else if (honitsu())
 		addYaku<Yaku::Honitsu>(result);
-	else if (hunyiseF())
+	else if (honitsuF())
 		addYaku<Yaku::HonitsuF>(result);
 	//清一色，混一色，断幺九，混老头，纯全带幺九，混全带幺九的判断
-	auto duanyao = true, hunlaotou = true, chunquan = true, hunquan = true;
+	auto tanyao = true, honroutou = true, junchan = true, honchan = true;
 	auto color = '0';
 	//枚举面子
 	for (auto& group : mentsu) {
-		if (!group.isyaojiu()) {
-			hunquan = false;
-			chunquan = false;
+		if (!group.is19Z()) {
+			honchan = false;
+			junchan = false;
 		}
-		else { chunquan = false; }
+		else { junchan = false; }
 		if (group.type == GroupType::Shuntsu) {
-			hunlaotou = false;
+			honroutou = false;
 			if (group.value == 7 || group.value == 1)
-				duanyao = false;
+				tanyao = false;
 		}
 		else //刻子、杠子或者雀头
 		{
-			if (group.isyaojiu())
-				duanyao = false;
-			else hunlaotou = false;
+			if (group.is19Z())
+				tanyao = false;
+			else honroutou = false;
 		}
 	}
-	if (duanyao) {
+	if (tanyao) {
 		result.han += 1;
 		result.yaku.add<Yaku::Tanyao>();
 	}
-	if (hunlaotou) {
+	if (honroutou) {
 		result.han += 2;
 		result.yaku.add<Yaku::Honroutou>();
 	}
-	if (chunquan) {
+	if (junchan) {
 		if (menchin) {
 			result.han += 3;
 			result.yaku.add<Yaku::Junchantaiyaochuu>();
@@ -438,7 +447,7 @@ TryToAgariResult YakuChecker::getResult() {
 			result.yaku.add<Yaku::JunchantaiyaochuuF>();
 		}
 	}
-	else if (hunquan) {
+	else if (honchan) {
 		if (menchin) {
 			result.han += 2;
 			result.yaku.add<Yaku::Honchantaiyaochuu>();
@@ -489,20 +498,20 @@ TryToAgariResult YakuChecker::getResult() {
 		}
 	}
 	//检查抢杠
-	if (par.type == 2) {
+	if (par.type == AgariWays::Chankan) {
 		result.han += 1;
 		result.yaku.add<Yaku::Chankan>();
 	}
 	//检查门清自摸
-	if (par.type == 0 && menchinCount == 4) {
+	if (par.type == AgariWays::Tsumo && menchinCount == 4) {
 		result.han += 1;
 		result.yaku.add<Yaku::Menzenchintsumo>();
 	}
 	//检查河底/海底
-	if (par.state == 2) {
-		if (par.type == 0)
+	if (par.state == BonusYakuState::LastTurn) {
+		if (par.type == AgariWays::Tsumo)
 			result.yaku.add<Yaku::Haiteiraoyue>();
-		else if (par.type == 1)result.yaku.add<Yaku::Houteiraoyui>();
+		else result.yaku.add<Yaku::Houteiraoyui>();
 	}
 	//std::cout << "*" << std::endl;
 	if (result.han == 0) { return TryToAgariResult(AgariFaildReason::NoYaku); }

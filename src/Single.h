@@ -49,7 +49,7 @@ public:
 			* 1000 + rhs.mValue * 10 + static_cast<int>(rhs.mAkadora);
 	}
 
-	[[nodiscard]] constexpr bool isyaojiu() const noexcept {
+	[[nodiscard]] constexpr bool is19Z() const noexcept {
 		if (mColor == 'z')return true;
 		if (mValue == 1 || mValue == 9)return true;
 		return false;

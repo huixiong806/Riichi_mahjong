@@ -393,19 +393,19 @@ TryToAgariResult Algorithms::chiitoi(const AgariParameters& par) {
 		else if (par.type == 1)res.yaku.add<Yaku::Houteiraoyui>();
 	}
 	//检查清一色，混一色，断幺九，混老头
-	auto qingyise = true, hunyise = true, duanyao = true, hunlaotou = true;
+	auto chinitsu = true, honitsu = true, duanyao = true, hunlaotou = true;
 	auto color = '0';
 	for (auto& item : myHandTile) {
 		if (item.color() == 'z') {
 			duanyao = false;
-			qingyise = false;
+			chinitsu = false;
 		}
 		else {
 			if (color == '0')
 				color = item.color();
 			else if (color != item.color()) {
-				qingyise = false;
-				hunyise = false;
+				chinitsu = false;
+				honitsu = false;
 			}
 		}
 		if (item.value() == 1 || item.value() == 9)
@@ -413,11 +413,11 @@ TryToAgariResult Algorithms::chiitoi(const AgariParameters& par) {
 		if (item.value() != 1 && item.value() != 9)
 			hunlaotou = false;
 	}
-	if (qingyise) {
+	if (chinitsu) {
 		res.han += 6;
 		res.yaku.add<Yaku::Chinitsu>();
 	}
-	else if (hunyise) {
+	else if (honitsu) {
 		res.han += 3;
 		res.yaku.add<Yaku::Honitsu>();
 	}

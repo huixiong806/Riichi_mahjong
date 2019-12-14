@@ -38,15 +38,15 @@ public:
 	}
 
 	//是否为老头牌组(非字牌19)
-	[[nodiscard]] bool islaotou()const {
+	[[nodiscard]] bool is19AndNotZ()const {
 		if (type == GroupType::Shuntsu)return false;
-		if (color == 'z')return true;
+		if (color == 'z')return false;
 		if (value == 1 || value == 9)return true;
 		return false;
 	}
 
-	//是否为幺九牌组(允许顺子，允许字牌)
-	[[nodiscard]] bool isyaojiu()const {
+	//是否为幺九牌组(允许123/789顺子，允许字牌)
+	[[nodiscard]] bool is19Z()const {
 		if (type == GroupType::Shuntsu) {
 			if (value == 7 || value == 1)return true;
 			return false;

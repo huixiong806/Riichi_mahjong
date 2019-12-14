@@ -48,26 +48,26 @@ private:
 public:
 	YakuChecker(const AgariParameters& i_par, const std::vector<Group>& i_menqingMianzi) noexcept;
 	//役满型
-	[[nodiscard]] bool tenhu() const noexcept;
-	[[nodiscard]] bool chihu() const noexcept;
-	[[nodiscard]] bool ziyise() const noexcept;
-	[[nodiscard]] bool sigangzi() const noexcept;
-	[[nodiscard]] bool xiaosixi() const noexcept;
-	[[nodiscard]] bool dasixi() const noexcept;
-	[[nodiscard]] bool qinglaotou() const noexcept;
-	[[nodiscard]] bool dasanyuan() const noexcept;
-	[[nodiscard]] bool lvyise() const noexcept;
-	[[nodiscard]] bool sianke() const noexcept;
-	[[nodiscard]] bool siankedanqi() const noexcept;
-	[[nodiscard]] bool jiulianbaodengShape() const noexcept;
-	[[nodiscard]] bool chunzhengjiulianbaodengShape() const noexcept;
-	[[nodiscard]] bool jiulianbaodeng() const noexcept;
-	[[nodiscard]] bool chunzhengjiulianbaodeng() const noexcept;
+	[[nodiscard]] bool tenhou() const noexcept;
+	[[nodiscard]] bool chihou() const noexcept;
+	[[nodiscard]] bool tsuuiisou() const noexcept;
+	[[nodiscard]] bool suukantsu() const noexcept;
+	[[nodiscard]] bool shousuushi() const noexcept;
+	[[nodiscard]] bool daisuushi() const noexcept;
+	[[nodiscard]] bool chinroutou() const noexcept;
+	[[nodiscard]] bool daisangen() const noexcept;
+	[[nodiscard]] bool ryuuiisou() const noexcept;
+	[[nodiscard]] bool suuankou() const noexcept;
+	[[nodiscard]] bool suuankoutanki() const noexcept;
+	[[nodiscard]] bool chuurenpoutouShape() const noexcept;
+	[[nodiscard]] bool chuurenkyuumenmachiShape() const noexcept;
+	[[nodiscard]] bool chuurenpoutou() const noexcept;
+	[[nodiscard]] bool chuurenkyuumenmachi() const noexcept;
 	//非役满型
-	[[nodiscard]] bool qingyise() const noexcept;
-	[[nodiscard]] bool qingyiseF() const noexcept;
-	[[nodiscard]] bool hunyise() const noexcept;
-	[[nodiscard]] bool hunyiseF() const noexcept;
+	[[nodiscard]] bool chinitsu() const noexcept;
+	[[nodiscard]] bool chinitsuF() const noexcept;
+	[[nodiscard]] bool honitsu() const noexcept;
+	[[nodiscard]] bool honitsuF() const noexcept;
 	//返回值第一项为是否满足平和，第二项为符数
 	[[nodiscard]] std::pair<bool,int> pinghuAndFuCount() const noexcept;
 	[[nodiscard]] TryToAgariResult getResult();
