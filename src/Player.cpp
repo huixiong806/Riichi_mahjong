@@ -276,7 +276,7 @@ void Player::doRiichi(BonusYakuState state, Single target) {
 		riichiJunme = subround;
 		ippatsu = true;
 		riichi = discardedTile.size() - 1;
-		if (state == 1)
+		if (state == BonusYakuState::FirstTurn)
 			riichiJunme = -2;
 		score -= 1000;
 		return;

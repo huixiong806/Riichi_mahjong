@@ -71,8 +71,6 @@ constexpr unsigned int yakuToIndex(const Yaku yaku) noexcept {
 	case Yaku::YakuhaiJikaze: return 4;
 	case Yaku::YakuhaiBakaze: return 5;
 	case Yaku::YakuhaiSangen: return 6;
-	//case Yaku::YakuhaiHatsu: return 7;
-	//case Yaku::Yipaizhong: return 8;
 	case Yaku::Pinhu: return 7;
 	case Yaku::Iipeikou: return 8;
 	case Yaku::Chankan: return 9;

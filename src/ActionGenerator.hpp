@@ -72,7 +72,7 @@ struct GameInfo {
 	std::vector<Single> handTile; //手牌
 	std::vector<Single> doraIndicator; //宝牌指示牌
 	Single nowTile; //决策者的自摸牌或是可以鸣牌/荣和的对象
-	bool naki{}; //为true表示别人刚打完牌，你可以选择鸣牌、荣和或者跳过
+	GameState gameState{}; //为true表示别人刚打完牌，你可以选择鸣牌、荣和或者跳过
 	bool rinshan{}; //当前自摸牌是否为岭上牌(仅mingpai=false时有效)
 	bool tsumogiri{}; //表示打出去这张牌是否为摸切(仅mingpai=true时有效)
 	int riichibouCount{}; //额外立直棒数量

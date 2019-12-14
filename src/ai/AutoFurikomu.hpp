@@ -13,9 +13,9 @@ public:
 	Action generateAction(const GameInfo& info) override {
 		Action res;
 		res.type = ActionType::Null;
-		if (info.nowWind != info.selfWind && info.naki == false)return res;
-		if (info.nowWind == info.selfWind && info.naki == true)return res;
-		if (info.naki) { res.type = ActionType::Skip; }
+		if (info.nowWind != info.selfWind && info.gameState == GameState::OneAct)return res;
+		if (info.nowWind == info.selfWind && info.gameState == GameState::WaitingForNaki)return res;
+		if (info.gameState== GameState::OneAct) { res.type = ActionType::Skip; }
 		else {
 			res.type = ActionType::DiscardTile;
 			res.target = info.nowTile;

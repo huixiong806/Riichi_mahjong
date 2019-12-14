@@ -194,7 +194,7 @@ void Human::printInfo(const GameInfo& info) {
 
 	std::cout << std::endl;
 	std::cout << "ID| ";
-	const int add = info.naki == false && info.nowTile == Null;
+	const int add = info.gameState == GameState::OneAct && info.nowTile == Null;
 	for (auto j = 0; j < (13+add - info.playerInfo[info.selfWind].groupTile.size() * 3); ++j) {
 		if (j < 9)std::cout << " ";
 		std::cout << j + 1 << " ";
@@ -205,11 +205,11 @@ void Human::printInfo(const GameInfo& info) {
 Action Human::generateAction(const GameInfo& info) {
 	Action res;
 	res.type = ActionType::Null;
-	if (info.nowWind != info.selfWind && info.naki == false)return res;
-	if (info.nowWind == info.selfWind && info.naki == true)return res;
-	if (info.naki == false && info.selfWind == info.nowWind)
+	if (info.nowWind != info.selfWind && info.gameState == GameState::OneAct)return res;
+	if (info.nowWind == info.selfWind && info.gameState == GameState::WaitingForNaki)return res;
+	if (info.gameState == GameState::OneAct && info.selfWind == info.nowWind)
 		printInfo(info);
-	if (info.naki == false) {
+	if (info.gameState == GameState::OneAct) {
 		if (info.nowTile != Null) {
 			std::cout << "摸 " << info.nowTile.getDisplay() << std::endl << std::endl;
 			auto actions = getAllNormalActions(info);

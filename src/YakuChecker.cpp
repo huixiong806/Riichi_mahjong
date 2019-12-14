@@ -169,7 +169,7 @@ bool YakuChecker::suuankou() const noexcept {
 		if (group.type == GroupType::Toitsu)
 			jyantou = Single(group.value, group.color, false);
 	}
-	return koutsuCount == 4 && par.type == 0 && !par.target.valueEqual(jyantou) && !tenhou();
+	return koutsuCount == 4 && par.type == AgariWays::Tsumo && !par.target.valueEqual(jyantou) && !tenhou();
 }
 //判断四暗刻单骑
 bool YakuChecker::suuankoutanki() const noexcept {
@@ -317,7 +317,7 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 	if (pinhu) {
 		//门清，附加平和一役
 		if (menchin) {
-			if (par.type == 1)fu += 10;
+			if (par.type != AgariWays::Tsumo)fu += 10;
 			meetTheCounditions = true;
 			//assert(res.result.fu == 20);
 		}
@@ -329,13 +329,13 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 			fu += 2;
 		//门清荣和+10符,自摸+2符
 		if (menchin) {
-			if (par.type >= 1)
+			if (par.type != AgariWays::Tsumo)
 				fu += 10;
 			else fu += 2;
 		}
 		else //副露自摸+2符
 		{
-			if (par.type == 0)
+			if (par.type == AgariWays::Tsumo)
 				fu += 2;
 		}
 	}
@@ -345,7 +345,7 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 TryToAgariResult YakuChecker::getResult() {
 	auto result = AgariResult();
 	if (mentsu.size() != 5)return TryToAgariResult(AgariFaildReason::ShapeWrong);
-	result.tsumo = par.type == 0;
+	result.tsumo = par.type == AgariWays::Tsumo;
 	//役满型 
 	//天地和
 	if (tenhou())

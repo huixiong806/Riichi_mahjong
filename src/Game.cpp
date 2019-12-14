@@ -22,7 +22,7 @@ void Game::startNewRound() {
 		item = false;
 	//mLastTurn = -1;
 	doraIndicatorCount = 1;
-	gameState = GAME_STATE_NORMAL;
+	gameState = GameState::OneAct;
 	newTurn(east, false);
 }
 void Game::newTurn(int who, bool lingShang) {
@@ -58,9 +58,9 @@ bool Game::endThisTurn()
 	for (int i = 0; i < 4; ++i)
 		if (!isReady[i])
 			return false;
-	if (gameState == GAME_STATE_WAITING_FOR_MINGPAI){
+	if (gameState == GameState::WaitingForNaki){
 		processNari();
-		gameState = GAME_STATE_NORMAL;
+		gameState = GameState::OneAct;
 	}
 	else{
 		Action action = playerAction[turn];
@@ -96,7 +96,7 @@ bool Game::endThisTurn()
 				throw("不具备自摸条件");
 			}
 		}
-		gameState = GAME_STATE_WAITING_FOR_MINGPAI;
+		gameState = GameState::WaitingForNaki;
 	}
 	for (auto i = 0; i < 4; ++i) {
 		isReady[i] = false;
@@ -106,7 +106,7 @@ bool Game::endThisTurn()
 }
 SetActionResult Game::setPlayerAction(int playerID, Action action) {
 	SetActionResult setActionResult = { true ,ErrorType::None };
-	if (gameState == GAME_STATE_WAITING_FOR_MINGPAI) {
+	if (gameState == GameState::WaitingForNaki) {
 		Single target = *player[turn].discardedTile.rbegin();
 		if (playerID == turn) {
 			isReady[playerID] = true;
@@ -499,7 +499,7 @@ GameInfo Game::getGameInfo(int index)const {
 	res.doraIndicator = mountain.getDoraIndicators(doraIndicatorCount);
 	res.prevailingWind = prevailingWind; //场风
 	res.selfWind = player[index].selfWind; //门风
-	if (gameState == GAME_STATE_WAITING_FOR_MINGPAI) {
+	if (gameState == GameState::WaitingForNaki) {
 		res.nowWind = player[turn].selfWind;
 		res.nowTile = *player[turn].discardedTile.rbegin();
 	}
@@ -513,7 +513,7 @@ GameInfo Game::getGameInfo(int index)const {
 	res.remainTiles = mountain.remainCount();
 	res.riichibouCount = riichibouValue; //额外立直棒数量
 	res.honba = honba; //本场
-	res.naki = gameState;
+	res.gameState = gameState;
 	res.round = round;
 	res.w = w;
 	return res;

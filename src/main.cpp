@@ -50,7 +50,7 @@ void test() {
 	res.prevailingWind = EAST; //场风
 	res.selfWind = EAST; //门风
 	res.nowWind = EAST;
-	res.naki = false;
+	res.gameState = GameState::OneAct;
 	res.w = false;
 	human->generateAction(res);
 	Player p;

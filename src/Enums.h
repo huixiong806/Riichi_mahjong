@@ -1,10 +1,16 @@
 #pragma once
-enum BonusYakuState {
+enum WindType {
+	EAST,
+	SOUTH,
+	WEST,
+	NORTH
+};
+enum class BonusYakuState {
 	Normal,//普通
 	FirstTurn,//天地和、W立
 	LastTurn,//河底、海底
 };
-enum AgariWays {
+enum class AgariWays {
 	Tsumo,
 	Ron,
 	Chankan,
@@ -34,10 +40,10 @@ enum class ErrorType {
 	CannotChooseNull,//不准给空指令
 };
 
-enum GameState :bool
+enum class GameState :bool
 {
-	GAME_STATE_NORMAL,
-	GAME_STATE_WAITING_FOR_MINGPAI
+	OneAct,
+	WaitingForNaki
 };
 
 enum class AgariFaildReason {

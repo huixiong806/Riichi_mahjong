@@ -1,11 +1,5 @@
 #pragma once
-enum WindType {
-	EAST,
-	SOUTH,
-	WEST,
-	NORTH
-};
-
+#include"Enums.h"
 struct Rule {
 	int doraCount = 3; //宝牌数量
 	int Hanshibari = 1; //番缚

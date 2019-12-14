@@ -141,11 +141,11 @@ std::vector<Single> Tester::getShowedTiles(const GameInfo& info)
 Action Tester::generateAction(const GameInfo& info) {
 	Action res;
 	res.type = ActionType::Null;
-	if (info.nowWind != info.selfWind && info.naki == false)return res;
-	if (info.nowWind == info.selfWind && info.naki == true)return res;
+	if (info.nowWind != info.selfWind && info.gameState == GameState::OneAct)return res;
+	if (info.nowWind == info.selfWind && info.gameState == GameState::WaitingForNaki)return res;
 	//if (info.mingpai == false && info.selfWind == info.nowWind)
 	//	printInfo(info);
-	if (info.naki == false) {
+	if (info.gameState == GameState::OneAct) {
 		if (info.nowTile != Null) {
 			auto actions = getAllNormalActions(info);
 			bool riichi = false;
