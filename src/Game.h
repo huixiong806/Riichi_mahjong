@@ -1,7 +1,7 @@
 #pragma once
 #include"Mountain.h"
 #include"Player.h"
-#include"ActionGenerator.hpp"
+#include"Enums.h"
 #include<vector>
 
 //返回一局的结果
@@ -15,11 +15,7 @@ struct SetActionResult {
 	bool success;
 	ErrorType type;
 };
-enum GameState:bool
-{
-	GAME_STATE_NORMAL,
-	GAME_STATE_WAITING_FOR_MINGPAI
-};
+
 class Game {
 private:
 	//int mIndex;//表示本局的编号

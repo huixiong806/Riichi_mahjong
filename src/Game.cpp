@@ -8,7 +8,7 @@ void Game::startNewRound() {
 	mountain.reset(rule); //牌山重置
 	for (auto i = east, j = 0; j < 4; i = (i + 1) % 4, j++) {
 		player[i].groupTile.clear();
-		player[i].discardTile.clear();
+		player[i].discardedTile.clear();
 		//mPlayer[i].score = mRule.startPoint;
 		player[i].handTile = mountain.hand[j];
 		std::sort(player[i].handTile.begin(), player[i].handTile.end());
@@ -65,7 +65,7 @@ bool Game::endThisTurn()
 	else{
 		Action action = playerAction[turn];
 		if (action.type == ActionType::Riichi) {
-			player[turn].doLizhi(static_cast<BonusYakuState>(w), action.target);
+			player[turn].doRiichi(static_cast<BonusYakuState>(w), action.target);
 			riichibouValue += 1000;
 			if (player[turn].rinshan == true) {
 				doraIndicatorCount++;
@@ -74,7 +74,7 @@ bool Game::endThisTurn()
 			}
 		}
 		else if (action.type == ActionType::DiscardTile){
-			player[turn].dapai(action.target);
+			player[turn].discardTile(action.target);
 			player[turn].ippatsu = false;
 			if (player[turn].rinshan == true) {
 				doraIndicatorCount++;
@@ -107,7 +107,7 @@ bool Game::endThisTurn()
 SetActionResult Game::setPlayerAction(int playerID, Action action) {
 	SetActionResult setActionResult = { true ,ErrorType::None };
 	if (gameState == GAME_STATE_WAITING_FOR_MINGPAI) {
-		Single target = *player[turn].discardTile.rbegin();
+		Single target = *player[turn].discardedTile.rbegin();
 		if (playerID == turn) {
 			isReady[playerID] = true;
 			playerAction[playerID] = Action();
@@ -126,7 +126,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				std::vector<Single> allDora = mountain.getDoras(doraIndicatorCount);
 				std::vector<Single> allUra = mountain.getUras(doraIndicatorCount);
 				TryToAgariResult result;
-				if (!player[playerID].canRong(target, prevailingWind, 1, 
+				if (!player[playerID].canRon(target, prevailingWind, AgariWays::Ron,
 											  static_cast<BonusYakuState>(w), allDora, allUra)) {
 					setActionResult.success = false;
 					setActionResult.type = ErrorType::ActionRejected;
@@ -136,8 +136,8 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				playerAction[playerID] = action;
 				break;
 			}
-			case ActionType::Chi:
-				if (!player[playerID].canChi(target, action.group,
+			case ActionType::Chii:
+				if (!player[playerID].canChii(target, action.group,
 				                          (static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4)) {
 					setActionResult.success = false;
 					setActionResult.type = ErrorType::ActionRejected;
@@ -153,7 +153,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				playerAction[playerID] = action;
 				break;
 			case ActionType::Pon:
-				if (!player[playerID].canPeng(target, action.group,
+				if (!player[playerID].canPon(target, action.group,
 				                           (static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4)
 				) {
 					//std::cout<<"*********"<< std::endl;
@@ -171,7 +171,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				playerAction[playerID] = action;
 				break;
 			case ActionType::Kan:
-				if (!player[playerID].canGang(target, action.group,
+				if (!player[playerID].canMinKan(target, action.group,
 				                           (static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4)
 				) {
 					setActionResult.success = false;
@@ -208,7 +208,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 		}
 		switch (action.type) {
 		case ActionType::DiscardTile:
-			if (!player[playerID].canDapai(action.target)){
+			if (!player[playerID].canDiscardTile(action.target)){
 				setActionResult.success = false;
 				setActionResult.type = ErrorType::ActionRejected;
 				return setActionResult;
@@ -217,7 +217,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 			break;
 		case ActionType::Riichi: {
 			if (mountain.remainCount() < 4 ||
-				!player[playerID].canLizhi(static_cast<BonusYakuState>(w),action.target)){
+				!player[playerID].canRiichi(static_cast<BonusYakuState>(w),action.target)){
 				setActionResult.success = false;
 				setActionResult.type = ErrorType::CantRiichi;
 				return setActionResult;
@@ -314,11 +314,11 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 		}
 		if (prevailingWind == rule.gameType && round == 4) {
 			//庄家没和牌或者和牌后是1位,游戏结束
-			auto zhuangjiaHupai = false;
+			auto oyaAgari = false;
 			for (auto& item : res)
 				if (player[item.agariID].selfWind == EAST)
-					zhuangjiaHupai = true;
-			if (!zhuangjiaHupai || (zhuangjiaHupai && top == east))
+					oyaAgari = true;
+			if (!oyaAgari || (oyaAgari && top == east))
 				gameIsOver = true;
 			//但如果top的点数不足就要继续
 			if (player[top].score < rule.endPoint)
@@ -342,13 +342,13 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 	}
 	result.renchan = player[east].tenpai();
 	auto bonus = 0, deBonus = 0;
-	auto tingpaiCount = 0;
+	auto tenpaiCount = 0;
 	for (auto i = 0; i < 4; ++i)
 		if (player[i].tenpai())
-			tingpaiCount++;
-	if (tingpaiCount == 1)bonus = 3000, deBonus = -1000;
-	else if (tingpaiCount == 2)bonus = 1500, deBonus = -1500;
-	else if (tingpaiCount == 3)bonus = 1000, deBonus = -3000;
+			tenpaiCount++;
+	if (tenpaiCount == 1)bonus = 3000, deBonus = -1000;
+	else if (tenpaiCount == 2)bonus = 1500, deBonus = -1500;
+	else if (tenpaiCount == 3)bonus = 1000, deBonus = -3000;
 	for (auto i = 0; i < 4; ++i) {
 		if (player[i].tenpai())player[i].score += bonus;
 		else player[i].score += deBonus;
@@ -356,8 +356,8 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 	//游戏结束判断
 	if (prevailingWind == rule.gameType && round == 4) {
 		//庄家没听牌或者收罚符后是1位,游戏结束
-		const auto zhuangjiaTingpai = result.renchan;
-		if (!zhuangjiaTingpai || (zhuangjiaTingpai && top == east))
+		const auto oyaTenpai = result.renchan;
+		if (!oyaTenpai || (oyaTenpai && top == east))
 			gameIsOver = true;
 		//但如果top的点数不足就要继续
 		if (player[top].score < rule.endPoint)
@@ -395,7 +395,7 @@ void Game::processNari() {
 				allDora.push_back(mountain.getDora(i));
 				allUra.push_back(mountain.getUra(i));
 			}
-			auto tmp = player[i].rong(*player[turn].discardTile.rbegin(), prevailingWind, 1,
+			auto tmp = player[i].ron(*player[turn].discardedTile.rbegin(), prevailingWind, AgariWays::Ron,
 									  static_cast<BonusYakuState>(w), allDora, allUra);
 			tmp.agariID = i;
 			tmp.furikomiID = turn;
@@ -411,16 +411,16 @@ void Game::processNari() {
 	//杠和碰
 	for (auto i = 0; i < 4; ++i) {
 		if (playerAction[i].type == ActionType::Kan) {
-			player[i].ronggang(playerAction[i].group);
-			player[turn].discardTile.pop_back();
+			player[i].minkan(playerAction[i].group);
+			player[turn].discardedTile.pop_back();
 
 			resetBounusYaku();
 			newTurn(i, true);
 			return;
 		}
 		if (playerAction[i].type == ActionType::Pon) {
-			player[i].peng(playerAction[i].group);
-			player[turn].discardTile.pop_back();
+			player[i].pon(playerAction[i].group);
+			player[turn].discardedTile.pop_back();
 			resetBounusYaku();
 			newTurnAfterNari(i);
 			return;
@@ -428,9 +428,9 @@ void Game::processNari() {
 	}
 	//吃
 	for (auto i = (turn + 1) % 4, j = 0; j < 3; ++j, i = (i + 1) % 4) {
-		if (playerAction[i].type == ActionType::Chi) {
-			player[i].chi(playerAction[i].group);
-			player[turn].discardTile.pop_back();
+		if (playerAction[i].type == ActionType::Chii) {
+			player[i].chii(playerAction[i].group);
+			player[turn].discardedTile.pop_back();
 			resetBounusYaku();
 			newTurnAfterNari(i);
 			return;
@@ -483,7 +483,7 @@ GameInfo Game::getGameInfo(int index)const {
 	//每个玩家的牌河，是否立直，以及副露牌组
 	for (auto i = 0, j = east; i <= 3; ++i, j = (j + 1) % 4) {
 		PlayerInfo info;
-		info.discardTile = player[j].discardTile;
+		info.discardTile = player[j].discardedTile;
 		info.groupTile = player[j].groupTile;
 		info.riichi = player[j].riichi;
 		info.riichiJunme = player[j].riichiJunme;
@@ -501,7 +501,7 @@ GameInfo Game::getGameInfo(int index)const {
 	res.selfWind = player[index].selfWind; //门风
 	if (gameState == GAME_STATE_WAITING_FOR_MINGPAI) {
 		res.nowWind = player[turn].selfWind;
-		res.nowTile = *player[turn].discardTile.rbegin();
+		res.nowTile = *player[turn].discardedTile.rbegin();
 	}
 	else {
 		res.nowWind = player[turn].selfWind;
@@ -511,9 +511,9 @@ GameInfo Game::getGameInfo(int index)const {
 			res.nowTile = Null;
 	}
 	res.remainTiles = mountain.remainCount();
-	res.lizhibangCount = riichibouValue; //额外立直棒数量
+	res.riichibouCount = riichibouValue; //额外立直棒数量
 	res.honba = honba; //本场
-	res.mingpai = gameState;
+	res.naki = gameState;
 	res.round = round;
 	res.w = w;
 	return res;

@@ -15,7 +15,7 @@ private:
 	std::vector<bool> disabledHandTile; //禁打手牌
 	std::vector<Group> groupTile; //副露牌组
 	Single nowTile; //自摸牌
-	std::vector<Single> discardTile; //牌河
+	std::vector<Single> discardedTile; //牌河
 	bool rinshan{}; //玩家当前的自摸牌是岭上牌
 	bool tsumogiri = false; //表示牌河里最后一张牌是否为摸切
 	int riichi = -1; //立直宣言牌是牌河中的第几张，-1为未立直
@@ -45,48 +45,41 @@ public:
 	}
 
 	//relativePosition 0,1,2,3分别表示下对上自
-	bool canChi(Single target, Group result, int relativePosition)const { return false; }
+	bool canChii(Single target, Group result, int relativePosition)const { return false; }
 
-	bool canPeng(Single target, Group result, int relativePosition)const;
+	bool canPon(Single target, Group result, int relativePosition)const;
 
-	//仅限荣杠
-	bool canGang(Single target, Group result, int relativePosition)const;
+	//仅限大明杠
+	bool canMinKan(Single target, Group result, int relativePosition)const;
 
-	void peng(Group result);
+	void pon(Group result);
 
-	void ronggang(Group result);
+	void minkan(Group result);
 
-	void chi(Group result) { }
+	void chii(Group result) { }
 
-	bool canDapai(Single target)const;
-	//返回false时不应变动私有变量
-	void dapai(Single target);
+	bool canDiscardTile(Single target)const;
 
-	//返回false时不应变动私有变量
-	/*
-	state
-	正常=0
-	天地和,w立=1
-	河底/海底=2
-	*/
+	void discardTile(Single target);
+
 	TryToAgariResult tsumo(WindType prevailingWind, BonusYakuState state, const std::vector<Single>& dora,
 	                      const std::vector<Single>& ura) {
-		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, 0, nowTile,
+		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, AgariWays::Tsumo, nowTile,
 		                                         handTile, groupTile, dora, ura));
 	}
 	bool canTsumo(WindType prevailingWind, BonusYakuState state, const std::vector<Single>& dora,
 		const std::vector<Single>& ura)const {
-		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, 0, nowTile,
+		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, AgariWays::Tsumo, nowTile,
 			handTile, groupTile, dora, ura)).success;
 	}
 
-	AgariResult rong(Single target, WindType prevailingWind, int type, BonusYakuState state, const std::vector<Single>& dora,
+	AgariResult ron(Single target, WindType prevailingWind, AgariWays type, BonusYakuState state, const std::vector<Single>& dora,
 	                 const std::vector<Single>& ura) {
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, type, target,
 		                                         handTile, groupTile, dora, ura)).result;
 	}
 
-	bool canRong(Single target, WindType prevailingWind, int type, BonusYakuState state, const std::vector<Single>& dora,
+	bool canRon(Single target, WindType prevailingWind, AgariWays type, BonusYakuState state, const std::vector<Single>& dora,
 	             const std::vector<Single>& ura)const {
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, type, target,
 		                                         handTile, groupTile, dora, ura)).success;
@@ -97,8 +90,8 @@ public:
 	天地和,w立=1
 	河底/海底=2
 	*/
-	bool canLizhi(BonusYakuState state, Single target)const;
-	void doLizhi(BonusYakuState state, Single target);
+	bool canRiichi(BonusYakuState state, Single target)const;
+	void doRiichi(BonusYakuState state, Single target);
 	//返回false时不应变动私有变量
 	bool ryuukyoku()const { return false; }
 	bool tenpai()const { return !Algorithms::tenpai(handTile).empty(); }

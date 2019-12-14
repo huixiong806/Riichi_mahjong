@@ -3,36 +3,9 @@
 #include "Single.h"
 #include "Group.h"
 #include "Rules.h"
+#include "Enums.h"
 #include <vector>
-enum BonusYakuState {
-	Normal,//普通
-	FirstTurn,//天地和、W立
-	LastTurn,//河底、海底
-};
 
-enum class ActionType {
-	Null,//空指令
-	Skip,
-	DiscardTile,//正常打牌
-	Chi,
-	Pon,
-	Kan,//杠
-	Ron,
-	Riichi,
-	Tsumo,
-	Ryuukyoku,
-	Peinuki,
-};
-
-enum class ErrorType {
-	None,//成功了，没有error
-	NotYourTurn,
-	AlreadyActed,
-	ActionRejected,
-	TileNotExist,//打牌时不存在要打的东西
-	CantRiichi,//不能立直
-	CannotChooseNull,//不准给空指令
-};
 
 struct Action {
 	ActionType type;
@@ -99,10 +72,10 @@ struct GameInfo {
 	std::vector<Single> handTile; //手牌
 	std::vector<Single> doraIndicator; //宝牌指示牌
 	Single nowTile; //决策者的自摸牌或是可以鸣牌/荣和的对象
-	bool mingpai{}; //为true表示别人刚打完牌，你可以选择鸣牌、荣和或者跳过
+	bool naki{}; //为true表示别人刚打完牌，你可以选择鸣牌、荣和或者跳过
 	bool rinshan{}; //当前自摸牌是否为岭上牌(仅mingpai=false时有效)
 	bool tsumogiri{}; //表示打出去这张牌是否为摸切(仅mingpai=true时有效)
-	int lizhibangCount{}; //额外立直棒数量
+	int riichibouCount{}; //额外立直棒数量
 	int honba{}; //本场数
 	int subround{}; //巡数
 	int remainTiles{}; //剩余牌数

@@ -7,61 +7,59 @@ enum class Yaku {
 	Ippatsu = 0x111,
 	Menzenchintsumo = 0x112,
 	Tanyao = 0x100,
-	YakuhaiJifuu = 0x101,
-	Yipaichangfeng = 0x102,
-	YakuhaiHaku = 0x103,
-	YakuhaiHatsu = 0x104,
-	Yipaizhong = 0x105,
-	Pinghu = 0x113,
-	Yibeikou = 0x114,
-	Qianggang = 0x106,
-	Lingshangkaihua = 0x107,
-	Haidilaoyue = 0x108,
-	Hedilaoyu = 0x109,
+	YakuhaiJikaze = 0x101,
+	YakuhaiBakaze = 0x102,
+	YakuhaiSangen = 0x103,
+	Pinhu = 0x113,
+	Iipeikou = 0x114,
+	Chankan = 0x106,
+	Rinshankaihou = 0x107,
+	Haiteiraoyue = 0x108,
+	Houteiraoyui = 0x109,
 
-	Lianglizhi = 0x210,
-	Sansetongke = 0x200,
-	Sangangzi = 0x201,
-	Duiduihu = 0x202,
-	Sananke = 0x203,
-	Xiaosanyuan = 0x204,
-	Hunlaotou = 0x205,
-	Qiduizi = 0x211,
+	doubleRiichi = 0x210,
+	Sanshokudoukou = 0x200,
+	Sankantsu = 0x201,
+	Toitoihou = 0x202,
+	Sanankou = 0x203,
+	Shousangen = 0x204,
+	Honroutou = 0x205,
+	Chiitoitsu = 0x211,
 
-	Hunquandaiyaojiu = 0x206,
-	HunquandaiyaojiuF = 0x126,
-	Yiqitongguan = 0x207,
-	YiqitongguanF = 0x127,
-	Sansetongshun = 0x208,
-	SansetongshunF = 0x128,
+	Honchantaiyaochuu = 0x206,
+	HonchantaiyaochuuF = 0x126,
+	Ikkitsuukan = 0x207,
+	IkkitsuukanF = 0x127,
+	Sanshokudoujun = 0x208,
+	SanshokudoujunF = 0x128,
 
-	Erbeikou = 0x310,
-	Chunquantaiyaojiu = 0x300,
-	ChunquantaiyaojiuF = 0x220,
-	Hunyise = 0x301,
-	HunyiseF = 0x221,
+	Ryanpeikou = 0x310,
+	Junchantaiyaochuu = 0x300,
+	JunchantaiyaochuuF = 0x220,
+	Honitsu = 0x301,
+	HonitsuF = 0x221,
 
-	Liujumanguan = 0x500,
-	Qingyise = 0x600,
-	QingyiseF = 0x520,
+	Nagashimangan = 0x500,
+	Chinitsu = 0x600,
+	ChinitsuF = 0x520,
 
 
-	Tianhu = 0xd00,
-	Dihu = 0xd01,
-	Dasanyuan = 0xd02,
-	Sianke = 0xd10,
-	Ziyise = 0xd03,
-	Lvyise = 0xd04,
-	Qinglaotou = 0xd05,
-	Guoshiwushuang = 0xd11,
-	Xiaosixi = 0xd06,
-	Sigangzi = 0xd07,
-	Jiulianbaodeng = 0xd12,
+	Tenhou = 0xd00,
+	Chihou = 0xd01,
+	Daisangen = 0xd02,
+	Suuankou = 0xd10,
+	Tsuuiisou = 0xd03,
+	Ryuuiisou = 0xd04,
+	Chinroutou = 0xd05,
+	Kokushimusou = 0xd11,
+	Shousuushi = 0xd06,
+	Suukantsu = 0xd07,
+	Chuurenpoutou = 0xd12,
 
-	Siankedanqi = 0xf10,
-	Guoshiwushuangshisanmian = 0xf11,
-	Chunzhengjiulianbaodeng = 0xf12,
-	Dasixi = 0xf00,
+	Suuankoutanki = 0xf10,
+	Kokushijuusanmenmachi = 0xf11,
+	Chuurenkyuumenmachi = 0xf12,
+	Daisuushi = 0xf00,
 };
 
 constexpr unsigned int yakuToIndex(const Yaku yaku) noexcept {
@@ -70,54 +68,54 @@ constexpr unsigned int yakuToIndex(const Yaku yaku) noexcept {
 	case Yaku::Ippatsu: return 1;
 	case Yaku::Menzenchintsumo: return 2;
 	case Yaku::Tanyao: return 3;
-	case Yaku::YakuhaiJifuu: return 4;
-	case Yaku::Yipaichangfeng: return 5;
-	case Yaku::YakuhaiHaku: return 6;
-	case Yaku::YakuhaiHatsu: return 7;
-	case Yaku::Yipaizhong: return 8;
-	case Yaku::Pinghu: return 9;
-	case Yaku::Yibeikou: return 10;
-	case Yaku::Qianggang: return 11;
-	case Yaku::Lingshangkaihua: return 12;
-	case Yaku::Haidilaoyue: return 13;
-	case Yaku::Hedilaoyu: return 14;
-	case Yaku::Lianglizhi: return 15;
-	case Yaku::Sansetongke: return 16;
-	case Yaku::Sangangzi: return 17;
-	case Yaku::Duiduihu: return 18;
-	case Yaku::Sananke: return 19;
-	case Yaku::Xiaosanyuan: return 20;
-	case Yaku::Hunlaotou: return 21;
-	case Yaku::Qiduizi: return 22;
-	case Yaku::Hunquandaiyaojiu: return 23;
-	case Yaku::HunquandaiyaojiuF: return 24;
-	case Yaku::Yiqitongguan: return 25;
-	case Yaku::YiqitongguanF: return 26;
-	case Yaku::Sansetongshun: return 27;
-	case Yaku::SansetongshunF: return 28;
-	case Yaku::Erbeikou: return 29;
-	case Yaku::Chunquantaiyaojiu: return 30;
-	case Yaku::ChunquantaiyaojiuF: return 31;
-	case Yaku::Hunyise: return 32;
-	case Yaku::HunyiseF: return 33;
-	case Yaku::Liujumanguan: return 34;
-	case Yaku::Qingyise: return 35;
-	case Yaku::QingyiseF: return 36;
-	case Yaku::Tianhu: return 37;
-	case Yaku::Dihu: return 38;
-	case Yaku::Dasanyuan: return 39;
-	case Yaku::Sianke: return 40;
-	case Yaku::Ziyise: return 41;
-	case Yaku::Lvyise: return 42;
-	case Yaku::Qinglaotou: return 43;
-	case Yaku::Guoshiwushuang: return 44;
-	case Yaku::Xiaosixi: return 45;
-	case Yaku::Sigangzi: return 46;
-	case Yaku::Jiulianbaodeng: return 47;
-	case Yaku::Siankedanqi: return 48;
-	case Yaku::Guoshiwushuangshisanmian: return 49;
-	case Yaku::Chunzhengjiulianbaodeng: return 50;
-	case Yaku::Dasixi: return 51;
+	case Yaku::YakuhaiJikaze: return 4;
+	case Yaku::YakuhaiBakaze: return 5;
+	case Yaku::YakuhaiSangen: return 6;
+	//case Yaku::YakuhaiHatsu: return 7;
+	//case Yaku::Yipaizhong: return 8;
+	case Yaku::Pinhu: return 7;
+	case Yaku::Iipeikou: return 8;
+	case Yaku::Chankan: return 9;
+	case Yaku::Rinshankaihou: return 10;
+	case Yaku::Haiteiraoyue: return 11;
+	case Yaku::Houteiraoyui: return 12;
+	case Yaku::doubleRiichi: return 13;
+	case Yaku::Sanshokudoukou: return 14;
+	case Yaku::Sankantsu: return 15;
+	case Yaku::Toitoihou: return 16;
+	case Yaku::Sanankou: return 17;
+	case Yaku::Shousangen: return 18;
+	case Yaku::Honroutou: return 19;
+	case Yaku::Chiitoitsu: return 20;
+	case Yaku::Honchantaiyaochuu: return 21;
+	case Yaku::HonchantaiyaochuuF: return 22;
+	case Yaku::Ikkitsuukan: return 23;
+	case Yaku::IkkitsuukanF: return 24;
+	case Yaku::Sanshokudoujun: return 25;
+	case Yaku::SanshokudoujunF: return 26;
+	case Yaku::Ryanpeikou: return 27;
+	case Yaku::Junchantaiyaochuu: return 28;
+	case Yaku::JunchantaiyaochuuF: return 29;
+	case Yaku::Honitsu: return 30;
+	case Yaku::HonitsuF: return 31;
+	case Yaku::Nagashimangan: return 32;
+	case Yaku::Chinitsu: return 33;
+	case Yaku::ChinitsuF: return 34;
+	case Yaku::Tenhou: return 35;
+	case Yaku::Chihou: return 36;
+	case Yaku::Daisangen: return 37;
+	case Yaku::Suuankou: return 38;
+	case Yaku::Tsuuiisou: return 39;
+	case Yaku::Ryuuiisou: return 40;
+	case Yaku::Chinroutou: return 41;
+	case Yaku::Kokushimusou: return 42;
+	case Yaku::Shousuushi: return 43;
+	case Yaku::Suukantsu: return 44;
+	case Yaku::Chuurenpoutou: return 45;
+	case Yaku::Suuankoutanki: return 46;
+	case Yaku::Kokushijuusanmenmachi: return 47;
+	case Yaku::Chuurenkyuumenmachi: return 48;
+	case Yaku::Daisuushi: return 49;
 	default: return 0xFFFFFFFF;
 	}
 }
@@ -234,17 +232,17 @@ private:
 	}
 
 	static constexpr Yaku reverse_table[] = {
-		Yaku::Riichi, Yaku::Ippatsu, Yaku::Menzenchintsumo, Yaku::Tanyao, Yaku::YakuhaiJifuu,
-		Yaku::Yipaichangfeng, Yaku::YakuhaiHaku, Yaku::YakuhaiHatsu, Yaku::Yipaizhong, Yaku::Pinghu,
-		Yaku::Yibeikou, Yaku::Qianggang, Yaku::Lingshangkaihua, Yaku::Haidilaoyue, Yaku::Hedilaoyu,
-		Yaku::Lianglizhi, Yaku::Sansetongke, Yaku::Sangangzi, Yaku::Duiduihu, Yaku::Sananke,
-		Yaku::Xiaosanyuan, Yaku::Hunlaotou, Yaku::Qiduizi, Yaku::Hunquandaiyaojiu,
-		Yaku::HunquandaiyaojiuF, Yaku::Yiqitongguan, Yaku::YiqitongguanF, Yaku::Sansetongshun,
-		Yaku::SansetongshunF, Yaku::Erbeikou, Yaku::Chunquantaiyaojiu, Yaku::ChunquantaiyaojiuF,
-		Yaku::Hunyise, Yaku::HunyiseF, Yaku::Liujumanguan, Yaku::Qingyise, Yaku::QingyiseF,
-		Yaku::Tianhu, Yaku::Dihu, Yaku::Dasanyuan, Yaku::Sianke, Yaku::Ziyise, Yaku::Lvyise,
-		Yaku::Qinglaotou, Yaku::Guoshiwushuang, Yaku::Xiaosixi, Yaku::Sigangzi, Yaku::Jiulianbaodeng,
-		Yaku::Siankedanqi, Yaku::Guoshiwushuangshisanmian, Yaku::Chunzhengjiulianbaodeng, Yaku::Dasixi
+		Yaku::Riichi, Yaku::Ippatsu, Yaku::Menzenchintsumo, Yaku::Tanyao, Yaku::YakuhaiJikaze,
+		Yaku::YakuhaiBakaze, Yaku::YakuhaiSangen, Yaku::Pinhu,
+		Yaku::Iipeikou, Yaku::Chankan, Yaku::Rinshankaihou, Yaku::Haiteiraoyue, Yaku::Houteiraoyui,
+		Yaku::doubleRiichi, Yaku::Sanshokudoukou, Yaku::Sankantsu, Yaku::Toitoihou, Yaku::Sanankou,
+		Yaku::Shousangen, Yaku::Honroutou, Yaku::Chiitoitsu, Yaku::Honchantaiyaochuu,
+		Yaku::HonchantaiyaochuuF, Yaku::Ikkitsuukan, Yaku::IkkitsuukanF, Yaku::Sanshokudoujun,
+		Yaku::SanshokudoujunF, Yaku::Ryanpeikou, Yaku::Junchantaiyaochuu, Yaku::JunchantaiyaochuuF,
+		Yaku::Honitsu, Yaku::HonitsuF, Yaku::Nagashimangan, Yaku::Chinitsu, Yaku::ChinitsuF,
+		Yaku::Tenhou, Yaku::Chihou, Yaku::Daisangen, Yaku::Suuankou, Yaku::Tsuuiisou, Yaku::Ryuuiisou,
+		Yaku::Chinroutou, Yaku::Kokushimusou, Yaku::Shousuushi, Yaku::Suukantsu, Yaku::Chuurenpoutou,
+		Yaku::Suuankoutanki, Yaku::Kokushijuusanmenmachi, Yaku::Chuurenkyuumenmachi, Yaku::Daisuushi
 	};
 
 	uint64_t status = 0;

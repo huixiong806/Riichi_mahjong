@@ -131,9 +131,9 @@ TryToAgariResult Algorithms::agari(const AgariParameters& par) {
 	if (guoshi.success)
 		return guoshi;
 	//只有国士能抢暗杠
-	if (par.state == 3)return TryToAgariResult(AgariFaildReason::CantQiangAnGang);
+	if (par.type == 3)return TryToAgariResult(AgariFaildReason::AgariTypeWrong);
 	//七对型的判定(两杯口将被拆解为七对型)
-	const auto qiduizi = qidui(par);
+	const auto qiduizi = chiitoi(par);
 	//一般型的判定
 	auto allTiles = par.handTile;
 	allTiles.push_back(par.target);
@@ -143,8 +143,8 @@ TryToAgariResult Algorithms::agari(const AgariParameters& par) {
 }
 
 //标准型和牌役种判断
-TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, std::vector<Group>& mianzi) {
-	auto allMianzi = mianzi;
+TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, std::vector<Group>& mentsu) {
+	auto allMianzi = mentsu;
 	allMianzi.insert(allMianzi.end(), par.groupTile.begin(), par.groupTile.end());
 	return CheckYakuForStandardType(par, allMianzi);
 }
@@ -163,9 +163,9 @@ state
 河底/海底=2
 */
 TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, const std::vector<Single>& remainTiles,
-                                         std::vector<Group> mianzi) {
+                                         std::vector<Group> mentsu) {
 	TryToAgariResult bestResult;
-	if (remainTiles.empty()) { return YakuCheckForStandard(par, mianzi); }
+	if (remainTiles.empty()) { return YakuCheckForStandard(par, mentsu); }
 	if (depth == 0) {
 		std::vector<Single> newRemainTiles { remainTiles.size() - 2 };
 		for (auto i = 0u; i < remainTiles.size() - 1; ++i) {
@@ -175,9 +175,9 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 					if (j != i && j != i + 1)
 						newRemainTiles.push_back(remainTiles[j]);
 				}
-				mianzi.push_back(Group::createToitsu(remainTiles[i], remainTiles[i + 1]));
-				bestResult = std::max(bestResult, agariSearch(par, depth + 1,  newRemainTiles , mianzi));
-				mianzi.pop_back();
+				mentsu.push_back(Group::createToitsu(remainTiles[i], remainTiles[i + 1]));
+				bestResult = std::max(bestResult, agariSearch(par, depth + 1,  newRemainTiles , mentsu));
+				mentsu.pop_back();
 			}
 		}
 		return bestResult;
@@ -220,18 +220,18 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 						newRemainTiles.push_back(item);
 				}
 				//三连刻
-				mianzi.push_back(Group::createKoutsu(group[0][0], group[0][1], group[0][2], 0));
-				mianzi.push_back(Group::createKoutsu(group[1][0], group[1][1], group[1][2], 0));
-				mianzi.push_back(Group::createKoutsu(group[2][0], group[2][1], group[2][2], 0));
-				bestResult = std::max(bestResult, agariSearch(par, depth + 3, newRemainTiles, mianzi));
-				mianzi.pop_back();
-				mianzi.pop_back();
-				mianzi.pop_back();
+				mentsu.push_back(Group::createKoutsu(group[0][0], group[0][1], group[0][2], 0));
+				mentsu.push_back(Group::createKoutsu(group[1][0], group[1][1], group[1][2], 0));
+				mentsu.push_back(Group::createKoutsu(group[2][0], group[2][1], group[2][2], 0));
+				bestResult = std::max(bestResult, agariSearch(par, depth + 3, newRemainTiles, mentsu));
+				mentsu.pop_back();
+				mentsu.pop_back();
+				mentsu.pop_back();
 				//三同顺
-				mianzi.push_back(Group::createShuntsu(group[0][0], group[1][0], group[2][0], 0));
-				mianzi.push_back(Group::createShuntsu(group[0][1], group[1][1], group[2][1], 0));
-				mianzi.push_back(Group::createShuntsu(group[0][2], group[1][2], group[2][2], 0));
-				bestResult = std::max(bestResult, agariSearch(par, depth + 3, newRemainTiles, mianzi));
+				mentsu.push_back(Group::createShuntsu(group[0][0], group[1][0], group[2][0], 0));
+				mentsu.push_back(Group::createShuntsu(group[0][1], group[1][1], group[2][1], 0));
+				mentsu.push_back(Group::createShuntsu(group[0][2], group[1][2], group[2][2], 0));
+				bestResult = std::max(bestResult, agariSearch(par, depth + 3, newRemainTiles, mentsu));
 				return bestResult;
 			}
 		}
@@ -253,8 +253,8 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 				}
 				newRemainTiles.push_back(item);
 			}
-			mianzi.push_back(Group::createKoutsu(kezi[0], kezi[1], kezi[2], 0));
-			bestResult = agariSearch(par, depth + 1, newRemainTiles, mianzi);
+			mentsu.push_back(Group::createKoutsu(kezi[0], kezi[1], kezi[2], 0));
+			bestResult = agariSearch(par, depth + 1, newRemainTiles, mentsu);
 			return bestResult;
 		}
 		//顺子
@@ -293,8 +293,8 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 						newRemainTiles.push_back(item);
 				}
 				//顺子
-				mianzi.push_back(Group::createShuntsu(group[0], group[1], group[2], 0));
-				bestResult = agariSearch(par, depth + 1, newRemainTiles, mianzi);
+				mentsu.push_back(Group::createShuntsu(group[0], group[1], group[2], 0));
+				bestResult = agariSearch(par, depth + 1, newRemainTiles, mentsu);
 				return bestResult;
 			}
 		}
@@ -305,7 +305,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 	return TryToAgariResult(AgariFaildReason::ShapeWrong);
 }
 
-TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
+TryToAgariResult Algorithms::chiitoi(const AgariParameters& par) {
 	auto res = AgariResult();
 	std::map<int, int> all;
 	for (auto& item : par.handTile)
@@ -317,9 +317,9 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	//役满型:天和,地和,字一色
 	if (par.state == 1 && par.type == 0) {
 		if (par.selfWind == EAST)
-			res.yaku.add<Yaku::Tianhu>();
+			res.yaku.add<Yaku::Tenhou>();
 		else
-			res.yaku.add<Yaku::Dihu>();
+			res.yaku.add<Yaku::Chihou>();
 		res.han -= 1;
 	}
 	auto ziyise = true;
@@ -333,7 +333,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 		ziyise = false;
 	if (ziyise == true) {
 		res.han -= 1;
-		res.yaku.add<Yaku::Ziyise>();
+		res.yaku.add<Yaku::Tsuuiisou>();
 	}
 	res.tsumo = par.type == 0;
 	//满足役满型
@@ -344,7 +344,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	//不满足役满型，则一定需要计算七对型
 	res.han += 2;
 	res.fu = 25;
-	res.yaku.add<Yaku::Qiduizi>();
+	res.yaku.add<Yaku::Chiitoitsu>();
 	//检查dora，akadora和uradora
 	auto myHandTile = par.handTile;
 	myHandTile.push_back(par.target);
@@ -365,7 +365,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 		//w立
 		if (par.riichiJunme == -2) {
 			res.han += 2;
-			res.yaku.add<Yaku::Lianglizhi>();
+			res.yaku.add<Yaku::doubleRiichi>();
 		}
 		else {
 			res.han += 1;
@@ -379,7 +379,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	//检查抢杠
 	if (par.type == 2) {
 		res.han += 1;
-		res.yaku.add<Yaku::Qianggang>();
+		res.yaku.add<Yaku::Chankan>();
 	}
 	//检查门清自摸
 	if (par.type == 0) {
@@ -389,8 +389,8 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	//检查河底/海底
 	if (par.state == 2) {
 		if (par.type == 0)
-			res.yaku.add<Yaku::Haidilaoyue>();
-		else if (par.type == 1)res.yaku.add<Yaku::Hedilaoyu>();
+			res.yaku.add<Yaku::Haiteiraoyue>();
+		else if (par.type == 1)res.yaku.add<Yaku::Houteiraoyui>();
 	}
 	//检查清一色，混一色，断幺九，混老头
 	auto qingyise = true, hunyise = true, duanyao = true, hunlaotou = true;
@@ -415,11 +415,11 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	}
 	if (qingyise) {
 		res.han += 6;
-		res.yaku.add<Yaku::Qingyise>();
+		res.yaku.add<Yaku::Chinitsu>();
 	}
 	else if (hunyise) {
 		res.han += 3;
-		res.yaku.add<Yaku::Hunyise>();
+		res.yaku.add<Yaku::Honitsu>();
 	}
 	if (duanyao) {
 		res.han += 1;
@@ -427,7 +427,7 @@ TryToAgariResult Algorithms::qidui(const AgariParameters& par) {
 	}
 	if (hunlaotou) {
 		res.han += 2;
-		res.yaku.add<Yaku::Hunlaotou>();
+		res.yaku.add<Yaku::Honroutou>();
 	}
 	res = getScore(par.selfWind, res);
 	return TryToAgariResult(res);
@@ -461,19 +461,19 @@ TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par) {
 		if (par.selfWind == EAST) {
 			if (guoshi != 0)
 				guoshi = 2;
-			res.yaku.add<Yaku::Tianhu>();
+			res.yaku.add<Yaku::Tenhou>();
 		}
 		else
-			res.yaku.add<Yaku::Dihu>();
+			res.yaku.add<Yaku::Chihou>();
 		if (guoshi > 0)
 			res.han -= 1;
 	}
 	if (guoshi == 1) {
-		res.yaku.add<Yaku::Guoshiwushuang>();
+		res.yaku.add<Yaku::Kokushimusou>();
 		res.han -= 1;
 	}
 	else if (guoshi == 2) {
-		res.yaku.add<Yaku::Guoshiwushuangshisanmian>();
+		res.yaku.add<Yaku::Kokushijuusanmenmachi>();
 		res.han -= 2;
 	}
 	else { return TryToAgariResult(AgariFaildReason::ShapeWrong); }
@@ -552,10 +552,10 @@ bool Algorithms::agariWithoutYaku(const Single& target, const std::vector<Single
 		if (state.colors[3].get(i) >= 5)return false;
 	}
 	//国士无双型的判定
-	const auto guoshi = getDistanceGuoshi(state) == -1;
+	const auto guoshi = getDistanceKokushi(state) == -1;
 	if (guoshi)return true;
 	//七对型的判定(两杯口将被拆解为七对型)
-	const auto qiduizi = getDistanceQidui(state) == -1;
+	const auto qiduizi = getDistanceChiitoi(state) == -1;
 	if (qiduizi)
 		return true;
 	//一般型的判定
@@ -563,7 +563,7 @@ bool Algorithms::agariWithoutYaku(const Single& target, const std::vector<Single
 	return normal;
 }
 
-void Algorithms::constructTarget(int quetou, int mianzi, std::queue<SparseSinglesOfColor>& q, SparseSinglesOfColor shape, int target, bool z) {
+void Algorithms::constructTarget(int quetou, int mentsu, std::queue<SparseSinglesOfColor>& q, SparseSinglesOfColor shape, int target, bool z) {
 	SparseSinglesOfColor nextShape;
 	if (quetou > 0) {
 		for (auto value = 1; value <= (z ? 7 : 9); ++value) {
@@ -571,17 +571,17 @@ void Algorithms::constructTarget(int quetou, int mianzi, std::queue<SparseSingle
 			const auto count = shape.get(value); 
 			if (count <= 2) {
 				nextShape.add(value,2);
-				constructTarget(quetou - 1, mianzi, q, nextShape, target, z);
+				constructTarget(quetou - 1, mentsu, q, nextShape, target, z);
 			}
 		}
 	}
-	if (mianzi > 0) {
+	if (mentsu > 0) {
 		//刻子
 		for (auto value = 1; value <= (z ? 7 : 9); ++value) {
 			nextShape = shape;
 			if (nextShape.get(value) <= 1) {
 				nextShape.add(value, 3);
-				constructTarget(quetou, mianzi - 1, q, nextShape, target, z);
+				constructTarget(quetou, mentsu - 1, q, nextShape, target, z);
 			}
 		}
 		//顺子
@@ -595,12 +595,12 @@ void Algorithms::constructTarget(int quetou, int mianzi, std::queue<SparseSingle
 					nextShape.add(value, 1);
 					nextShape.add(value+1, 1);
 					nextShape.add(value+2, 1);
-					constructTarget(quetou, mianzi - 1, q, nextShape, target, z);
+					constructTarget(quetou, mentsu - 1, q, nextShape, target, z);
 				}
 			}
 		}
 	}
-	if (mianzi > 0 || quetou > 0)return;
+	if (mentsu > 0 || quetou > 0)return;
 	q.push(shape);
 	if (!z)distanceToTarget[CompactSinglesOfColor(shape).raw()][target] = 0;
 	else distanceToTargetZ[CompactSinglesOfColor(shape).raw()][target] = 0;
@@ -618,10 +618,10 @@ void Algorithms::preprocessDistance() {
 	//枚举目标
 	for (auto target = 0; target < 10; ++target) {
 		const auto quetou = target / 5;
-		const auto mianzi = target % 5;
+		const auto mentsu = target % 5;
 		//构造目标(同时也是BFS的起点)
 		std::queue<SparseSinglesOfColor> q;
-		constructTarget(quetou, mianzi, q, SparseSinglesOfColor(), target, false);
+		constructTarget(quetou, mentsu, q, SparseSinglesOfColor(), target, false);
 		while (!q.empty()) {
 			const auto now = q.front();
 			q.pop();
@@ -647,7 +647,7 @@ void Algorithms::preprocessDistance() {
 			}
 		}
 		//字牌
-		constructTarget(quetou, mianzi, q, SparseSinglesOfColor(), target, true);
+		constructTarget(quetou, mentsu, q, SparseSinglesOfColor(), target, true);
 		while (!q.empty()) {
 			const auto now = q.front();
 			q.pop();
@@ -676,9 +676,9 @@ void Algorithms::preprocessDistance() {
 }
 
 //获得单花色向听数
-int Algorithms::getDistanceSingle(int shape, int mianzi, int quetou, bool z) {
-	if (!z)return distanceToTarget[shape][mianzi + quetou * 5];
-	return distanceToTargetZ[shape][mianzi + quetou * 5];
+int Algorithms::getDistanceSingle(int shape, int mentsu, int quetou, bool z) {
+	if (!z)return distanceToTarget[shape][mentsu + quetou * 5];
+	return distanceToTargetZ[shape][mentsu + quetou * 5];
 }
 
 //计算14张手牌的向听数(0为一向听，-1为和牌)
@@ -746,7 +746,7 @@ int Algorithms::getDistanceStandard(const CompactSingles& handTile) {
 }
 
 //计算14张手牌的向听数(0为一向听，-1为和牌)
-int Algorithms::getDistanceQidui(const CompactSingles& handTile) {
+int Algorithms::getDistanceChiitoi(const CompactSingles& handTile) {
 	//计算七对子向听数
 	auto duiziCount = 0;
 	auto fupaiCount = 0;
@@ -759,7 +759,7 @@ int Algorithms::getDistanceQidui(const CompactSingles& handTile) {
 	return 6 - duiziCount + std::max(0, 7 - duiziCount - fupaiCount);
 }
 //计算14张手牌的国士无双向听数(0为一向听，-1为和牌)
-int Algorithms::getDistanceGuoshi(const CompactSingles& handTile){
+int Algorithms::getDistanceKokushi(const CompactSingles& handTile){
 	auto yaojiuTypeCount=0;
 	auto yaojiuCount = 0;
 	for (int i = 0; i < 3;++i) {
@@ -776,5 +776,5 @@ int Algorithms::getDistanceGuoshi(const CompactSingles& handTile){
 }
 //计算14张手牌的向听数(0为一向听，-1为和牌)
 int Algorithms::getDistance(const CompactSingles& handTile){
-	return std::min(std::min(getDistanceGuoshi(handTile), getDistanceQidui(handTile)), getDistanceStandard(handTile));
+	return std::min(std::min(getDistanceKokushi(handTile), getDistanceChiitoi(handTile)), getDistanceStandard(handTile));
 }

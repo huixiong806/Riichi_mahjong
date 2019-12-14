@@ -8,24 +8,24 @@
 const std::string windName[4] = {"东", "南", "西", "北"};
 const std::string actionName[11] = {"error", "跳过", "error", "吃", "碰", "杠", "和", "立直", "自摸", "流局", "拔北"};
 
-std::vector<Action> Tester::getAllActionsMingpai(const GameInfo& info) {
+std::vector<Action> Tester::getAllNakiActions(const GameInfo& info) {
 	std::vector<Action> res;
 	res.emplace_back(ActionType::Skip);
-	auto temp = getRongAction(info);
+	auto temp = getRonAction(info);
 	res.insert(res.end(), temp.begin(), temp.end());
 	return res;
 }
 
-std::vector<Action> Tester::getAllActionsNormal(const GameInfo& info) {
+std::vector<Action> Tester::getAllNormalActions(const GameInfo& info) {
 	std::vector<Action> res;
-	auto temp = getZimoAction(info);
+	auto temp = getTsumoAction(info);
 	if (info.nowTile != Null)
 		res.emplace_back(ActionType::DiscardTile, info.nowTile);
 	if (info.playerInfo[static_cast<int>(info.selfWind)].riichiJunme == -1)
 		for (auto i : info.handTile)
 			res.emplace_back(ActionType::DiscardTile, i);
 	res.insert(res.end(), temp.begin(), temp.end());
-	temp = getLizhiAction(info);
+	temp = getRiichiAction(info);
 	res.insert(res.end(), temp.begin(), temp.end());
 	return res;
 }
@@ -37,7 +37,7 @@ void Tester::printActions(std::vector<Action> actions) {
 			std::cout << num << " ";
 		else {
 			if (i > 0 && actions[i - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
-			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Pon || actions[i].type ==
+			if (actions[i].type == ActionType::Chii || actions[i].type == ActionType::Pon || actions[i].type ==
 				ActionType::Kan)
 				std::cout << num << "." << actionName[static_cast<int>(actions[i].type)] << " " << actions[i]
 				                                                                                   .group.getString() <<
@@ -53,14 +53,14 @@ void Tester::printActions(std::vector<Action> actions) {
 	if (actions[actions.size() - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
 }
 
-std::vector<Action> Tester::getRongAction(const GameInfo& info) {
+std::vector<Action> Tester::getRonAction(const GameInfo& info) {
 	std::vector<Action> res;
 	BonusYakuState state = BonusYakuState::Normal;
 	if (info.w)BonusYakuState::FirstTurn;
 	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
-	                                                      info.playerInfo[info.selfWind].ippatsu, state, 1, info.nowTile,
+	                                                      info.playerInfo[info.selfWind].ippatsu, state, AgariWays::Ron, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
@@ -68,14 +68,14 @@ std::vector<Action> Tester::getRongAction(const GameInfo& info) {
 	return res;
 }
 
-std::vector<Action> Tester::getZimoAction(const GameInfo& info) {
+std::vector<Action> Tester::getTsumoAction(const GameInfo& info) {
 	std::vector<Action> res;
 	BonusYakuState state = BonusYakuState::Normal;
 	if (info.w)BonusYakuState::FirstTurn;
 	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
-	                                                      info.playerInfo[info.selfWind].ippatsu, state, 0, info.nowTile,
+	                                                      info.playerInfo[info.selfWind].ippatsu, state, AgariWays::Tsumo, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
@@ -83,7 +83,7 @@ std::vector<Action> Tester::getZimoAction(const GameInfo& info) {
 	return res;
 }
 
-std::vector<Action> Tester::getLizhiAction(const GameInfo& info) {
+std::vector<Action> Tester::getRiichiAction(const GameInfo& info) {
 	std::set<Action> res;
 	if (info.playerInfo[static_cast<int>(info.selfWind)].score < 1000)
 		return std::vector<Action>();
@@ -103,7 +103,7 @@ std::vector<Action> Tester::getLizhiAction(const GameInfo& info) {
 		BonusYakuState state = BonusYakuState::Normal;
 		if (info.w)state = BonusYakuState::FirstTurn;
 		else if (info.remainTiles == 0)state = BonusYakuState::LastTurn;
-		if (player.canLizhi(state, target)) { res.insert(Action(ActionType::Riichi, target)); }
+		if (player.canRiichi(state, target)) { res.insert(Action(ActionType::Riichi, target)); }
 	}
 	std::vector<Action> ret;
 	for (auto& item : res)
@@ -141,15 +141,15 @@ std::vector<Single> Tester::getShowedTiles(const GameInfo& info)
 Action Tester::generateAction(const GameInfo& info) {
 	Action res;
 	res.type = ActionType::Null;
-	if (info.nowWind != info.selfWind && info.mingpai == false)return res;
-	if (info.nowWind == info.selfWind && info.mingpai == true)return res;
+	if (info.nowWind != info.selfWind && info.naki == false)return res;
+	if (info.nowWind == info.selfWind && info.naki == true)return res;
 	//if (info.mingpai == false && info.selfWind == info.nowWind)
 	//	printInfo(info);
-	if (info.mingpai == false) {
+	if (info.naki == false) {
 		if (info.nowTile != Null) {
-			auto actions = getAllActionsNormal(info);
+			auto actions = getAllNormalActions(info);
 			bool riichi = false;
-			bool tsumohai = false;
+			bool tsumo = false;
 			auto templ = info.handTile;
 			templ.push_back(info.nowTile);
 			int nowXiangting = Algorithms::getDistance(CompactSingles(templ));
@@ -166,7 +166,7 @@ Action Tester::generateAction(const GameInfo& info) {
 				int count = 0;
 				if (act.type == ActionType::Tsumo) {
 					res = act;
-					tsumohai = true;
+					tsumo = true;
 					break;
 				}
 				else if (act.type == ActionType::Riichi) {
@@ -215,7 +215,7 @@ Action Tester::generateAction(const GameInfo& info) {
 					}
 				}
 			}
-			if(tsumohai){
+			if(tsumo){
 				return res;
 			}
 			else if (riichi) {
@@ -229,7 +229,7 @@ Action Tester::generateAction(const GameInfo& info) {
 		}
 	}
 	else {
-		auto actions = getAllActionsMingpai(info);
+		auto actions = getAllNakiActions(info);
 		if (actions.size() == 1)
 			res = actions[0];
 		else {

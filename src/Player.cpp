@@ -7,7 +7,7 @@ void Player::setInfo(int subround_,
 					 const std::vector<bool>& disabledHandTile_, 
 					 const std::vector<Group>& groupTile_, 
 					 const Single& nowTile_, 
-					 const std::vector<Single>& discardTile_, 
+					 const std::vector<Single>& discardedTile_, 
 					 bool rinshan_, 
 					 bool tsumogiri_, 
 					 int riichi_, 
@@ -20,7 +20,7 @@ void Player::setInfo(int subround_,
 	disabledHandTile = disabledHandTile_; //禁打手牌
 	groupTile = groupTile_; //副露牌组
 	nowTile = nowTile_; //自摸牌
-	discardTile = discardTile_; //牌河
+	discardedTile = discardedTile_; //牌河
 	rinshan = rinshan_; //玩家当前的自摸牌是岭上牌
 	tsumogiri = tsumogiri_; //表示牌河里最后一张牌是否为摸切
 	riichi = riichi_; //立直宣言牌是牌河中的第几张，-1为未立直
@@ -28,7 +28,7 @@ void Player::setInfo(int subround_,
 	ippatsu = ippatsu_; //当前是否为一发巡
 }
 
-bool Player::canPeng(Single target, Group result, int relativePosition) const {
+bool Player::canPon(Single target, Group result, int relativePosition) const {
 	//检查类型
 	if (result.type != GroupType::Koutsu)
 		return false;
@@ -65,8 +65,7 @@ bool Player::canPeng(Single target, Group result, int relativePosition) const {
 	return true;
 }
 
-//仅限荣杠
-bool Player::canGang(Single target, Group result, int relativePosition) const {
+bool Player::canMinKan(Single target, Group result, int relativePosition) const {
 	//检查类型
 	if (result.type != GroupType::Kantsu)
 		return false;
@@ -103,7 +102,7 @@ bool Player::canGang(Single target, Group result, int relativePosition) const {
 	return true;
 }
 
-void Player::peng(Group result) {
+void Player::pon(Group result) {
 	groupTile.push_back(result);
 	const auto other0 = Single(result.value, result.color, result.akadora & 2);
 	const auto other1 = Single(result.value, result.color, result.akadora & 4);
@@ -122,7 +121,7 @@ void Player::peng(Group result) {
 	while (handTile.back() == Null)handTile.pop_back();
 }
 
-void Player::ronggang(Group result) {
+void Player::minkan(Group result) {
 	groupTile.push_back(result);
 	const auto other0 = Single(result.value, result.color, result.akadora & 2);
 	const auto other1 = Single(result.value, result.color, result.akadora & 4);
@@ -146,7 +145,7 @@ void Player::ronggang(Group result) {
 	while (handTile.back() == Null)handTile.pop_back();
 }
 
-bool Player::canDapai(Single target) const {
+bool Player::canDiscardTile(Single target) const {
 	if (target == Null)return false;
 	if (nowTile == target)
 		return true;
@@ -160,18 +159,18 @@ bool Player::canDapai(Single target) const {
 
 //返回false时不应变动私有变量
 
-void Player::dapai(Single target) {//打牌
+void Player::discardTile(Single target) {//打牌
 	if (target == Null)
 		return throw("打牌失败-Null是能打的牌？");
 	if (nowTile == target) {
-		discardTile.push_back(nowTile);
+		discardedTile.push_back(nowTile);
 		tsumogiri = true;
 		nowTile = Null;
 		return;
 	}
 	for (auto i = 0; i < handTile.size(); ++i) {
 		if (target == handTile[i]) {
-			discardTile.push_back(target);
+			discardedTile.push_back(target);
 			handTile[i] = nowTile;
 			std::sort(handTile.begin(), handTile.end()); //从小到大排序
 			if (nowTile == Null)
@@ -190,7 +189,7 @@ state
 天地和,w立=1
 河底/海底=2
 */
-bool Player::canLizhi(BonusYakuState state, Single target) const {
+bool Player::canRiichi(BonusYakuState state, Single target) const {
 	//要打的牌是否存在?
 	if (target == Null)return false;
 	auto myTile = handTile;
@@ -224,10 +223,9 @@ bool Player::canLizhi(BonusYakuState state, Single target) const {
 	return !Algorithms::tenpai(myTile).empty();
 }
 
-void Player::doLizhi(BonusYakuState state, Single target) {
+void Player::doRiichi(BonusYakuState state, Single target) {
 	//要打的牌是否存在?
-	if (target == Null)
-	{
+	if (target == Null){
 		throw("立直失败-Null是能打的牌？");
 		return;
 	}
@@ -243,8 +241,7 @@ void Player::doLizhi(BonusYakuState state, Single target) {
 			break;
 		}
 	}
-	if (!success)
-	{
+	if (!success){
 		throw("立直失败-要打的牌不存在");
 		return;
 	}
@@ -252,8 +249,7 @@ void Player::doLizhi(BonusYakuState state, Single target) {
 	if (!groupTile.empty()) {
 		for (auto& item : groupTile) {
 			//暗杠必须满足type=Gang且state=0
-			if (item.type != GroupType::Kantsu || item.state != 0)
-			{
+			if (item.type != GroupType::Kantsu || item.state != 0){
 				throw("立直失败-有非暗杠副露");
 				return;
 			}
@@ -276,10 +272,10 @@ void Player::doLizhi(BonusYakuState state, Single target) {
 	*/
 	handTile = backup;
 	if (isTenpai) {
-		dapai(target);
+		discardTile(target);
 		riichiJunme = subround;
 		ippatsu = true;
-		riichi = discardTile.size() - 1;
+		riichi = discardedTile.size() - 1;
 		if (state == 1)
 			riichiJunme = -2;
 		score -= 1000;

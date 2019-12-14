@@ -8,28 +8,28 @@
 const std::string windName[4] = {"东", "南", "西", "北"};
 const std::string actionName[11] = {"error", "跳过", "error", "吃", "碰", "杠", "和", "立直", "自摸", "流局", "拔北"};
 
-std::vector<Action> Human::getAllActionsMingpai(const GameInfo& info) {
+std::vector<Action> Human::getAllNakiActions(const GameInfo& info) {
 	std::vector<Action> res;
 	res.emplace_back(ActionType::Skip);
-	auto temp = getPengActions(info);
+	auto temp = getPonActions(info);
 	res.insert(res.end(), temp.begin(), temp.end());
-	temp = getRongGangActions(info);
+	temp = getMinKanActions(info);
 	res.insert(res.end(), temp.begin(), temp.end());
-	temp = getRongAction(info);
+	temp = getRonAction(info);
 	res.insert(res.end(), temp.begin(), temp.end());
 	return res;
 }
 
-std::vector<Action> Human::getAllActionsNormal(const GameInfo& info) {
+std::vector<Action> Human::getAllNormalActions(const GameInfo& info) {
 	std::vector<Action> res;
-	auto temp = getZimoAction(info);
+	auto temp = getTsumoAction(info);
 	if (info.nowTile != Null)
 		res.emplace_back(ActionType::DiscardTile, info.nowTile);
 	if (info.playerInfo[static_cast<int>(info.selfWind)].riichiJunme == -1)
 		for (auto i : info.handTile)
 			res.emplace_back(ActionType::DiscardTile, i);
 	res.insert(res.end(), temp.begin(), temp.end());
-	temp = getLizhiAction(info);
+	temp = getRiichiAction(info);
 	res.insert(res.end(), temp.begin(), temp.end());
 	return res;
 }
@@ -41,7 +41,7 @@ void Human::printActions(std::vector<Action> actions) {
 			std::cout << num << " ";
 		else {
 			if (i > 0 && actions[i - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
-			if (actions[i].type == ActionType::Chi || actions[i].type == ActionType::Pon || actions[i].type ==
+			if (actions[i].type == ActionType::Chii || actions[i].type == ActionType::Pon || actions[i].type ==
 				ActionType::Kan)
 				std::cout << num << "." << actionName[static_cast<int>(actions[i].type)] << " " << actions[i]
 				                                                                                   .group.getString() <<
@@ -57,14 +57,14 @@ void Human::printActions(std::vector<Action> actions) {
 	if (actions[actions.size() - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
 }
 
-std::vector<Action> Human::getRongAction(const GameInfo& info) {
+std::vector<Action> Human::getRonAction(const GameInfo& info) {
 	std::vector<Action> res;
 	BonusYakuState state = BonusYakuState::Normal;
 	if (info.w)BonusYakuState::FirstTurn;
 	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
-	                                                      info.playerInfo[info.selfWind].ippatsu, state, 1, info.nowTile,
+	                                                      info.playerInfo[info.selfWind].ippatsu, state, AgariWays::Ron, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
@@ -72,14 +72,14 @@ std::vector<Action> Human::getRongAction(const GameInfo& info) {
 	return res;
 }
 
-std::vector<Action> Human::getZimoAction(const GameInfo& info) {
+std::vector<Action> Human::getTsumoAction(const GameInfo& info) {
 	std::vector<Action> res;
 	BonusYakuState state = BonusYakuState::Normal;
 	if (info.w)BonusYakuState::FirstTurn;
 	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
-	                                                      info.playerInfo[info.selfWind].ippatsu, state, 0, info.nowTile,
+	                                                      info.playerInfo[info.selfWind].ippatsu, state, AgariWays::Tsumo, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
@@ -87,7 +87,7 @@ std::vector<Action> Human::getZimoAction(const GameInfo& info) {
 	return res;
 }
 
-std::vector<Action> Human::getLizhiAction(const GameInfo& info) {
+std::vector<Action> Human::getRiichiAction(const GameInfo& info) {
 	std::set<Action> res;
 	if (info.playerInfo[static_cast<int>(info.selfWind)].score < 1000)
 		return std::vector<Action>();
@@ -107,7 +107,7 @@ std::vector<Action> Human::getLizhiAction(const GameInfo& info) {
 		BonusYakuState state = BonusYakuState::Normal;
 		if (info.w)state = BonusYakuState::FirstTurn;
 		else if (info.remainTiles == 0)state = BonusYakuState::LastTurn;
-		if (player.canLizhi(state, target)) { res.insert(Action(ActionType::Riichi, target)); }
+		if (player.canRiichi(state, target)) { res.insert(Action(ActionType::Riichi, target)); }
 	}
 	std::vector<Action> ret;
 	for (auto& item : res)
@@ -123,7 +123,7 @@ std::vector<Action> Human::getChiActions(const GameInfo& info) {
 	// TODO: POSSIBLE INCORRECT IMPLEMENTATION
 }
 
-std::vector<Action> Human::getRongGangActions(const GameInfo& info) {
+std::vector<Action> Human::getMinKanActions(const GameInfo& info) {
 	std::vector<Action> res;
 	if (info.playerInfo[static_cast<int>(info.selfWind)].riichiJunme != -1)
 		return res;
@@ -140,7 +140,7 @@ std::vector<Action> Human::getRongGangActions(const GameInfo& info) {
 	return res;
 }
 
-std::vector<Action> Human::getPengActions(const GameInfo& info) {
+std::vector<Action> Human::getPonActions(const GameInfo& info) {
 	std::vector<Action> res;
 	if (info.playerInfo[static_cast<int>(info.selfWind)].riichiJunme != -1)
 		return res;
@@ -185,8 +185,8 @@ void Human::printInfo(const GameInfo& info) {
 	}
 	auto hand = info.handTile;
 	hand.push_back(info.nowTile);
-	std::cout << "当前面子手" << Algorithms::getDistanceStandard(CompactSingles(hand)) << "向听，七对" << Algorithms::getDistanceQidui(CompactSingles(hand)) <<
-		"向听，国士"<< Algorithms::getDistanceGuoshi(CompactSingles(hand)) <<"向听"<< std::endl;
+	std::cout << "当前面子手" << Algorithms::getDistanceStandard(CompactSingles(hand)) << "向听，七对" << Algorithms::getDistanceChiitoi(CompactSingles(hand)) <<
+		"向听，国士"<< Algorithms::getDistanceKokushi(CompactSingles(hand)) <<"向听"<< std::endl;
 	std::cout << windName[info.selfWind] << "| ";
 
 	for (auto& item : info.handTile)
@@ -194,7 +194,7 @@ void Human::printInfo(const GameInfo& info) {
 
 	std::cout << std::endl;
 	std::cout << "ID| ";
-	const int add = info.mingpai == false && info.nowTile == Null;
+	const int add = info.naki == false && info.nowTile == Null;
 	for (auto j = 0; j < (13+add - info.playerInfo[info.selfWind].groupTile.size() * 3); ++j) {
 		if (j < 9)std::cout << " ";
 		std::cout << j + 1 << " ";
@@ -205,14 +205,14 @@ void Human::printInfo(const GameInfo& info) {
 Action Human::generateAction(const GameInfo& info) {
 	Action res;
 	res.type = ActionType::Null;
-	if (info.nowWind != info.selfWind && info.mingpai == false)return res;
-	if (info.nowWind == info.selfWind && info.mingpai == true)return res;
-	if (info.mingpai == false && info.selfWind == info.nowWind)
+	if (info.nowWind != info.selfWind && info.naki == false)return res;
+	if (info.nowWind == info.selfWind && info.naki == true)return res;
+	if (info.naki == false && info.selfWind == info.nowWind)
 		printInfo(info);
-	if (info.mingpai == false) {
+	if (info.naki == false) {
 		if (info.nowTile != Null) {
 			std::cout << "摸 " << info.nowTile.getDisplay() << std::endl << std::endl;
-			auto actions = getAllActionsNormal(info);
+			auto actions = getAllNormalActions(info);
 			std::cout << "请选择:" << std::endl;
 			printActions(actions);
 			int index;
@@ -231,7 +231,7 @@ Action Human::generateAction(const GameInfo& info) {
 		std::cout << std::endl;
 	}
 	else {
-		auto actions = getAllActionsMingpai(info);
+		auto actions = getAllNakiActions(info);
 		if (actions.size() != 1)
 			printInfo(info);
 		std::cout << windName[static_cast<int>(info.nowWind)] << "家打出了" << info.nowTile.getDisplay() << std::endl;

@@ -41,7 +41,7 @@ namespace {
 void push_console_locale_utf8(std::string_view locale_no_encode) {
 	auto new_locale = std::string(locale_no_encode) + ".UTF-8";
 	{
-		std::lock_guard lk{locale_lock};
+		std::lock_guard<std::mutex> lk{locale_lock};
 #ifdef WIN32_CP
 		if (last.empty()) {
 			default_codepage = GetConsoleOutputCP();
@@ -60,7 +60,7 @@ void push_console_locale_utf8(std::string_view locale_no_encode) {
 
 void pop_console_locale() {
 	{
-		std::lock_guard lk{locale_lock};
+		std::lock_guard<std::mutex> lk{locale_lock};
 		if (!last.empty()) {
 			std::setlocale(LC_ALL, last.back());
 			last.pop_back();

@@ -5,14 +5,14 @@
 class Human : public ActionGenerator {
 private:
 	void printActions(std::vector<Action> actions);
-	std::vector<Action> getRongGangActions(const GameInfo& info);
-	std::vector<Action> getPengActions(const GameInfo& info);
+	std::vector<Action> getMinKanActions(const GameInfo& info);
+	std::vector<Action> getPonActions(const GameInfo& info);
 	std::vector<Action> getChiActions(const GameInfo& info);
-	std::vector<Action> getZimoAction(const GameInfo& info);
-	std::vector<Action> getLizhiAction(const GameInfo& info);
-	std::vector<Action> getRongAction(const GameInfo& info);
-	std::vector<Action> getAllActionsMingpai(const GameInfo& info);
-	std::vector<Action> getAllActionsNormal(const GameInfo& info);
+	std::vector<Action> getTsumoAction(const GameInfo& info);
+	std::vector<Action> getRiichiAction(const GameInfo& info);
+	std::vector<Action> getRonAction(const GameInfo& info);
+	std::vector<Action> getAllNakiActions(const GameInfo& info);
+	std::vector<Action> getAllNormalActions(const GameInfo& info);
 	void printInfo(const GameInfo& info);
 public:
 	Human() { name = "No Name"; }

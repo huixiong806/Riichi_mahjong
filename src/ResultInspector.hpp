@@ -4,7 +4,7 @@
 #include"Single.h"
 #include"Group.h"
 #include"Yaku.h"
-#include"ActionGenerator.hpp"
+#include"Enums.h"
 
 struct AgariResult {
 	bool tsumo;//自摸
@@ -29,13 +29,6 @@ struct AgariResult {
 	bool operator ==(const AgariResult& rhs) const { return scoreAdd == rhs.scoreAdd; }
 };
 
-enum class AgariFaildReason {
-	Null,//空
-	ShapeWrong,//不满足和牌型
-	NoYaku,//无役
-	NotEnoughFan,//番缚
-	CantQiangAnGang //非国士无双不能抢暗杠
-};
 
 struct TryToAgariResult {
 	AgariResult result;
@@ -69,23 +62,13 @@ struct TryToAgariResult {
 	}
 };
 
-/*type
-	自摸=0
-	荣和=1
-	抢杠=2
-	抢暗杠=3
-	state
-	正常=0
-	天地和=1
-	河底/海底=2
-*/
 struct AgariParameters {
 	WindType selfWind;
 	WindType prevailingWind;
 	int riichiJunme;
 	bool ippatsu;
 	BonusYakuState state;
-	int type;
+	AgariWays type;
 	Single target;
 	std::vector<Single> handTile;
 	std::vector<Group> groupTile;
@@ -98,7 +81,7 @@ struct AgariParameters {
 		int lizhiXunmu_,
 		bool yifa_,
 		BonusYakuState state_,
-		int type_,
+		AgariWays type_,
 		const Single& target_,
 		const std::vector<Single>& handTile_,
 		const std::vector<Group>& groupTile_,

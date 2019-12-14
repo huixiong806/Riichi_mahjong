@@ -12,7 +12,7 @@ protected:
 	std::vector<Single> mB; //岭上，dora指示牌
 	std::vector<Single> mMountain; //牌山序列
 	int mHandPtr; //手牌指针
-	int mLingshangPtr; //岭上牌指针
+	int mRinshanPtr; //岭上牌指针
 public:
 	virtual ~Mountain() noexcept = default;
 	std::vector<Single> hand[4]; //四家初始手牌

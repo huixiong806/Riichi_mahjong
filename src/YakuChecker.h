@@ -12,17 +12,17 @@ protected:
 	using InternalInvoke = bool (YakuChecker::*)() const noexcept;
 	inline static std::array<InternalInvoke, 52> yakuCheckFunc;
 	// fake constructor for implementing static initialization
-	YakuChecker() noexcept: menqingCount(0), menqing(false), par(*reinterpret_cast<AgariParameters*>(this)),
-	                        mianzi(*reinterpret_cast<std::vector<Group>*>(this)) { }
+	YakuChecker() noexcept: menchinCount(0), menchin(false), par(*reinterpret_cast<AgariParameters*>(this)),
+	                        mentsu(*reinterpret_cast<std::vector<Group>*>(this)) { }
 
 private:
 	// operation buffers
 	mutable Yakus exec{}, result{};
 	// parameters
-	const int menqingCount;
-	const bool menqing;
+	const int menchinCount;
+	const bool menchin;
 	const AgariParameters& par;
-	const std::vector<Group>& mianzi;
+	const std::vector<Group>& mentsu;
 
 	template <Yaku Y, class Invoke>
 	[[nodiscard]] bool UnSyncCacheInvoke(const Invoke invoke) const noexcept {
@@ -79,4 +79,4 @@ public:
 	}
 };
 
-TryToAgariResult CheckYakuForStandardType(const AgariParameters& par, const std::vector<Group>& mianzi);
+TryToAgariResult CheckYakuForStandardType(const AgariParameters& par, const std::vector<Group>& mentsu);

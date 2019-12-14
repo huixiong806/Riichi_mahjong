@@ -19,11 +19,11 @@ private:
 	static TryToAgariResult guoshiwushuang(const AgariParameters& par);
 	//试图和牌，并计算标准型和牌点数，返回(点数最大的)结果,depth=0表示枚举雀头，dep=4为最深层
 	static TryToAgariResult agariSearch(const AgariParameters& par, int depth, const std::vector<Single>& remainTiles,
-	                                    std::vector<Group> mianzi);
+	                                    std::vector<Group> mentsu);
 	//试图和牌，并计算七对型和牌点数
-	static TryToAgariResult qidui(const AgariParameters& par);
+	static TryToAgariResult chiitoi(const AgariParameters& par);
 	//构造给定数量的雀头和面子的牌型，存到queue中,target表示目标雀头和面子数的压缩型
-	static void constructTarget(int quetou, int mianzi, std::queue<SparseSinglesOfColor>& q, SparseSinglesOfColor shape, int target, bool z);
+	static void constructTarget(int quetou, int mentsu, std::queue<SparseSinglesOfColor>& q, SparseSinglesOfColor shape, int target, bool z);
 	//5的幂
 	static const int pow5[10];
 	//到给定目标的距离，参数分别为原形状、目标雀头数*5+目标面子数(雀头最多只能有一个) 原形状为9位5进制数，从低到高表示手牌中数字1~9有几个
@@ -31,7 +31,7 @@ private:
 	//到给定目标的距离(字牌)，参数分别为原形状、目标雀头数*5+目标面子数(雀头最多只能有一个) 原形状为9位5进制数，从低到高表示手牌中东南西北白发中有几个
 	static uint8_t distanceToTargetZ[78125][10];
 	//标准型役种判断
-	static TryToAgariResult YakuCheckForStandard(const AgariParameters& par, std::vector<Group>& mianzi);
+	static TryToAgariResult YakuCheckForStandard(const AgariParameters& par, std::vector<Group>& mentsu);
 public:
 
 	//试图和牌，返回点数最大的结果
@@ -60,11 +60,11 @@ public:
 	//计算14张手牌的标准型向听数(0为一向听，-1为和牌)
 	static int getDistanceStandard(const CompactSingles& handTile);
 	//计算14张手牌的七对型向听数(0为一向听，-1为和牌)
-	static int getDistanceQidui(const CompactSingles& handTile);
+	static int getDistanceChiitoi(const CompactSingles& handTile);
 	//计算14张手牌的国士无双向听数(0为一向听，-1为和牌)
-	static int getDistanceGuoshi(const CompactSingles& handTile);
+	static int getDistanceKokushi(const CompactSingles& handTile);
 	//计算14张手牌的向听数(0为一向听，-1为和牌)
 	static int getDistance(const CompactSingles& handTile);
 	//获得单花色向听数
-	static int getDistanceSingle(int shape, int mianzi, int quetou, bool z);
+	static int getDistanceSingle(int shape, int mentsu, int quetou, bool z);
 };

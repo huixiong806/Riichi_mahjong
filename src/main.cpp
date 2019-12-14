@@ -8,11 +8,13 @@
 #include <vector>
 #include <ctime>
 #include <unordered_map>
+#include <memory>
 #include "Game.h"
 #include "ai/Human.h"
 #include "ai/AutoFurikomu.hpp"
 #include "utils/console.h"
 #include "ai/Tester.h"
+
 using namespace std;
 shared_ptr<ActionGenerator> player[4];
 Game game;
@@ -48,7 +50,7 @@ void test() {
 	res.prevailingWind = EAST; //场风
 	res.selfWind = EAST; //门风
 	res.nowWind = EAST;
-	res.mingpai = false;
+	res.naki = false;
 	res.w = false;
 	human->generateAction(res);
 	Player p;
@@ -83,8 +85,8 @@ void test() {
 void test2() {
 	while (true) {
 		int a[7];
-		auto mianzi = 0, quetou = 0;
-		cin >> a[0] >> a[1] >> a[2] >> a[3] >> a[4] >> a[5] >> a[6] >> mianzi >> quetou;
+		auto mentsu = 0, quetou = 0;
+		cin >> a[0] >> a[1] >> a[2] >> a[3] >> a[4] >> a[5] >> a[6] >> mentsu >> quetou;
 		const auto shape = a[0] + (a[1] * 5) + (a[2] * 25) + (a[3] * 125) + (a[4] * 625) + a[5] * 3125 + a[6] * 15625;
 		//while (pai)
 		//{
@@ -92,7 +94,7 @@ void test2() {
 		//	pai = pai / 10;
 		//}
 		//int target = quetou * 5 + mianzi;
-		cout << Algorithms::getDistanceSingle(shape, mianzi, quetou, true) << endl;
+		cout << Algorithms::getDistanceSingle(shape, mentsu, quetou, true) << endl;
 	}
 }
 
@@ -168,7 +170,7 @@ int main_loop() {
 }
 
 int main() {
-	push_console_locale_utf8("zh_CN");
+	//push_console_locale_utf8("zh_CN");
 	cout << "预处理中..." << endl;
 	Algorithms::preprocessDistance();
 	cout << "预处理结束" << endl;

@@ -15,8 +15,8 @@ std::string Single::getDisplay() const {
 		res.push_back(mColor);
 	}
 	else {
-		const std::string zi[8] = {"??", "东", "南", "西", "北", "白", "发", "中"};
-		res = zi[mValue];
+		const std::string displayCharacter[8] = {"??", "东", "南", "西", "北", "白", "发", "中"};
+		res = displayCharacter[mValue];
 	}
 	return res;
 }

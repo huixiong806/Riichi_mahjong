@@ -4,10 +4,10 @@ namespace {
 	class S_Init : public YakuChecker {
 	public:
 		S_Init() noexcept {
-			Set<Yaku::Qingyise>(&YakuChecker::qingyise);
-			Set<Yaku::QingyiseF>(&YakuChecker::qingyiseF);
-			Set<Yaku::Jiulianbaodeng>(&YakuChecker::jiulianbaodeng);
-			Set<Yaku::Chunzhengjiulianbaodeng>(&YakuChecker::chunzhengjiulianbaodeng);
+			Set<Yaku::Chinitsu>(&YakuChecker::qingyise);
+			Set<Yaku::ChinitsuF>(&YakuChecker::qingyiseF);
+			Set<Yaku::Chuurenpoutou>(&YakuChecker::jiulianbaodeng);
+			Set<Yaku::Chuurenkyuumenmachi>(&YakuChecker::chunzhengjiulianbaodeng);
 		}
 
 	private:
@@ -31,16 +31,16 @@ YakuChecker::YakuChecker(
 	const AgariParameters& i_par,
 	const std::vector<Group>& i_menqingMianzi
 ) noexcept
-	: menqingCount(i_menqingMianzi.size() - 1), //非副露的面子数
-	  menqing(menqingCount == 4), //是否门清
-	  par(i_par), mianzi(i_menqingMianzi) {}
+	: menchinCount(i_menqingMianzi.size() - 1), //非副露的面子数
+	  menchin(menchinCount == 4), //是否门清
+	  par(i_par), mentsu(i_menqingMianzi) {}
 
 bool YakuChecker::tenhu() const noexcept { return par.state == 1 && par.type == 0 && par.selfWind == EAST; }
 
 bool YakuChecker::chihu() const noexcept { return par.state == 1 && par.type == 0 && par.selfWind != EAST; }
 
 bool YakuChecker::ziyise() const noexcept {
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (group.color != 'z')
 			return false;
 	}
@@ -49,7 +49,7 @@ bool YakuChecker::ziyise() const noexcept {
 
 bool YakuChecker::sigangzi() const noexcept {
 	auto gangziCount = 0;
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (group.type == GroupType::Kantsu)
 			gangziCount++;
 	}
@@ -57,11 +57,11 @@ bool YakuChecker::sigangzi() const noexcept {
 }
 
 bool YakuChecker::qingyise() const noexcept {
-	return UnSyncCacheInvoke<Yaku::Qingyise>(
+	return UnSyncCacheInvoke<Yaku::Chinitsu>(
 		[this]() noexcept {
 			auto qingyise = true;
 			auto color = '0';
-			for (auto& group : mianzi) {
+			for (auto& group : mentsu) {
 				if (group.color == 'z') { qingyise = false; }
 				else {
 					if (color == '0')
@@ -70,16 +70,16 @@ bool YakuChecker::qingyise() const noexcept {
 						qingyise = false;
 				}
 			}
-			return qingyise && menqing;
+			return qingyise && menchin;
 		});
 }
 
 bool YakuChecker::qingyiseF() const noexcept {
-	return UnSyncCacheInvoke<Yaku::QingyiseF>(
+	return UnSyncCacheInvoke<Yaku::ChinitsuF>(
 		[this]() noexcept {
 			auto qingyise = true;
 			auto color = '0';
-			for (auto& group : mianzi) {
+			for (auto& group : mentsu) {
 				if (group.color == 'z') { qingyise = false; }
 				else {
 					if (color == '0')
@@ -88,12 +88,12 @@ bool YakuChecker::qingyiseF() const noexcept {
 						qingyise = false;
 				}
 			}
-			return qingyise && !menqing;
+			return qingyise && !menchin;
 		});
 }
 
 bool YakuChecker::qinglaotou() const noexcept {
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (!group.islaotou())
 			return false;
 	}
@@ -101,7 +101,7 @@ bool YakuChecker::qinglaotou() const noexcept {
 }
 
 bool YakuChecker::lvyise() const noexcept {
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (!group.isgreen())
 			return false;
 	}
@@ -113,7 +113,7 @@ bool YakuChecker::xiaosixi() const noexcept {
 
 	auto fengCount = 0; //风面子/雀头计数
 	auto fengQuetou = false;
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (group.color == 'z') {
 			if (group.value <= 4) {
 				fengCount++;
@@ -128,7 +128,7 @@ bool YakuChecker::xiaosixi() const noexcept {
 //大四喜
 bool YakuChecker::dasixi() const noexcept {
 	auto fengCount = 0; //风面子/雀头计数
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (group.color == 'z') {
 			if (group.value <= 4) {
 				fengCount++;
@@ -143,7 +143,7 @@ bool YakuChecker::dasixi() const noexcept {
 //大三元
 bool YakuChecker::dasanyuan() const noexcept {
 	auto sanyuanCount = 0;
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (group.color == 'z') {
 			if (group.value > 4) {
 				sanyuanCount++;
@@ -156,10 +156,10 @@ bool YakuChecker::dasanyuan() const noexcept {
 }
 
 bool YakuChecker::sianke() const noexcept {
-	if (!menqing)return false;
+	if (!menchin)return false;
 	auto keziCount = 0;
 	Single quetou;
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (group.type == GroupType::Koutsu)
 			keziCount++;
 		if (group.type == GroupType::Toitsu)
@@ -169,10 +169,10 @@ bool YakuChecker::sianke() const noexcept {
 }
 
 bool YakuChecker::siankedanqi() const noexcept {
-	if (!menqing)return false;
+	if (!menchin)return false;
 	auto keziCount = 0;
 	Single quetou;
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (group.type == GroupType::Koutsu)
 			keziCount++;
 		if (group.type == GroupType::Toitsu)
@@ -212,7 +212,7 @@ bool YakuChecker::chunzhengjiulianbaodengShape()const noexcept {
 	return true;
 }
 bool YakuChecker::jiulianbaodeng() const noexcept {
-	return UnSyncCacheInvoke<Yaku::Jiulianbaodeng>(
+	return UnSyncCacheInvoke<Yaku::Chuurenpoutou>(
 		[this]() noexcept {
 			if (tenhu()|| chunzhengjiulianbaodengShape()) return false;
 			return jiulianbaodengShape();
@@ -220,7 +220,7 @@ bool YakuChecker::jiulianbaodeng() const noexcept {
 }
 
 bool YakuChecker::chunzhengjiulianbaodeng() const noexcept {
-	return UnSyncCacheInvoke<Yaku::Chunzhengjiulianbaodeng>(
+	return UnSyncCacheInvoke<Yaku::Chuurenkyuumenmachi>(
 		[this]() noexcept {
 			return chunzhengjiulianbaodengShape() || (jiulianbaodengShape() && tenhu());
 		});
@@ -229,7 +229,7 @@ bool YakuChecker::hunyise() const noexcept{
 	auto color = '0';
 	bool hunyise = true;
 	//副露牌
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (group.color != 'z') {
 			if (color == '0')
 				color = group.color;
@@ -237,13 +237,13 @@ bool YakuChecker::hunyise() const noexcept{
 		}
 	}
 	if (qingyise())hunyise = false;
-	return hunyise && menqing;
+	return hunyise && menchin;
 }
 bool YakuChecker::hunyiseF() const noexcept {
 	auto color = '0';
 	bool hunyiseF = true;
 	//副露牌
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (group.color != 'z') {
 			if (color == '0')
 				color = group.color;
@@ -251,7 +251,7 @@ bool YakuChecker::hunyiseF() const noexcept {
 		}
 	}
 	if (qingyiseF())hunyiseF = false;
-	return hunyiseF && !menqing;
+	return hunyiseF && !menchin;
 }
 //平和和符数计算
 std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
@@ -259,46 +259,46 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 	auto fu = 20;
 	auto pinghu = true;
 	//首先判断雀头是否为役牌
-	if (mianzi[0].color == 'z') {
-		if (mianzi[0].value >= 5) {
+	if (mentsu[0].color == 'z') {
+		if (mentsu[0].value >= 5) {
 			pinghu = false;
 			fu += 2;
 		}
-		if (mianzi[0].value == par.prevailingWind + 1) {
+		if (mentsu[0].value == par.prevailingWind + 1) {
 			fu += 2;
 			pinghu = false;
 		}
-		if (mianzi[0].value == par.selfWind + 1) {
+		if (mentsu[0].value == par.selfWind + 1) {
 			fu += 2;
 			pinghu = false;
 		}
 	}
 	//判断是否有刻子
 	for (auto i = 1; i <= 4; ++i) {
-		if (mianzi[i].type != GroupType::Shuntsu) {
+		if (mentsu[i].type != GroupType::Shuntsu) {
 			pinghu = false;
-			if (mianzi[i].type == GroupType::Koutsu)
-				fu += 2 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
-			if (mianzi[i].type == GroupType::Kantsu)
-				fu += 8 * (mianzi[i].isyaojiu() ? 2 : 1) * (i <= menqingCount ? 2 : 1);
+			if (mentsu[i].type == GroupType::Koutsu)
+				fu += 2 * (mentsu[i].isyaojiu() ? 2 : 1) * (i <= menchinCount ? 2 : 1);
+			if (mentsu[i].type == GroupType::Kantsu)
+				fu += 8 * (mentsu[i].isyaojiu() ? 2 : 1) * (i <= menchinCount ? 2 : 1);
 		}
 	}
 	//和牌方式是否为两面
 	auto liangmianOnly = true; //是否只能被看成两面
 	auto liangmian = false; //是否可以被看成两面
-	for (auto i = 1; i <= menqingCount; ++i) {
-		if (mianzi[i].type == GroupType::Shuntsu) {
-			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
+	for (auto i = 1; i <= menchinCount; ++i) {
+		if (mentsu[i].type == GroupType::Shuntsu) {
+			if (par.target.valueEqual(Single(mentsu[i].value, mentsu[i].color, false)))
 				liangmian = true;
-			if (par.target.valueEqual(Single(mianzi[i].value + 2, mianzi[i].color, false)))
+			if (par.target.valueEqual(Single(mentsu[i].value + 2, mentsu[i].color, false)))
 				liangmian = true;
 		}
-		if (mianzi[i].type == GroupType::Toitsu) {
-			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
+		if (mentsu[i].type == GroupType::Toitsu) {
+			if (par.target.valueEqual(Single(mentsu[i].value, mentsu[i].color, false)))
 				liangmianOnly = false;
 		}
-		if (mianzi[i].type == GroupType::Koutsu || mianzi[i].type == GroupType::Kantsu) {
-			if (par.target.valueEqual(Single(mianzi[i].value, mianzi[i].color, false)))
+		if (mentsu[i].type == GroupType::Koutsu || mentsu[i].type == GroupType::Kantsu) {
+			if (par.target.valueEqual(Single(mentsu[i].value, mentsu[i].color, false)))
 				liangmianOnly = false;
 		}
 	}
@@ -307,7 +307,7 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 	//为平和型
 	if (pinghu) {
 		//门清，附加平和一役
-		if (menqing) {
+		if (menchin) {
 			if (par.type == 1)fu += 10;
 			meetTheCounditions = true;
 			//assert(res.result.fu == 20);
@@ -319,7 +319,7 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 		if (liangmianOnly == false)
 			fu += 2;
 		//门清荣和+10符,自摸+2符
-		if (menqing) {
+		if (menchin) {
 			if (par.type >= 1)
 				fu += 10;
 			else fu += 2;
@@ -335,39 +335,39 @@ std::pair<bool, int> YakuChecker::pinghuAndFuCount() const noexcept{
 }
 TryToAgariResult YakuChecker::getResult() {
 	auto result = AgariResult();
-	if (mianzi.size() != 5)return TryToAgariResult(AgariFaildReason::ShapeWrong);
+	if (mentsu.size() != 5)return TryToAgariResult(AgariFaildReason::ShapeWrong);
 	result.tsumo = par.type == 0;
 	//役满型 
 	//天地和
 	if (tenhu())
-		addYaku<Yaku::Tianhu>(result);
+		addYaku<Yaku::Tenhou>(result);
 	if (chihu())
-		addYaku<Yaku::Dihu>(result);
+		addYaku<Yaku::Chihou>(result);
 	//字一色、四杠子
 	if (ziyise())
-		addYaku<Yaku::Ziyise>(result);
+		addYaku<Yaku::Tsuuiisou>(result);
 	if (sigangzi())
-		addYaku<Yaku::Sigangzi>(result);
+		addYaku<Yaku::Suukantsu>(result);
 	//清老头，绿一色，小四喜，大四喜，大三元
 	if (qinglaotou())
-		addYaku<Yaku::Qinglaotou>(result);
+		addYaku<Yaku::Chinroutou>(result);
 	if (lvyise())
-		addYaku<Yaku::Lvyise>(result);
+		addYaku<Yaku::Ryuuiisou>(result);
 	if (xiaosixi())
-		addYaku<Yaku::Xiaosixi>(result);
+		addYaku<Yaku::Shousuushi>(result);
 	if (dasixi())
-		addYaku<Yaku::Dasixi>(result);
+		addYaku<Yaku::Daisuushi>(result);
 	if (dasanyuan())
-		addYaku<Yaku::Dasanyuan>(result);
+		addYaku<Yaku::Daisangen>(result);
 	if (sianke())
-		addYaku<Yaku::Sianke>(result);
+		addYaku<Yaku::Suuankou>(result);
 	if (siankedanqi())
-		addYaku<Yaku::Siankedanqi>(result);
+		addYaku<Yaku::Suuankoutanki>(result);
 	//九莲宝灯，纯正九莲宝灯
 	if (jiulianbaodeng())
-		addYaku<Yaku::Jiulianbaodeng>(result);
+		addYaku<Yaku::Chuurenpoutou>(result);
 	if (chunzhengjiulianbaodeng())
-		addYaku<Yaku::Chunzhengjiulianbaodeng>(result);
+		addYaku<Yaku::Chuurenkyuumenmachi>(result);
 	//满足役满型
 	if (result.han < 0) { return AgariResult(Algorithms::getScore(par.selfWind, result)); }
 	auto myHandTile = par.handTile;
@@ -387,22 +387,22 @@ TryToAgariResult YakuChecker::getResult() {
 	//平和
 	auto pinghuResult = pinghuAndFuCount();
 	if (pinghuResult.first){
-		addYaku<Yaku::Pinghu>(result);
+		addYaku<Yaku::Pinhu>(result);
 	}
 	result.fu = pinghuResult.second;
 	if (qingyise())
-		addYaku<Yaku::Qingyise>(result);
+		addYaku<Yaku::Chinitsu>(result);
 	else if (qingyiseF())
-		addYaku<Yaku::QingyiseF>(result);
+		addYaku<Yaku::ChinitsuF>(result);
 	else if (hunyise())
-		addYaku<Yaku::Hunyise>(result);
+		addYaku<Yaku::Honitsu>(result);
 	else if (hunyiseF())
-		addYaku<Yaku::HunyiseF>(result);
+		addYaku<Yaku::HonitsuF>(result);
 	//清一色，混一色，断幺九，混老头，纯全带幺九，混全带幺九的判断
 	auto duanyao = true, hunlaotou = true, chunquan = true, hunquan = true;
 	auto color = '0';
 	//枚举面子
-	for (auto& group : mianzi) {
+	for (auto& group : mentsu) {
 		if (!group.isyaojiu()) {
 			hunquan = false;
 			chunquan = false;
@@ -426,26 +426,26 @@ TryToAgariResult YakuChecker::getResult() {
 	}
 	if (hunlaotou) {
 		result.han += 2;
-		result.yaku.add<Yaku::Hunlaotou>();
+		result.yaku.add<Yaku::Honroutou>();
 	}
 	if (chunquan) {
-		if (menqing) {
+		if (menchin) {
 			result.han += 3;
-			result.yaku.add<Yaku::Chunquantaiyaojiu>();
+			result.yaku.add<Yaku::Junchantaiyaochuu>();
 		}
 		else {
 			result.han += 2;
-			result.yaku.add<Yaku::ChunquantaiyaojiuF>();
+			result.yaku.add<Yaku::JunchantaiyaochuuF>();
 		}
 	}
 	else if (hunquan) {
-		if (menqing) {
+		if (menchin) {
 			result.han += 2;
-			result.yaku.add<Yaku::Hunquandaiyaojiu>();
+			result.yaku.add<Yaku::Honchantaiyaochuu>();
 		}
 		else {
 			result.han += 1;
-			result.yaku.add<Yaku::HunquandaiyaojiuF>();
+			result.yaku.add<Yaku::HonchantaiyaochuuF>();
 		}
 	}
 	/*
@@ -477,7 +477,7 @@ TryToAgariResult YakuChecker::getResult() {
 		//w立
 		if (par.riichiJunme == -2) {
 			result.han += 2;
-			result.yaku.add<Yaku::Lianglizhi>();
+			result.yaku.add<Yaku::doubleRiichi>();
 		}
 		else {
 			result.han += 1;
@@ -491,18 +491,18 @@ TryToAgariResult YakuChecker::getResult() {
 	//检查抢杠
 	if (par.type == 2) {
 		result.han += 1;
-		result.yaku.add<Yaku::Qianggang>();
+		result.yaku.add<Yaku::Chankan>();
 	}
 	//检查门清自摸
-	if (par.type == 0 && menqingCount == 4) {
+	if (par.type == 0 && menchinCount == 4) {
 		result.han += 1;
 		result.yaku.add<Yaku::Menzenchintsumo>();
 	}
 	//检查河底/海底
 	if (par.state == 2) {
 		if (par.type == 0)
-			result.yaku.add<Yaku::Haidilaoyue>();
-		else if (par.type == 1)result.yaku.add<Yaku::Hedilaoyu>();
+			result.yaku.add<Yaku::Haiteiraoyue>();
+		else if (par.type == 1)result.yaku.add<Yaku::Houteiraoyui>();
 	}
 	//std::cout << "*" << std::endl;
 	if (result.han == 0) { return TryToAgariResult(AgariFaildReason::NoYaku); }
@@ -524,6 +524,6 @@ TryToAgariResult YakuChecker::getResult() {
 	return TryToAgariResult(result);
 }
 
-TryToAgariResult CheckYakuForStandardType(const AgariParameters& par, const std::vector<Group>& mianzi) {
-	return YakuChecker(par, mianzi).getResult();
+TryToAgariResult CheckYakuForStandardType(const AgariParameters& par, const std::vector<Group>& mentsu) {
+	return YakuChecker(par, mentsu).getResult();
 }

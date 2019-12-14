@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <random>
 
-Mountain::Mountain() { mHandPtr = mLingshangPtr = 0; }
+Mountain::Mountain() { mHandPtr = mRinshanPtr = 0; }
 
 std::string Mountain::getMountainString() {//获得牌山序列
 	std::string res;
@@ -16,7 +16,7 @@ std::string Mountain::getMountainString() {//获得牌山序列
 }
 
 Single Mountain::nextRinshan() {//获取下一张岭上牌(自动移海底牌)
-	const auto res = mB[mLingshangPtr++];
+	const auto res = mB[mRinshanPtr++];
 	mB.push_back(mA[mA.size() - 1]);
 	mA.pop_back();
 	return res;
@@ -76,7 +76,7 @@ std::vector<Single> Mountain::getUraIndicators(int count)const{
 
 void Mountain::reset(const Rule& rule) {
 	mHandPtr = 0;
-	mLingshangPtr = 0;
+	mRinshanPtr = 0;
 	mMountain.clear();
 	mA.clear();
 	mB.clear();
