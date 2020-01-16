@@ -16,7 +16,7 @@ private:
 	//判断是否形式和牌,不考虑役
 	static bool agariWithoutYaku(const Single& target, const std::vector<Single>& handTile);
 	//试图和牌，并计算国士无双型和牌点数
-	static TryToAgariResult guoshiwushuang(const AgariParameters& par);
+	static TryToAgariResult kokushi(const AgariParameters& par);
 	//试图和牌，并计算标准型和牌点数，返回(点数最大的)结果,depth=0表示枚举雀头，dep=4为最深层
 	static TryToAgariResult agariSearch(const AgariParameters& par, int depth, const std::vector<Single>& remainTiles,
 	                                    std::vector<Group> mentsu);
@@ -57,7 +57,7 @@ public:
 	//static void addNumberCount(int& shape, int value, int count);
 	//预处理，计算单花色离目标的距离(仅允许插入和删除两个操作)
 	static void preprocessDistance();
-	//计算14张手牌的标准型向听数(0为一向听，-1为和牌)
+	//计算2,5,8,11,14张手牌的标准型向听数(0为一向听，-1为和牌)
 	static int getDistanceStandard(const CompactSingles& handTile);
 	//计算14张手牌的七对型向听数(0为一向听，-1为和牌)
 	static int getDistanceChiitoi(const CompactSingles& handTile);

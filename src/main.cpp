@@ -84,18 +84,16 @@ void test() {
 
 void test2() {
 	while (true) {
-		int a[7];
-		auto mentsu = 0, quetou = 0;
-		cin >> a[0] >> a[1] >> a[2] >> a[3] >> a[4] >> a[5] >> a[6] >> mentsu >> quetou;
-		const auto shape = a[0] + (a[1] * 5) + (a[2] * 25) + (a[3] * 125) + (a[4] * 625) + a[5] * 3125 + a[6] * 15625;
-		//while (pai)
-		//{
-		//	Algorithms::addNumberCount(shape, pai % 10, 1);
-		//	pai = pai / 10;
-		//}
-		//int target = quetou * 5 + mianzi;
-		cout << Algorithms::getDistanceSingle(shape, mentsu, quetou, true) << endl;
+		vector<Single>handTile;
+		handTile.emplace_back(1, 's', 0);
+		handTile.emplace_back(4, 's', 0);
+		handTile.emplace_back(1, 'm', 0);
+		handTile.emplace_back(4, 'm', 0);
+		handTile.emplace_back(7, 'm', 0);
+		cout << Algorithms::getDistanceStandard(CompactSingles(handTile))<<endl;
+		break;
 	}
+	while (true);
 }
 
 int main_loop() {
@@ -107,10 +105,8 @@ int main_loop() {
 
 	已知bug:
 	红宝牌碰和杠的时候会出问题
-	副露牌向听数判断有错
 	*/
 	const int seed = time(0);
-	
 	//cout << "输入种子:" << endl;
 	//cin >> seed;
 	srand(seed);

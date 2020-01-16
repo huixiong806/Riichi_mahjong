@@ -127,9 +127,9 @@ AgariResult Algorithms::getScore(WindType selfWind, AgariResult inp) {
 
 TryToAgariResult Algorithms::agari(const AgariParameters& par) {
 	//国士无双的判定
-	const auto kokushi = guoshiwushuang(par);
-	if (kokushi.success)
-		return kokushi;
+	const auto kokushiOK = kokushi(par);
+	if (kokushiOK.success)
+		return kokushiOK;
 	//只有国士能抢暗杠
 	if (par.type == AgariWays::ChanAnkan)return TryToAgariResult(AgariFaildReason::AgariTypeWrong);
 	//七对型的判定(两杯口将被拆解为七对型)
@@ -430,7 +430,7 @@ TryToAgariResult Algorithms::chiitoi(const AgariParameters& par) {
 }
 
 //判断是否为国士无双和牌型
-TryToAgariResult Algorithms::guoshiwushuang(const AgariParameters& par) {
+TryToAgariResult Algorithms::kokushi(const AgariParameters& par) {
 	auto res = AgariResult();
 	auto kokushi = 0;
 	if (par.groupTile.empty()) {
@@ -678,21 +678,19 @@ int Algorithms::getDistanceSingle(int shape, int mentsu, int jyantou, bool z) {
 	return distanceToTargetZ[shape][mentsu + jyantou * 5];
 }
 
-//计算14张手牌的向听数(0为一向听，-1为和牌)
+//计算2,5,8,11,14张手牌的标准形向听数(0为一向听，-1为和牌)
 int Algorithms::getDistanceStandard(const CompactSingles& handTile) {
-	//计算标准型向听数
+	//计算标准形向听数
+	int tileCount = handTile.getTileCount();
+	int maxB = 4-(14-tileCount)/3;//目标要凑成maxB个面子
 	int dp[5][5][2]; //a当前已经完成的花色数，b当前已经完成的面子数，c当前已经完成的雀头数,dp表示最小距离
-	//int pre[5][5][2];
-	for (auto& i : dp)
-		for (auto& j : i)
-			for (int& k : j) {
-				k = 99; //此距离最大为18，表示8向听
-				//pre[i][j][k] = -1;
-			}
+	for (auto a = 0; a < 5; ++a)
+		for (auto b = 0; b <= maxB; ++b)
+			dp[a][b][0] = dp[a][b][1] = 999;//此距离最大为18，表示8向听
 	dp[0][0][0] = 0; //设定边界值，0花色0面子0雀头距离为0
 	for (auto a = 1; a < 5; ++a)
-		for (auto b = 0; b < 5; ++b)
-			for (auto k = 0; k < 5 && b - k >= 0; ++k) //枚举这一种花色要达成的面子数
+		for (auto b = 0; b <= maxB; ++b)
+			for (auto k = 0; k <= maxB && b - k >= 0; ++k) //枚举这一种花色要达成的面子数
 			{
 				dp[a][b][0] = std::min(dp[a][b][0], dp[a - 1][b - k][0] + getDistanceSingle(handTile.colors[a-1].raw(), k, 0, a == 4));
 				dp[a][b][1] = std::min(dp[a][b][1], dp[a - 1][b - k][0] + getDistanceSingle(handTile.colors[a-1].raw(), k, 1, a == 4));
@@ -739,10 +737,10 @@ int Algorithms::getDistanceStandard(const CompactSingles& handTile) {
 		}
 		std::cout << std::endl;
 	}*/
-	return dp[4][4][1] / 2 - 1;
+	return dp[4][maxB][1] / 2 - 1;
 }
 
-//计算14张手牌的向听数(0为一向听，-1为和牌)
+//计算14张手牌的七对向听数(0为一向听，-1为和牌)
 int Algorithms::getDistanceChiitoi(const CompactSingles& handTile) {
 	//计算七对子向听数
 	auto toitsuCount = 0;
@@ -771,7 +769,9 @@ int Algorithms::getDistanceKokushi(const CompactSingles& handTile){
 	}
 	return 12 + static_cast<int>(yaochuuCount <= yaochuuTypeCount) - yaochuuTypeCount;
 }
-//计算14张手牌的向听数(0为一向听，-1为和牌)
+//计算5,8,11,14张手牌的向听数(0为一向听，-1为和牌)
 int Algorithms::getDistance(const CompactSingles& handTile){
-	return std::min(std::min(getDistanceKokushi(handTile), getDistanceChiitoi(handTile)), getDistanceStandard(handTile));
+	if (handTile.getTileCount() == 14)
+		return std::min(std::min(getDistanceKokushi(handTile), getDistanceChiitoi(handTile)), getDistanceStandard(handTile));
+	return getDistanceStandard(handTile);
 }

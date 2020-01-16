@@ -103,6 +103,18 @@ struct SparseSinglesOfColor {
 	[[nodiscard]] constexpr auto get(const unsigned int v) const noexcept { return rep >> Offsets[v] & 0b111; }
 
 	[[nodiscard]] constexpr auto raw() const noexcept { return rep; }
+
+	[[nodiscard]] constexpr auto tileCount()const noexcept{
+		return	(rep >> Offsets[1] & 0b111) +
+			(rep >> Offsets[2] & 0b111) +
+			(rep >> Offsets[3] & 0b111) +
+			(rep >> Offsets[4] & 0b111) +
+			(rep >> Offsets[5] & 0b111) +
+			(rep >> Offsets[6] & 0b111) +
+			(rep >> Offsets[7] & 0b111) +
+			(rep >> Offsets[8] & 0b111) +
+			(rep >> Offsets[9] & 0b111);
+	}
 private:
 	uint32_t rep;
 	explicit constexpr SparseSinglesOfColor(const uint32_t r) noexcept: rep(r) {}
@@ -158,9 +170,20 @@ struct CompactSinglesOfColor {
 	{}
 	[[nodiscard]] explicit constexpr operator SparseSinglesOfColor() const noexcept {
 		return SparseSinglesOfColor{}
-		       .add(9, get<0u>()).add(1, get<1u>()).add(2, get<2u>()).add(3, get<3u>())
+		       .add(9, get<9u>()).add(1, get<1u>()).add(2, get<2u>()).add(3, get<3u>())
 		       .add(4, get<4u>()).add(5, get<5u>()).add(6, get<6u>()).add(7, get<7u>())
 		       .add(8, get<8u>());
+	}
+	[[nodiscard]] constexpr auto tileCount()const noexcept {
+		return	(rep / Pow5[1] % 5) +
+			(rep / Pow5[2] % 5) +
+			(rep / Pow5[3] % 5) +
+			(rep / Pow5[4] % 5) +
+			(rep / Pow5[5] % 5) +
+			(rep / Pow5[6] % 5) +
+			(rep / Pow5[7] % 5) +
+			(rep / Pow5[8] % 5) +
+			(rep / Pow5[9] % 5);
 	}
 private:
 	uint32_t rep;
@@ -183,6 +206,13 @@ struct alignas(std::max_align_t) SparseSingles {
 				colors[3].add(item.value(), 1);
 		}
 	}
+	int getTileCount()const noexcept
+	{
+		auto count = 0;
+		for (auto& item : colors)
+			count += item.tileCount();
+		return count;
+	}
 };
 
 struct alignas(std::max_align_t) CompactSingles {
@@ -199,6 +229,13 @@ struct alignas(std::max_align_t) CompactSingles {
 			if (item.color() == 'z')
 				colors[3].add(item.value(), 1);
 		}
+	}
+	int getTileCount()const noexcept
+	{
+		auto count = 0;
+		for (auto& item : colors)
+			count += item.tileCount();
+		return count;
 	}
 };
 
