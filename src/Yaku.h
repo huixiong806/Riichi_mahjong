@@ -9,7 +9,9 @@ enum class Yaku {
 	Tanyao = 0x100,
 	YakuhaiJikaze = 0x101,
 	YakuhaiBakaze = 0x102,
-	YakuhaiSangen = 0x103,
+	YakuhaiHaku = 0x103,
+	YakuhaiHatsu = 0x104,
+	YakuhaiChun = 0x105,
 	Pinhu = 0x113,
 	Iipeikou = 0x114,
 	Chankan = 0x106,
@@ -70,50 +72,52 @@ constexpr unsigned int yakuToIndex(const Yaku yaku) noexcept {
 	case Yaku::Tanyao: return 3;
 	case Yaku::YakuhaiJikaze: return 4;
 	case Yaku::YakuhaiBakaze: return 5;
-	case Yaku::YakuhaiSangen: return 6;
-	case Yaku::Pinhu: return 7;
-	case Yaku::Iipeikou: return 8;
-	case Yaku::Chankan: return 9;
-	case Yaku::Rinshankaihou: return 10;
-	case Yaku::Haiteiraoyue: return 11;
-	case Yaku::Houteiraoyui: return 12;
-	case Yaku::doubleRiichi: return 13;
-	case Yaku::Sanshokudoukou: return 14;
-	case Yaku::Sankantsu: return 15;
-	case Yaku::Toitoihou: return 16;
-	case Yaku::Sanankou: return 17;
-	case Yaku::Shousangen: return 18;
-	case Yaku::Honroutou: return 19;
-	case Yaku::Chiitoitsu: return 20;
-	case Yaku::Honchantaiyaochuu: return 21;
-	case Yaku::HonchantaiyaochuuF: return 22;
-	case Yaku::Ikkitsuukan: return 23;
-	case Yaku::IkkitsuukanF: return 24;
-	case Yaku::Sanshokudoujun: return 25;
-	case Yaku::SanshokudoujunF: return 26;
-	case Yaku::Ryanpeikou: return 27;
-	case Yaku::Junchantaiyaochuu: return 28;
-	case Yaku::JunchantaiyaochuuF: return 29;
-	case Yaku::Honitsu: return 30;
-	case Yaku::HonitsuF: return 31;
-	case Yaku::Nagashimangan: return 32;
-	case Yaku::Chinitsu: return 33;
-	case Yaku::ChinitsuF: return 34;
-	case Yaku::Tenhou: return 35;
-	case Yaku::Chihou: return 36;
-	case Yaku::Daisangen: return 37;
-	case Yaku::Suuankou: return 38;
-	case Yaku::Tsuuiisou: return 39;
-	case Yaku::Ryuuiisou: return 40;
-	case Yaku::Chinroutou: return 41;
-	case Yaku::Kokushimusou: return 42;
-	case Yaku::Shousuushi: return 43;
-	case Yaku::Suukantsu: return 44;
-	case Yaku::Chuurenpoutou: return 45;
-	case Yaku::Suuankoutanki: return 46;
-	case Yaku::Kokushijuusanmenmachi: return 47;
-	case Yaku::Chuurenkyuumenmachi: return 48;
-	case Yaku::Daisuushi: return 49;
+	case Yaku::YakuhaiHaku: return 6;
+	case Yaku::YakuhaiHatsu: return 7;
+	case Yaku::YakuhaiChun: return 8;
+	case Yaku::Pinhu: return 9;
+	case Yaku::Iipeikou: return 10;
+	case Yaku::Chankan: return 11;
+	case Yaku::Rinshankaihou: return 12;
+	case Yaku::Haiteiraoyue: return 13;
+	case Yaku::Houteiraoyui: return 14;
+	case Yaku::doubleRiichi: return 15;
+	case Yaku::Sanshokudoukou: return 16;
+	case Yaku::Sankantsu: return 17;
+	case Yaku::Toitoihou: return 18;
+	case Yaku::Sanankou: return 19;
+	case Yaku::Shousangen: return 20;
+	case Yaku::Honroutou: return 21;
+	case Yaku::Chiitoitsu: return 22;
+	case Yaku::Honchantaiyaochuu: return 23;
+	case Yaku::HonchantaiyaochuuF: return 24;
+	case Yaku::Ikkitsuukan: return 25;
+	case Yaku::IkkitsuukanF: return 26;
+	case Yaku::Sanshokudoujun: return 27;
+	case Yaku::SanshokudoujunF: return 28;
+	case Yaku::Ryanpeikou: return 29;
+	case Yaku::Junchantaiyaochuu: return 30;
+	case Yaku::JunchantaiyaochuuF: return 31;
+	case Yaku::Honitsu: return 32;
+	case Yaku::HonitsuF: return 33;
+	case Yaku::Nagashimangan: return 34;
+	case Yaku::Chinitsu: return 35;
+	case Yaku::ChinitsuF: return 36;
+	case Yaku::Tenhou: return 37;
+	case Yaku::Chihou: return 38;
+	case Yaku::Daisangen: return 39;
+	case Yaku::Suuankou: return 40;
+	case Yaku::Tsuuiisou: return 41;
+	case Yaku::Ryuuiisou: return 42;
+	case Yaku::Chinroutou: return 43;
+	case Yaku::Kokushimusou: return 44;
+	case Yaku::Shousuushi: return 45;
+	case Yaku::Suukantsu: return 46;
+	case Yaku::Chuurenpoutou: return 47;
+	case Yaku::Suuankoutanki: return 48;
+	case Yaku::Kokushijuusanmenmachi: return 49;
+	case Yaku::Chuurenkyuumenmachi: return 50;
+	case Yaku::Daisuushi: return 51;
 	default: return 0xFFFFFFFF;
 	}
 }
@@ -231,7 +235,7 @@ private:
 
 	static constexpr Yaku reverse_table[] = {
 		Yaku::Riichi, Yaku::Ippatsu, Yaku::Menzenchintsumo, Yaku::Tanyao, Yaku::YakuhaiJikaze,
-		Yaku::YakuhaiBakaze, Yaku::YakuhaiSangen, Yaku::Pinhu,
+		Yaku::YakuhaiBakaze, Yaku::YakuhaiHaku,Yaku::YakuhaiHatsu,Yaku::YakuhaiChun, Yaku::Pinhu,
 		Yaku::Iipeikou, Yaku::Chankan, Yaku::Rinshankaihou, Yaku::Haiteiraoyue, Yaku::Houteiraoyui,
 		Yaku::doubleRiichi, Yaku::Sanshokudoukou, Yaku::Sankantsu, Yaku::Toitoihou, Yaku::Sanankou,
 		Yaku::Shousangen, Yaku::Honroutou, Yaku::Chiitoitsu, Yaku::Honchantaiyaochuu,

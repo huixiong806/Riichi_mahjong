@@ -20,9 +20,9 @@ private:
 	mutable Yakus exec{}, result{};
 	// parameters
 	const int menchinCount;
-	const bool menchin;
+	bool menchin;
 	const AgariParameters& par;
-	const std::vector<Group>& mentsu;
+	std::vector<Group> mentsu;
 
 	template <Yaku Y, class Invoke>
 	[[nodiscard]] bool UnSyncCacheInvoke(const Invoke invoke) const noexcept {
@@ -46,7 +46,7 @@ private:
 	template <Yaku Y>
 	void UnSyncCacheSet(const bool val) const noexcept { if (val) { result.add<Y>(); } }
 public:
-	YakuChecker(const AgariParameters& i_par, const std::vector<Group>& i_menqingMianzi) noexcept;
+	YakuChecker(const AgariParameters& i_par, const std::vector<Group>& i_allMentsu) noexcept;
 	//役满型
 	[[nodiscard]] bool tenhou() const noexcept;
 	[[nodiscard]] bool chihou() const noexcept;
@@ -68,6 +68,36 @@ public:
 	[[nodiscard]] bool chinitsuF() const noexcept;
 	[[nodiscard]] bool honitsu() const noexcept;
 	[[nodiscard]] bool honitsuF() const noexcept;
+	[[nodiscard]] bool tanyao() const noexcept;
+	[[nodiscard]] bool honroutou() const noexcept;
+	[[nodiscard]] bool honchantaiyaochuu() const noexcept;
+	[[nodiscard]] bool honchantaiyaochuuF() const noexcept;
+	[[nodiscard]] bool junchantaiyaochuu() const noexcept;
+	[[nodiscard]] bool junchantaiyaochuuF() const noexcept;
+	[[nodiscard]] bool sanshokudoujun() const noexcept;
+	[[nodiscard]] bool sanshokudoujunF() const noexcept;
+	[[nodiscard]] bool sanshokudoukou() const noexcept;
+	[[nodiscard]] bool ikkitsuukan() const noexcept;
+	[[nodiscard]] bool ikkitsuukanF() const noexcept;
+	[[nodiscard]] bool shousangen() const noexcept;
+	[[nodiscard]] bool sankantsu() const noexcept;
+	[[nodiscard]] bool toitoihou() const noexcept;
+	[[nodiscard]] bool iipeikou() const noexcept;
+	[[nodiscard]] bool ryanpeikou() const noexcept;
+	[[nodiscard]] bool yakuhaiJikaze() const noexcept;
+	[[nodiscard]] bool yakuhaiBakaze() const noexcept;
+	[[nodiscard]] bool yakuhaiHaku() const noexcept;
+	[[nodiscard]] bool yakuhaiHatsu() const noexcept;
+	[[nodiscard]] bool yakuhaiChun() const noexcept;
+	[[nodiscard]] bool riichi() const noexcept;
+	[[nodiscard]] bool doubleRiichi() const noexcept;
+	[[nodiscard]] bool ippatsu() const noexcept;
+	[[nodiscard]] bool chankan() const noexcept;
+	[[nodiscard]] bool rinshan() const noexcept;
+	[[nodiscard]] bool houtei() const noexcept;
+	[[nodiscard]] bool haitei() const noexcept;
+	[[nodiscard]] bool menchintsumo() const noexcept;
+	[[nodiscard]] bool sanankou() const noexcept;
 	//返回值第一项为是否满足平和，第二项为符数
 	[[nodiscard]] std::pair<bool,int> pinghuAndFuCount() const noexcept;
 	[[nodiscard]] TryToAgariResult getResult();
@@ -78,5 +108,5 @@ public:
 		return (this->*yakuCheckFunc[Id])();
 	}
 };
-
-TryToAgariResult CheckYakuForStandardType(const AgariParameters& par, const std::vector<Group>& mentsu);
+//menchinGroup 下标为0的元素描述雀头，下标为1~3的元素描述门前清的面子(可选)
+TryToAgariResult CheckYakuForStandardType(const AgariParameters& par, const std::vector<Group>& menChinMentsu);

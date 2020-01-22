@@ -144,9 +144,7 @@ TryToAgariResult Algorithms::agari(const AgariParameters& par) {
 
 //标准型和牌役种判断
 TryToAgariResult Algorithms::YakuCheckForStandard(const AgariParameters& par, std::vector<Group>& mentsu) {
-	auto allMentsu = mentsu;
-	allMentsu.insert(allMentsu.end(), par.groupTile.begin(), par.groupTile.end());
-	return CheckYakuForStandardType(par, allMentsu);
+	return CheckYakuForStandardType(par, mentsu);
 }
 
 //判断是否为标准和牌型，返回(点数最大的)结果,depth=0表示枚举雀头，dep=4为最深层
@@ -185,7 +183,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 	auto pool = getPool(remainTiles);
 	//判断顺子和刻子
 	for (auto i = 0; i <= 33; ++i) {
-		//唯一的分歧点，三连刻和三同顺
+		//唯一的分歧点，三连刻和三同顺,这时候需要一个先安排顺子的分支
 		if (i != 7 && i != 8 && i != 16 && i != 17 && i <= 24) {
 			if (pool[i] >= 3 && pool[i + 1] >= 3 && pool[i + 2] >= 3) {
 				Single standard[3];
@@ -219,20 +217,14 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 					if (!equalToStandard)
 						newRemainTiles.push_back(item);
 				}
-				//三连刻
-				mentsu.push_back(Group::createKoutsu(group[0][0], group[0][1], group[0][2], 0));
-				mentsu.push_back(Group::createKoutsu(group[1][0], group[1][1], group[1][2], 0));
-				mentsu.push_back(Group::createKoutsu(group[2][0], group[2][1], group[2][2], 0));
-				bestResult = std::max(bestResult, agariSearch(par, depth + 3, newRemainTiles, mentsu));
-				mentsu.pop_back();
-				mentsu.pop_back();
-				mentsu.pop_back();
 				//三同顺
 				mentsu.push_back(Group::createShuntsu(group[0][0], group[1][0], group[2][0], 0));
 				mentsu.push_back(Group::createShuntsu(group[0][1], group[1][1], group[2][1], 0));
 				mentsu.push_back(Group::createShuntsu(group[0][2], group[1][2], group[2][2], 0));
 				bestResult = std::max(bestResult, agariSearch(par, depth + 3, newRemainTiles, mentsu));
-				return bestResult;
+				mentsu.pop_back();
+				mentsu.pop_back();
+				mentsu.pop_back();
 			}
 		}
 		//刻子
@@ -254,7 +246,7 @@ TryToAgariResult Algorithms::agariSearch(const AgariParameters& par, int depth, 
 				newRemainTiles.push_back(item);
 			}
 			mentsu.push_back(Group::createKoutsu(kezi[0], kezi[1], kezi[2], 0));
-			bestResult = agariSearch(par, depth + 1, newRemainTiles, mentsu);
+			bestResult = std::max(bestResult,agariSearch(par, depth + 1, newRemainTiles, mentsu));
 			return bestResult;
 		}
 		//顺子

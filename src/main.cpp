@@ -35,18 +35,18 @@ void test() {
 	res.handTile.emplace_back(1, 's', 0);
 	res.handTile.emplace_back(1, 's', 0);
 	res.handTile.emplace_back(1, 's', 0);
-	res.handTile.emplace_back(1, 's', 0);
-	res.handTile.emplace_back(2, 's', 0);
 	res.handTile.emplace_back(2, 's', 0);
 	res.handTile.emplace_back(2, 's', 0);
 	res.handTile.emplace_back(2, 's', 0);
 	res.handTile.emplace_back(3, 's', 0);
 	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(3, 'z', 0);
-	res.handTile.emplace_back(3, 'z', 0);
+	res.handTile.emplace_back(3, 'm', 0);
+	res.handTile.emplace_back(1, 'm', 0);
+	res.handTile.emplace_back(2, 'm', 0);
+	res.handTile.emplace_back(5, 's', 0);
+	res.handTile.emplace_back(5, 's', 0);
 	sort(res.handTile.begin(), res.handTile.end());
-	res.nowTile = Single(3, 's', false);
+	res.nowTile = Single(3,'s',false);
 	res.prevailingWind = EAST; //场风
 	res.selfWind = EAST; //门风
 	res.nowWind = EAST;
@@ -57,7 +57,8 @@ void test() {
 	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, false);
 	TryToAgariResult r{};
 	//for (int i = 1000000; i > 0; --i) {
-		r = p.tsumo(res.prevailingWind, static_cast<BonusYakuState>(res.w), {}, {});
+	r = p.tsumo(res.prevailingWind, static_cast<BonusYakuState>(res.w), {}, {});
+	//r = p.ron(res.nowTile,res.prevailingWind,AgariWays::Ron, static_cast<BonusYakuState>(res.w), {}, {});
 	//}
 	auto re = r.result;
 	cout << "Test " << (re.tsumo ? "自摸" : "荣和") << endl;
@@ -174,5 +175,5 @@ int main() {
 	//system("pause");
 	//test2();
 	main_loop();
-	pop_console_locale();
+	//pop_console_locale();
 }

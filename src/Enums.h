@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 enum WindType {
 	EAST,
 	SOUTH,
@@ -6,9 +6,9 @@ enum WindType {
 	NORTH
 };
 enum class BonusYakuState {
-	Normal,//ÆÕÍ¨
-	FirstTurn,//ÌìµØºÍ¡¢WÁ¢
-	LastTurn,//ºÓµ×¡¢º£µ×
+	Normal,//æ™®é€š
+	FirstTurn,//å¤©åœ°å’Œã€Wç«‹
+	LastTurn,//æ²³åº•ã€æµ·åº•
 };
 enum class AgariWays {
 	Tsumo,
@@ -17,12 +17,12 @@ enum class AgariWays {
 	ChanAnkan
 };
 enum class ActionType {
-	Null,//¿ÕÖ¸Áî
+	Null,//ç©ºæŒ‡ä»¤
 	Skip,
-	DiscardTile,//Õı³£´òÅÆ
+	DiscardTile,//æ­£å¸¸æ‰“ç‰Œ
 	Chii,
 	Pon,
-	Kan,//¸Ü
+	Kan,//æ 
 	Ron,
 	Riichi,
 	Tsumo,
@@ -31,13 +31,13 @@ enum class ActionType {
 };
 
 enum class ErrorType {
-	None,//³É¹¦ÁË£¬Ã»ÓĞerror
+	None,//æˆåŠŸäº†ï¼Œæ²¡æœ‰error
 	NotYourTurn,
 	AlreadyActed,
 	ActionRejected,
-	TileNotExist,//´òÅÆÊ±²»´æÔÚÒª´òµÄ¶«Î÷
-	CantRiichi,//²»ÄÜÁ¢Ö±
-	CannotChooseNull,//²»×¼¸ø¿ÕÖ¸Áî
+	TileNotExist,//æ‰“ç‰Œæ—¶ä¸å­˜åœ¨è¦æ‰“çš„ä¸œè¥¿
+	CantRiichi,//ä¸èƒ½ç«‹ç›´
+	CannotChooseNull,//ä¸å‡†ç»™ç©ºæŒ‡ä»¤
 };
 
 enum class GameState :bool
@@ -47,9 +47,9 @@ enum class GameState :bool
 };
 
 enum class AgariFaildReason {
-	Null,//¿Õ
-	ShapeWrong,//²»Âú×ãºÍÅÆĞÍ
-	NoYaku,//ÎŞÒÛ
-	NotEnoughHan,//·¬¸¿
-	AgariTypeWrong //·Ç¹úÊ¿ÎŞË«²»ÄÜÇÀ°µ¸Ü
+	Null,//ç©º
+	ShapeWrong,//ä¸æ»¡è¶³å’Œç‰Œå‹
+	NoYaku,//æ— å½¹
+	NotEnoughHan,//ç•ªç¼š
+	AgariTypeWrong //éå›½å£«æ— åŒä¸èƒ½æŠ¢æš—æ 
 };

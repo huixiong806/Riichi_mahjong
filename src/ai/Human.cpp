@@ -64,7 +64,8 @@ std::vector<Action> Human::getRonAction(const GameInfo& info) {
 	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
-	                                                      info.playerInfo[info.selfWind].ippatsu, state, AgariWays::Ron, info.nowTile,
+	                                                      info.playerInfo[info.selfWind].ippatsu,
+														  info.rinshan,state, AgariWays::Ron, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
@@ -79,7 +80,8 @@ std::vector<Action> Human::getTsumoAction(const GameInfo& info) {
 	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
 	const auto result = Algorithms::agari(AgariParameters(info.selfWind, info.prevailingWind,
 	                                                      info.playerInfo[info.selfWind].riichiJunme,
-	                                                      info.playerInfo[info.selfWind].ippatsu, state, AgariWays::Tsumo, info.nowTile,
+	                                                      info.playerInfo[info.selfWind].ippatsu,
+														  info.rinshan,state, AgariWays::Tsumo, info.nowTile,
 	                                                      info.handTile, info.playerInfo[info.selfWind].groupTile,
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)

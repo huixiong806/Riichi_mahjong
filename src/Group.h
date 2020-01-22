@@ -20,14 +20,14 @@ public:
 	uint8_t value{}; //顺子的话value等于最小的那个
 	uint8_t akadora{}; //从低到高分别表示三张牌(从小到大)是否为红宝牌
 	uint8_t state{};
-	//低位表示吃/碰/杠的那张牌的来源(0,1,2,3对应吃、碰、荣杠、暗杠的自下对上,4,5,6,7对应加杠的自下对上(4无效))，高位0，10，20分别表示第一张，第二张，第三张。(刻子，杠子默认为0)
+	//(10进制)低位表示吃/碰/杠的那张牌的来源(0,1,2,3对应吃、碰、荣杠、暗杠的自下对上,4,5,6,7对应加杠的自下对上(4无效))，高位0，10，20分别表示第一张，第二张，第三张。(刻子，杠子默认为0)
 	//source表示碰的那张牌的来源(0,1,2,3对应自下对上,4,5,6,7也对应自下对上，并且为加杠(4无效))
 	static Group createKoutsu(Single a, Single b, Single target, int source);
 	static Group createShuntsu(Single a, Single b, Single target, int source);
 	static Group createKantsu(Single a, Single b, Single c, Single target, int source);
 	static Group createToitsu(Single a, Single b);
 	//是否为绿牌
-	[[nodiscard]] bool isgreen()const {
+	[[nodiscard]] bool isGreen()const {
 		if (color == 'z')return value == 6;
 		if (color == 's') {
 			if (type != GroupType::Shuntsu)
@@ -36,15 +36,24 @@ public:
 		}
 		return false;
 	}
-
-	//是否为老头牌组(非字牌19)
-	[[nodiscard]] bool is19AndNotZ()const {
+	//是否为暗杠
+	[[nodiscard]] bool isAnkan()const {
+		return type == GroupType::Kantsu&&state == 0;
+	}
+	//是否为老头牌组(非字牌19刻子)
+	[[nodiscard]] bool isRoutouAndNotZ()const {
 		if (type == GroupType::Shuntsu)return false;
 		if (color == 'z')return false;
 		if (value == 1 || value == 9)return true;
 		return false;
 	}
-
+	//是否为老头牌组(只允许19刻子和字牌，不允许顺子)
+	[[nodiscard]] bool isRoutou()const {
+		if (type == GroupType::Shuntsu)return false;
+		if (color == 'z')return true;
+		if (value == 1 || value == 9)return true;
+		return false;
+	}
 	//是否为幺九牌组(允许123/789顺子，允许字牌)
 	[[nodiscard]] bool is19Z()const {
 		if (type == GroupType::Shuntsu) {
@@ -55,7 +64,16 @@ public:
 		if (value == 1 || value == 9)return true;
 		return false;
 	}
-
+	//是否为幺九牌组(允许123/789顺子，不允许字牌)
+	[[nodiscard]] bool is19AndNotZ()const {
+		if (type == GroupType::Shuntsu) {
+			if (value == 7 || value == 1)return true;
+			return false;
+		}
+		if (color == 'z')return false;
+		if (value == 1 || value == 9)return true;
+		return false;
+	}
 	[[nodiscard]] std::string getString() const {
 		std::string res;
 		if (state % 10 == 0 && type != GroupType::Kantsu) {

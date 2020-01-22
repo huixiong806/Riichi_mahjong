@@ -209,7 +209,7 @@ bool Player::canRiichi(BonusYakuState state, Single target) const {
 	if (!groupTile.empty()) {
 		for (auto& item : groupTile) {
 			//暗杠必须满足type=Gang且state=0
-			if (item.type != GroupType::Kantsu || item.state != 0)
+			if (!item.isAnkan())
 				return false;
 		}
 	}

@@ -5,7 +5,6 @@
 #include"Group.h"
 #include"Yaku.h"
 #include"Enums.h"
-
 struct AgariResult {
 	bool tsumo;//自摸
 	int furikomiID{}; //放铳人ID 
@@ -17,8 +16,8 @@ struct AgariResult {
 	int uradora;//里宝牌数
 	int scoreAdd; //不包含立直棒和本场棒的计算
 	int scoreDecFurikomi; //自摸无效 
-	int scoreDecOya; //荣和无效 
-	int scoreDecKodomo; //荣和无效 
+	int scoreDecOya; //荣和无效,庄家和牌无效
+	int scoreDecKodomo; //荣和无效
 	//int nukidora;
 	AgariResult() {
 		tsumo = han = fu = dora = akadora = uradora = scoreAdd = scoreDecFurikomi = scoreDecOya = scoreDecKodomo = 0;
@@ -67,6 +66,7 @@ struct AgariParameters {
 	WindType prevailingWind;
 	int riichiJunme;
 	bool ippatsu;
+	bool rinshan;
 	BonusYakuState state;
 	AgariWays type;
 	Single target;
@@ -80,6 +80,7 @@ struct AgariParameters {
 		WindType prevailingWind_,
 		int lizhiXunmu_,
 		bool yifa_,
+		bool rinshan_,
 		BonusYakuState state_,
 		AgariWays type_,
 		const Single& target_,
@@ -99,5 +100,6 @@ struct AgariParameters {
 		groupTile = groupTile_;
 		dora = dora_;
 		ura = ura_;
+		rinshan = rinshan_;
 	}
 };

@@ -64,24 +64,24 @@ public:
 
 	TryToAgariResult tsumo(WindType prevailingWind, BonusYakuState state, const std::vector<Single>& dora,
 	                      const std::vector<Single>& ura) {
-		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, AgariWays::Tsumo, nowTile,
+		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu,rinshan, state, AgariWays::Tsumo, nowTile,
 		                                         handTile, groupTile, dora, ura));
 	}
 	bool canTsumo(WindType prevailingWind, BonusYakuState state, const std::vector<Single>& dora,
 		const std::vector<Single>& ura)const {
-		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, AgariWays::Tsumo, nowTile,
+		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, AgariWays::Tsumo, nowTile,
 			handTile, groupTile, dora, ura)).success;
 	}
 
 	AgariResult ron(Single target, WindType prevailingWind, AgariWays type, BonusYakuState state, const std::vector<Single>& dora,
 	                 const std::vector<Single>& ura) {
-		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, type, target,
+		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, type, target,
 		                                         handTile, groupTile, dora, ura)).result;
 	}
 
 	bool canRon(Single target, WindType prevailingWind, AgariWays type, BonusYakuState state, const std::vector<Single>& dora,
 	             const std::vector<Single>& ura)const {
-		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, state, type, target,
+		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, type, target,
 		                                         handTile, groupTile, dora, ura)).success;
 	}
 	/*
