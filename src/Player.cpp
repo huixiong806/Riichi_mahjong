@@ -1,5 +1,4 @@
 #include"Player.h"
-
 void Player::setInfo(int subround_, 
 					 int score_, 
 					 WindType selfWind_, 
@@ -28,9 +27,11 @@ void Player::setInfo(int subround_,
 	ippatsu = ippatsu_; //当前是否为一发巡
 }
 
-bool Player::canPon(Single target, Group result, int relativePosition) const {
+bool Player::canChii(Single target, Group result, int relativePosition) const
+{
+	return false;
 	//检查类型
-	if (result.type != GroupType::Koutsu)
+	if (result.type != GroupType::Shuntsu)
 		return false;
 	//检查颜色
 	if (target.color() != result.color)
@@ -45,6 +46,43 @@ bool Player::canPon(Single target, Group result, int relativePosition) const {
 	if ((result.akadora & 1) != target.isAkadora())
 		return false;
 	const auto akadoraCount = (result.akadora & 2) + (result.akadora & 4);
+	auto realAkadoraCount = 0;
+	auto tileCount = 0;
+	for (auto& item : handTile) {
+		if (item.color() == result.color && item.value() == result.value) {
+			tileCount++;
+			if (item.isAkadora())
+				realAkadoraCount++;
+		}
+	}
+	//牌数不够
+	if (tileCount < 2)return false;
+	//红宝牌不够
+	if (realAkadoraCount < akadoraCount)
+		return false;
+	//非红宝牌不够
+	if ((tileCount - realAkadoraCount) < (2 - akadoraCount))
+		return false;
+	return true;
+}
+
+bool Player::canPon(Single target, Group result, int relativePosition) const {
+	//检查类型
+	if (result.type != GroupType::Koutsu)
+		return false;
+	//检查颜色
+	if (target.color() != result.color)
+		return false;
+	//检查数值
+	if (target.value() != result.value)
+		return false;
+	//检查位置
+	if (relativePosition != static_cast<int>(result.state))
+		return false;
+	//检查红宝牌是否正确
+	if ((result.akadora & 1) != target.isAkadora())
+		return false;
+	const auto akadoraCount = ((result.akadora & 0b10)?1:0) + ((result.akadora & 0b100)?1:0);
 	auto realAkadoraCount = 0;
 	auto tileCount = 0;
 	for (auto& item : handTile) {
@@ -81,7 +119,7 @@ bool Player::canMinKan(Single target, Group result, int relativePosition) const 
 	//检查红宝牌是否正确
 	if ((result.akadora & 1) != target.isAkadora())
 		return false;
-	const auto akadoraCount = (result.akadora & 2) + (result.akadora & 4) + (result.akadora & 8);
+	const auto akadoraCount = ((result.akadora & 0b10) ? 1 : 0) + ((result.akadora & 0b100) ? 1 : 0)+ ((result.akadora & 0b1000) ? 1 : 0);
 	auto realAkadoraCount = 0;
 	auto tileCount = 0;
 	for (auto& item : handTile) {
@@ -143,6 +181,10 @@ void Player::minkan(Group result) {
 	}
 	sort(handTile.begin(), handTile.end());
 	while (handTile.back() == Null)handTile.pop_back();
+}
+
+void Player::chii(Group result)
+{
 }
 
 bool Player::canDiscardTile(Single target) const {

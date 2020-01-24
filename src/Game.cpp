@@ -117,7 +117,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 			case ActionType::Null:
 				setActionResult.success = false;
 				setActionResult.type = ErrorType::CannotChooseNull;
-				return setActionResult;
+				break;
 			case ActionType::Skip:
 				isReady[playerID] = true;
 				playerAction[playerID] = action;
@@ -154,7 +154,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				break;
 			case ActionType::Pon:
 				if (!player[playerID].canPon(target, action.group,
-				                           (static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4)
+				                           (static_cast<int>(player[turn].selfWind) + 4 - static_cast<int>(player[playerID].selfWind)) % 4)
 				) {
 					//std::cout<<"*********"<< std::endl;
 					setActionResult.success = false;
@@ -287,8 +287,7 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 		//荣和的本场费计算 
 		if (!res[0].tsumo)
 			player[res[0].furikomiID].score -= honba * 300;
-		else //自摸的本场费计算 
-		{
+		else {//自摸的本场费计算 
 			for (auto i = 0; i < 4; ++i)
 				if (targetPlayer != i)
 					player[i].score -= honba * 100;
@@ -302,7 +301,6 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 			if (item.tsumo) {
 				for (auto i = 0; i < 4; ++i) {
 					if (item.agariID != i) {
-						//std::cout<<item.scoreDecXian<<std::endl;
 						if (player[i].selfWind == EAST)
 							player[i].score -= item.scoreDecOya;
 						else

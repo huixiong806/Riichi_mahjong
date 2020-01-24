@@ -45,7 +45,7 @@ public:
 	}
 
 	//relativePosition 0,1,2,3分别表示下对上自
-	bool canChii(Single target, Group result, int relativePosition)const { return false; }
+	bool canChii(Single target, Group result, int relativePosition)const;
 
 	bool canPon(Single target, Group result, int relativePosition)const;
 
@@ -56,7 +56,7 @@ public:
 
 	void minkan(Group result);
 
-	void chii(Group result) { }
+	void chii(Group result);
 
 	bool canDiscardTile(Single target)const;
 
@@ -84,12 +84,6 @@ public:
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, type, target,
 		                                         handTile, groupTile, dora, ura)).success;
 	}
-	/*
-	state
-	正常=0
-	天地和,w立=1
-	河底/海底=2
-	*/
 	bool canRiichi(BonusYakuState state, Single target)const;
 	void doRiichi(BonusYakuState state, Single target);
 	//返回false时不应变动私有变量

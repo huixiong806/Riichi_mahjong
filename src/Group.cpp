@@ -17,10 +17,10 @@ Group Group::createKantsu(Single a, Single b, Single c, Single target, int sourc
 	temp.push_back(c);
 	//统一赤普共存的情况，避免它们因顺序不同而被当成两种不同杠子(根本没用，因为杠只可能有一种选择)
 	std::sort(temp.begin(), temp.end());
-	res.akadora |= static_cast<uint8_t>(target.isAkadora());
-	res.akadora |= static_cast<uint8_t>(temp[0].isAkadora()) << 1;
-	res.akadora |= static_cast<uint8_t>(temp[1].isAkadora()) << 2;
-	res.akadora |= static_cast<uint8_t>(temp[2].isAkadora()) << 3;
+	res.akadora |= static_cast<uint8_t>(target.isAkadora())&0b1;
+	res.akadora |= (static_cast<uint8_t>(temp[0].isAkadora())&0b1) << 1;
+	res.akadora |= (static_cast<uint8_t>(temp[1].isAkadora())&0b1) << 2;
+	res.akadora |= (static_cast<uint8_t>(temp[2].isAkadora())&0b1) << 3;
 	return res;
 }
 
@@ -31,11 +31,12 @@ Group Group::createKoutsu(Single a, Single b, Single target, int source) {
 	res.color = target.color();
 	res.value = target.value();
 	res.state = source;
+	res.state += 0;//第一张是目标
 	res.akadora = 0;
 	if (a > b)std::swap(a, b); //统一赤普共存的情况，避免它们因顺序不同而被当成两种不同刻子
-	res.akadora |= static_cast<uint8_t>(target.isAkadora());
-	res.akadora |= static_cast<uint8_t>(a.isAkadora()) << 1;
-	res.akadora |= static_cast<uint8_t>(b.isAkadora()) << 2;
+	res.akadora |= static_cast<uint8_t>(target.isAkadora())&0b1;
+	res.akadora |= (static_cast<uint8_t>(a.isAkadora())&0b1) << 1;
+	res.akadora |= (static_cast<uint8_t>(b.isAkadora())&0b1) << 2;
 	return res;
 }
 

@@ -21,7 +21,6 @@ public:
 	uint8_t akadora{}; //从低到高分别表示三张牌(从小到大)是否为红宝牌
 	uint8_t state{};
 	//(10进制)低位表示吃/碰/杠的那张牌的来源(0,1,2,3对应吃、碰、荣杠、暗杠的自下对上,4,5,6,7对应加杠的自下对上(4无效))，高位0，10，20分别表示第一张，第二张，第三张。(刻子，杠子默认为0)
-	//source表示碰的那张牌的来源(0,1,2,3对应自下对上,4,5,6,7也对应自下对上，并且为加杠(4无效))
 	static Group createKoutsu(Single a, Single b, Single target, int source);
 	static Group createShuntsu(Single a, Single b, Single target, int source);
 	static Group createKantsu(Single a, Single b, Single c, Single target, int source);
@@ -222,8 +221,14 @@ public:
 
 	bool operator <(const Group& rhs) const {
 		if (type < rhs.type)return true;
+		if (type > rhs.type)return false;
 		if (color < rhs.color)return true;
+		if (color > rhs.color)return false;
 		if (value < rhs.value)return true;
+		if (value > rhs.value)return false;
+		if (state < rhs.state)return true;
+		if (state > rhs.state)return false;
+		if (akadora < rhs.akadora)return true;
 		return false;
 	}
 

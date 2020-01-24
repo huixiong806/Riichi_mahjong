@@ -133,7 +133,7 @@ std::vector<Action> Human::getMinKanActions(const GameInfo& info) {
 	std::vector<Single> candidate;
 	for (auto& item : info.handTile)
 		if (item.valueEqual(target))
-			candidate.push_back(target);
+			candidate.push_back(item);
 	if (candidate.size() < 3)return res;
 	assert(candidate.size() == 3);
 	res.emplace_back(ActionType::Kan,
@@ -150,7 +150,7 @@ std::vector<Action> Human::getPonActions(const GameInfo& info) {
 	std::vector<Single> candidate;
 	for (auto& item : info.handTile)
 		if (item.valueEqual(target))
-			candidate.push_back(target);
+			candidate.push_back(item);
 	if (candidate.size() < 2)return res;
 	if (candidate.size() == 2) {
 		res.emplace_back(ActionType::Pon,

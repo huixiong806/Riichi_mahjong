@@ -121,3 +121,50 @@ void Mountain::reset(const Rule& rule) {
 	for (auto i = 1; i <= 14; ++i)
 		mB.push_back(all[--ptr]);
 }
+
+void Mountain::DEBUG_RESET(const Rule & rule)
+{
+	mHandPtr = 0;
+	mRinshanPtr = 0;
+	mMountain.clear();
+	mA.clear();
+	mB.clear();
+	for (auto& j : hand)
+		j.clear();
+	std::vector<Single> all;
+	for (auto ii = 1; ii <= 9; ++ii) {
+		auto i = (ii + 3) % 9 + 1;
+		for (auto j = 1; j <= 4; ++j) {
+			if (i == 5 && j == 1 && rule.doraCount > 0) //红宝牌
+			{
+				all.emplace_back(i, 'm', true);
+				all.emplace_back(i, 'p', true);
+				all.emplace_back(i, 's', true);
+			}
+			else if (i == 5 && j == 2 && rule.doraCount == 4) //红宝牌5饼
+			{
+				all.emplace_back(i, 'm', false);
+				all.emplace_back(i, 'p', true);
+				all.emplace_back(i, 's', false);
+			}
+			else {
+				all.emplace_back(i, 'm', false);
+				all.emplace_back(i, 'p', false);
+				all.emplace_back(i, 's', false);
+			}
+			if (i <= 7)all.emplace_back(i, 'z', false);
+		}
+	}
+	auto ptr = 0;
+	for (auto& j : hand)
+		for (auto i = 1; i <= 13; ++i)
+			j.push_back(all[ptr++]);
+	tsumohai = all[ptr++];
+	for (auto i = ptr; i < all.size(); ++i)
+		mMountain.push_back(all[i]);
+	for (auto i = 1; i <= 69; ++i)
+		mA.push_back(all[ptr++]);
+	ptr = all.size();
+	for (auto i = 1; i <= 14; ++i)
+		mB.push_back(all[--ptr]);
+}

@@ -19,6 +19,7 @@ public:
 	Single tsumohai; //庄家0巡的自摸牌
 	Mountain(); //构造函数
 	virtual void reset(const Rule& rule); //产生新牌山
+	void DEBUG_RESET(const Rule& rule); //产生作弊的牌山，方便debug
 	Single getDora(int index)const; //获取宝牌
 	Single getUra(int index)const; //获取里宝牌
 	std::vector<Single> getDoras(int count)const; //获取宝牌组,count表示获得前几个

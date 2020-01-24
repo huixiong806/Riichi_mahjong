@@ -100,17 +100,13 @@ void test2() {
 int main_loop() {
 
 	/*
-	种子收集
-	3 杠3z
-	233 7对子自摸，留1m和3p
-
 	已知bug:
-	红宝牌碰和杠的时候会出问题
+	暂无
 	*/
 	const int seed = time(0);
 	//cout << "输入种子:" << endl;
 	//cin >> seed;
-	srand(seed);
+	srand(20);
 	player[0] = make_shared<Tester>("全自动放铳鸡 A");
 	player[1] = make_shared<Tester>("全自动放铳鸡 B");
 	player[2] = make_shared<Tester>("全自动放铳鸡 C");
@@ -129,7 +125,6 @@ int main_loop() {
 				const auto res = game.setPlayerAction(i, action);
 				if (!res.success) {
 					cout << "出现错误,输入任意内容退出,错误编码:" << static_cast<int>(res.type) << endl;
-					assert(0);
 					int a;
 					cin >> a;
 					return 0;
