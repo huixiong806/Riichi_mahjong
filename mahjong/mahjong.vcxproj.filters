@@ -67,6 +67,12 @@
     <ClInclude Include="..\src\Player.h">
       <Filter>src\headFiles</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\BookManager.h">
+      <Filter>src\headFiles</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\InformationStream.hpp">
+      <Filter>src\hppFiles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YakuChecker.cpp">
@@ -106,6 +112,9 @@
       <Filter>src\ai</Filter>
     </ClCompile>
     <ClCompile Include="..\src\Player.cpp">
+      <Filter>src\sourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\BookManager.cpp">
       <Filter>src\sourceFiles</Filter>
     </ClCompile>
   </ItemGroup>

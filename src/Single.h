@@ -59,9 +59,12 @@ public:
 	[[nodiscard]] std::string getString() const;
 };
 
-//Null永远是最大的
+using Tiles = std::vector<Single>;
+
+//Null牌在排序中永远是最大的
 static constexpr Single Null{};
 
+//单色状态压缩过的手牌，二进制压缩，为了减少遍历节省时间。每种牌最多支持7张
 struct SparseSinglesOfColor {
 	constexpr SparseSinglesOfColor() noexcept: SparseSinglesOfColor(0) {}
 
@@ -121,6 +124,7 @@ private:
 	static constexpr unsigned int Offsets[] = {0u,0u, 3u, 6u, 9u, 16u, 19u, 22u, 25u, 28u};
 };
 
+//单色状态压缩过的手牌，5进制高压缩型，为了节省空间。每种牌最多支持4张
 struct CompactSinglesOfColor {
 	constexpr CompactSinglesOfColor() noexcept: CompactSinglesOfColor(0) {}
 	

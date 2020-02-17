@@ -8,7 +8,7 @@
 
 
 struct Action {
-	ActionType type;
+	ActionType type;//表示决策的类型
 	Single target; //表示打哪张牌,仅打牌时有效
 	Group group; //仅吃碰杠有效
 	bool operator<(const Action& rhs) const {
@@ -58,29 +58,63 @@ struct PlayerInfo {
 };
 //游戏状态数据包，传递给决策器来决策
 struct GameInfo {
-	Rule rule;  //规则
-	std::vector<PlayerInfo> playerInfo; //按顺序分别为东南西北四家
-	WindType prevailingWind; //场风
-	WindType selfWind; //门风
+	//规则
+	Rule rule; 
+
+	//按顺序分别为东南西北四家
+	std::vector<PlayerInfo> playerInfo; 
+
+	//场风
+	WindType prevailingWind; 
+
+	//门风
+	WindType selfWind; 
+
+	//nowWind 的意义取决于 gameState，表示打出牌(gameState 为 GAME_STATE_WATING_FOR_MINGPAI)/该打牌(gameState == GAME_STATE_NORMAL)的人的门风。
 	WindType nowWind;
+
+	//手牌
+	std::vector<Single> handTile;
+
+	//宝牌指示牌,先翻出来的下标小
+	std::vector<Single> doraIndicator;
+
+	//决策者的自摸牌或是可以鸣牌/荣和的对象
+	Single nowTile; 
+
 	/*
-	  表示打出牌(mingpai=true)/该打牌(mingpai=false)的人的门风。
-	  如果为自己的话，mingpai=true表示自己什么也干不了(因为不能鸣自己的牌)，需要给空指令。
-	  mingpai=false表示自己该打牌了，mingpai=false并且自摸牌为Null说明是刚吃、碰过牌后的打牌。
-	  如果为别人的话，mingpai=true时自己必须选择一样操作，mingpai=false时需要给空指令
+		gameState 为 GAME_STATE_NORMAL 表示自己该打牌了，分两种情况
+			自摸牌为Null说明是刚吃、碰过牌后的打牌。
+			自摸牌不为Null说明是刚摸牌后的打牌
+		gameState 为 GAME_STATE_WATING_FOR_MINGPAI 表示该处理某人打出的牌了
+			如果 nowWind==selfWind 的话，自己什么也干不了(因为不能鸣自己的牌)，需要给空指令。
+			如果 nowWind!=selfWind 的话，gameState 为 WATING_FOR_MINGPAI 时自己必须选择一样操作(鸣牌，和牌或者跳过)
 	*/
-	std::vector<Single> handTile; //手牌
-	std::vector<Single> doraIndicator; //宝牌指示牌
-	Single nowTile; //决策者的自摸牌或是可以鸣牌/荣和的对象
-	GameState gameState{}; //为true表示别人刚打完牌，你可以选择鸣牌、荣和或者跳过
-	bool rinshan{}; //当前自摸牌是否为岭上牌(仅mingpai=false时有效)
-	bool tsumogiri{}; //表示打出去这张牌是否为摸切(仅mingpai=true时有效)
-	int riichibouCount{}; //额外立直棒数量
-	int honba{}; //本场数
-	int subround{}; //巡数
-	int remainTiles{}; //剩余牌数
-	int round{}; //局数(如东2局就是2)
-	bool w{}; //是否处于w立,天和,地和可成立的状态
+	GameState gameState{}; 
+
+	//当前自摸牌是否为岭上牌
+	bool rinshan{}; 
+
+	//表示打出去这张牌是否为摸切
+	bool tsumogiri{}; 
+
+	//额外立直棒数量
+	int riichibouCount{}; 
+
+	//本场数
+	int honba{}; 
+
+	//巡数
+	int subround{}; 
+
+	//剩余牌数
+	int remainTiles{}; 
+
+	//局数(如东2局就是2)
+	int round{}; 
+
+	//是否处于w立,天和,地和可成立的状态
+	bool w{}; 
 };
 
 class ActionGenerator {

@@ -11,11 +11,11 @@ private:
 	int subround{}; //巡数
 	int score{};
 	WindType selfWind; //门风
-	std::vector<Single> handTile; //手牌
-	std::vector<bool> disabledHandTile; //禁打手牌
+	Tiles handTile; //手牌
+	std::vector<bool> disabledHandTile; //禁打手牌(食替)
 	std::vector<Group> groupTile; //副露牌组
 	Single nowTile; //自摸牌
-	std::vector<Single> discardedTile; //牌河
+	Tiles discardedTile; //牌河
 	bool rinshan{}; //玩家当前的自摸牌是岭上牌
 	bool tsumogiri = false; //表示牌河里最后一张牌是否为摸切
 	int riichi = -1; //立直宣言牌是牌河中的第几张，-1为未立直
@@ -39,55 +39,73 @@ public:
 		bool ippatsu_ //当前是否为一发巡
 	);
 
+	//设置当前的自摸牌
 	void setNowTile(Single target, bool isLingshang) {
 		rinshan = isLingshang;
 		nowTile = target;
 	}
 
-	//relativePosition 0,1,2,3分别表示下对上自
+	//TODO:检测玩家给出的吃操作的正确性，relativePosition 0,1,2,3分别表示自下对上
 	bool canChii(Single target, Group result, int relativePosition)const;
 
+	//检测玩家给出的碰操作的正确性，relativePosition 0,1,2,3分别表示自下对上
 	bool canPon(Single target, Group result, int relativePosition)const;
 
-	//仅限大明杠
+	//检测玩家给出的明杠操作的正确性，relativePosition 0,1,2,3分别表示自下对上
 	bool canMinKan(Single target, Group result, int relativePosition)const;
 
-	void pon(Group result);
 
-	void minkan(Group result);
-
-	void chii(Group result);
-
+	//检测玩家给出的打牌操作的正确性
 	bool canDiscardTile(Single target)const;
 
-	void discardTile(Single target);
-
-	TryToAgariResult tsumo(WindType prevailingWind, BonusYakuState state, const std::vector<Single>& dora,
-	                      const std::vector<Single>& ura) {
-		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu,rinshan, state, AgariWays::Tsumo, nowTile,
-		                                         handTile, groupTile, dora, ura));
-	}
-	bool canTsumo(WindType prevailingWind, BonusYakuState state, const std::vector<Single>& dora,
-		const std::vector<Single>& ura)const {
+	//检测玩家给出的自摸操作的正确性
+	bool canTsumo(WindType prevailingWind, BonusYakuState state, const Tiles& dora, const Tiles& ura)const {
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, AgariWays::Tsumo, nowTile,
 			handTile, groupTile, dora, ura)).success;
 	}
 
-	AgariResult ron(Single target, WindType prevailingWind, AgariWays type, BonusYakuState state, const std::vector<Single>& dora,
-	                 const std::vector<Single>& ura) {
+	//检查玩家给出的荣和操作的正确性
+	bool canRon(Single target, WindType prevailingWind, AgariWays type, BonusYakuState state, const Tiles& dora, const Tiles& ura)const {
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, type, target,
-		                                         handTile, groupTile, dora, ura)).result;
+			handTile, groupTile, dora, ura)).success;
+	}
+	//检查玩家给出的立直操作的正确性
+	bool canRiichi(BonusYakuState state, Single target)const;
+	
+	//TODO:检查玩家给出的九种九牌流局操作是否正确
+	bool canRyuukyouku() { return false; }
+
+	//执行碰操作
+	void pon(Group result);
+
+	//执行明杠操作
+	void minkan(Group result);
+
+	//TODO:执行吃操作
+	void chii(Group result);
+
+	//执行立直操作
+	void doRiichi(BonusYakuState state, Single target);
+
+	//执行打牌操作
+	void discardTile(Single target);
+
+	//执行自摸操作
+	TryToAgariResult tsumo(WindType prevailingWind, BonusYakuState state, const Tiles& dora, const Tiles& ura) {
+		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, AgariWays::Tsumo, nowTile,
+			handTile, groupTile, dora, ura));
 	}
 
-	bool canRon(Single target, WindType prevailingWind, AgariWays type, BonusYakuState state, const std::vector<Single>& dora,
-	             const std::vector<Single>& ura)const {
+	//执行荣和操作
+	AgariResult ron(Single target, WindType prevailingWind, AgariWays type, BonusYakuState state, const Tiles& dora, const Tiles& ura) {
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, type, target,
-		                                         handTile, groupTile, dora, ura)).success;
+			handTile, groupTile, dora, ura)).result;
 	}
-	bool canRiichi(BonusYakuState state, Single target)const;
-	void doRiichi(BonusYakuState state, Single target);
-	//返回false时不应变动私有变量
-	bool ryuukyoku()const { return false; }
+
+	//TODO:执行流局操作
+	void ryuukyoku()const { }
+
+	//是否听牌
 	bool tenpai()const { return !Algorithms::tenpai(handTile).empty(); }
 	
 };

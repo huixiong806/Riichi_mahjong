@@ -12,13 +12,13 @@
 #include "Game.h"
 #include "ai/Human.h"
 #include "ai/AutoFurikomu.hpp"
+#include "InformationStream.hpp"
 #include "utils/console.h"
 #include "ai/Tester.h"
 
 using namespace std;
 shared_ptr<ActionGenerator> player[4];
 Game game;
-
 void test() {
 	auto human = make_shared<Human>("测试人");
 	GameInfo res;
@@ -31,22 +31,23 @@ void test() {
 		info.score = 99999;
 		res.playerInfo.push_back(info);
 	}
+	res.remainTiles = 10;
 	//手牌
 	res.handTile.emplace_back(1, 's', 0);
 	res.handTile.emplace_back(1, 's', 0);
-	res.handTile.emplace_back(1, 's', 0);
-	res.handTile.emplace_back(2, 's', 0);
 	res.handTile.emplace_back(2, 's', 0);
 	res.handTile.emplace_back(2, 's', 0);
 	res.handTile.emplace_back(3, 's', 0);
 	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(3, 'm', 0);
-	res.handTile.emplace_back(1, 'm', 0);
-	res.handTile.emplace_back(2, 'm', 0);
-	res.handTile.emplace_back(5, 's', 0);
-	res.handTile.emplace_back(5, 's', 0);
+	res.handTile.emplace_back(4, 's', 0);
+	res.handTile.emplace_back(4, 's', 0);
+	res.handTile.emplace_back(5, 'm', 0);
+	res.handTile.emplace_back(5, 'm', 0);
+	res.handTile.emplace_back(6, 'm', 0);
+	res.handTile.emplace_back(6, 'm', 0);
+	res.handTile.emplace_back(7, 's', 0);
 	sort(res.handTile.begin(), res.handTile.end());
-	res.nowTile = Single(3,'s',false);
+	res.nowTile = Single(7,'s',false);
 	res.prevailingWind = EAST; //场风
 	res.selfWind = EAST; //门风
 	res.nowWind = EAST;
@@ -61,25 +62,18 @@ void test() {
 	//r = p.ron(res.nowTile,res.prevailingWind,AgariWays::Ron, static_cast<BonusYakuState>(res.w), {}, {});
 	//}
 	auto re = r.result;
-	cout << "Test " << (re.tsumo ? "自摸" : "荣和") << endl;
-	cout << endl;
+	cout << BookManager::lang.mj_yaku << ":" << endl;
 	for (auto&& yk : re.yaku) {
 		cout << getYakuName(yk) << " ";
 		cout << endl;
 	}
-	cout << "宝牌" << re.dora << "   红宝牌" << re.akadora << "   里宝牌" << re.uradora << endl;
+	cout << BookManager::lang.mj_dora << re.dora << "   "
+		<< BookManager::lang.mj_aka << re.akadora << "   "
+		<< BookManager::lang.mj_ura << re.uradora << endl;
 	if (re.han < 0) {
-		const string ykman[7] = {"", "一", "两", "三", "四", "五", "六"};
-		if (re.han == -1)
-			cout << "役满 " << re.scoreAdd << "点" << endl;
-		else
-			cout << ykman[-re.han] << "倍役满 " << re.scoreAdd << "点" << endl;
-		cout << "庄家失点" << re.scoreDecOya << "  闲家失点" << re.scoreDecKodomo << endl;
+		cout << BookManager::lang.mj_yakuman[-re.han] << " " << re.scoreAdd << BookManager::lang.mj_den << endl;
 	}
-	else {
-		cout << re.han << "番" << re.fu << "符   " << re.scoreAdd << "点" << endl;
-		cout << "庄家失点" << re.scoreDecOya << "  闲家失点" << re.scoreDecKodomo << endl;
-	}
+	else { cout << re.han << BookManager::lang.mj_han << re.fu << BookManager::lang.mj_fu << "   " << re.scoreAdd << BookManager::lang.mj_den << endl; }
 
 }
 
@@ -106,25 +100,24 @@ int main_loop() {
 	const int seed = time(0);
 	//cout << "输入种子:" << endl;
 	//cin >> seed;
-	srand(20);
-	player[0] = make_shared<Tester>("全自动放铳鸡 A");
-	player[1] = make_shared<Tester>("全自动放铳鸡 B");
-	player[2] = make_shared<Tester>("全自动放铳鸡 C");
-	player[3] = make_shared<Human>("测试人");
-	cout << "游戏开始！" << endl;
+	srand(time(0));
+	player[0] = make_shared<Tester>("A");
+	player[1] = make_shared<Tester>("B");
+	player[2] = make_shared<Tester>("C");
+	player[3] = make_shared<Human>("Tester");
+	game.startNewGame();
+	InfoPrinter::printControlInfoLine(BookManager::lang.ct_gameStarted);
 	auto first = true;
 	do {
-		if (first)
-			game.startNewGame();
-		else game.startNextRound();
+		if(!first)game.startNextRound();
 		first = false;
-		cout << "新的一局开始了" << endl;
+		InfoPrinter::printControlInfoLine(BookManager::lang.ct_roundStarted);
 		do {
 			for (auto i = 0; i < 4; ++i) {
 				const auto action = player[i]->generateAction(game.getGameInfo(i));
 				const auto res = game.setPlayerAction(i, action);
 				if (!res.success) {
-					cout << "出现错误,输入任意内容退出,错误编码:" << static_cast<int>(res.type) << endl;
+					cout << "error happend!,error code:" << static_cast<int>(res.type) << endl;
 					int a;
 					cin >> a;
 					return 0;
@@ -133,42 +126,40 @@ int main_loop() {
 			assert(game.endThisTurn());
 		} while (!game.roundOver());
 		auto result = game.getRoundResult();
-		cout << "本局结束" << endl;
-		if (result.ryuukyoku) { cout << "流局" << endl; }
+		InfoPrinter::printControlInfoLine(BookManager::lang.ct_roundOver);
+		if (result.ryuukyoku) {InfoPrinter::printControlInfoLine(BookManager::lang.mj_ryuukyoku);}
 		else if (!result.agariResult.empty()) {
 			for (auto& res : result.agariResult) {
-				cout << player[res.agariID]->getName() << " " << (res.tsumo ? "自摸" : "荣和") << endl;
-				cout << "役种:" << endl;
+				cout << player[res.agariID]->getName() << " " << (res.tsumo ? BookManager::lang.mj_tsumo : BookManager::lang.mj_ron) << endl;
+				cout << BookManager::lang.mj_yaku<<":" << endl;
 				for (auto&& yk : res.yaku) {
 					cout << getYakuName(yk) << " ";
 					cout << endl;
 				}
-				cout << "宝牌" << res.dora << "   红宝牌" << res.akadora << "   里宝牌" << res.uradora << endl;
+				cout << BookManager::lang.mj_dora << res.dora << "   "
+					<< BookManager::lang.mj_aka << res.akadora << "   "
+					<< BookManager::lang.mj_ura << res.uradora << endl;
 				if (res.han < 0) {
-					const string ykman[7] = { "", "一", "两", "三", "四", "五", "六" };
-					if (res.han == -1)
-						cout << "役满 " << res.scoreAdd << "点" << endl;
-					else
-						cout << ykman[-res.han] << "倍役满 " << res.scoreAdd << "点" << endl;
+					cout << BookManager::lang.mj_yakuman[-res.han]<<" " << res.scoreAdd << BookManager::lang.mj_den << endl;
 				}
-				else { cout << res.han << "番" << res.fu << "符   " << res.scoreAdd << "点" << endl; }
+				else { cout << res.han << BookManager::lang.mj_han << res.fu<< BookManager::lang.mj_fu << "   " << res.scoreAdd << BookManager::lang.mj_den << endl; }
 			}
 		}
 		cout << endl;
-	} while (!game.gameOver());
-	cout << "游戏结束！" << endl;
+	}while (!game.gameOver());
+	InfoPrinter::printControlInfoLine(BookManager::lang.ct_gameOver);
 	std::cin.get();
 	return 0;
 }
 
 int main() {
 	//push_console_locale_utf8("zh_CN");
-	cout << "预处理中..." << endl;
-	Algorithms::preprocessDistance();
-	cout << "预处理结束" << endl;
+	system("chcp 936");
+	BookManager::init();
 	//test();
 	//system("pause");
 	//test2();
+	
 	main_loop();
 	//pop_console_locale();
 }

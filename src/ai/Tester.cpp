@@ -110,8 +110,7 @@ std::vector<Action> Tester::getRiichiAction(const GameInfo& info) {
 	ret.push_back(item);
 	return ret;
 }
-std::vector<Single> Tester::getShowedTiles(const GameInfo& info)
-{
+std::vector<Single> Tester::getShowedTiles(const GameInfo& info){
 	std::vector<Single> res;
 	for (auto wind = 0; wind <= 3; ++wind) {
 		for (auto& item : info.playerInfo[wind].groupTile) {
@@ -157,8 +156,8 @@ Action Tester::generateAction(const GameInfo& info) {
 			std::vector<int>pool=Algorithms::getPool(getShowedTiles(info));
 			Action temp;
 			Action res;
-			/*
-			for (auto& item : info.handTile)
+			
+			/*for (auto& item : info.handTile)
 				std::cout << item.getDisplay() << " ";
 			std::cout << info.nowTile.getDisplay() << " ";
 			std::cout << std::endl;*/
@@ -176,7 +175,7 @@ Action Tester::generateAction(const GameInfo& info) {
 					}
 				}
 				else if (act.type == ActionType::DiscardTile) {
-					//std::cout << "打" << act.target.getDisplay() << ",";
+					
 					auto allTiles = info.handTile;
 					allTiles.push_back(info.nowTile);
 					for (auto& item : allTiles) {
@@ -205,6 +204,7 @@ Action Tester::generateAction(const GameInfo& info) {
 								//std::cout << "向听倒退" << std::endl;
 								break;
 							}
+							//std::cout << "打" << act.target.getDisplay() << ",";
 							//std::cout << maxXiangtingThis << "向听,枚数:" << count << std::endl;
 							if (count > maxCount) {
 								maxCount = count;

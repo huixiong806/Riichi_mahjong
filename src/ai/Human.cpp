@@ -4,10 +4,7 @@
 #include <iostream>
 #include <iomanip>
 #include "Human.h"
-
-const std::string windName[4] = {"东", "南", "西", "北"};
-const std::string actionName[11] = {"error", "跳过", "error", "吃", "碰", "杠", "和", "立直", "自摸", "流局", "拔北"};
-
+#include "InformationStream.hpp";
 std::vector<Action> Human::getAllNakiActions(const GameInfo& info) {
 	std::vector<Action> res;
 	res.emplace_back(ActionType::Skip);
@@ -40,21 +37,23 @@ void Human::printActions(std::vector<Action> actions) {
 		if (actions[i].type == ActionType::DiscardTile)
 			std::cout << num << " ";
 		else {
-			if (i > 0 && actions[i - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
+			if (i > 0 && actions[i - 1].type == ActionType::DiscardTile) 
+				std::cout << BookManager::lang.mj_discardTile<<"(0"+ BookManager::lang.mj_tsumogiri+")" << std::endl;
 			if (actions[i].type == ActionType::Chii || actions[i].type == ActionType::Pon || actions[i].type ==
 				ActionType::Kan)
-				std::cout << num << "." << actionName[static_cast<int>(actions[i].type)] << " " << actions[i]
+				std::cout << num << "." << BookManager::lang.ct_action[static_cast<int>(actions[i].type)] << " " << actions[i]
 				                                                                                   .group.getString() <<
 					std::endl;
 			else if (actions[i].type == ActionType::Riichi) {
-				std::cout << num << ".切" << actions[i].target.getDisplay() << "立直" << std::endl;
+				std::cout << num << "." << BookManager::lang.mj_discard << actions[i].target.getDisplay() << BookManager::lang.mj_riichi << std::endl;
 			}
 			else
-				std::cout << num << "." << actionName[static_cast<int>(actions[i].type)] << std::endl;
+				std::cout << num << "." << BookManager::lang.ct_action[static_cast<int>(actions[i].type)] << std::endl;
 		}
 		num++;
 	}
-	if (actions[actions.size() - 1].type == ActionType::DiscardTile) { std::cout << "打牌(0摸切)" << std::endl; }
+	if (actions[actions.size() - 1].type == ActionType::DiscardTile)
+		std::cout << BookManager::lang.mj_discardTile << "(0" + BookManager::lang.mj_tsumogiri + ")" << std::endl;
 }
 
 std::vector<Action> Human::getRonAction(const GameInfo& info) {
@@ -165,35 +164,70 @@ std::vector<Action> Human::getPonActions(const GameInfo& info) {
 	for (const auto item : temp) { res.emplace_back(Action(ActionType::Pon, item)); }
 	return res;
 }
-
+bool Human::isDora(const GameInfo& info, const Single& tile){
+	if (tile.isAkadora())return true;
+	for (auto& item : info.doraIndicator) {
+		if(tile.valueEqual(item.next()))
+			return true;
+	}
+	return false;
+}
+void Human::printTile(const GameInfo& info,const Single& tile) {
+	if (isDora(info, tile)) {
+		InfoPrinter::printColorString(tile.getDisplay(), Color(0, 255, 0));
+	}
+	else {
+		InfoPrinter::printColorString(tile.getDisplay(), Color(0, 255, 255));
+	}
+}
 void Human::printInfo(const GameInfo& info) {
 	std::cout << std::endl;
+	//system("cls");
 	std::cout << name << std::endl;
-	std::cout << windName[static_cast<int>(info.prevailingWind)] << info.round << "局 " << info.honba << "本场 剩余" <<
-		info.remainTiles << "张" << std::endl;
-	std::cout << "自风为" << windName[static_cast<int>(info.selfWind)] << std::endl;
-	//<< "  场风役牌:" << Single((int)info.prevailingWind + 1, 'z', false).getString() << "  自风役牌:" << Single((int)info.selfWind + 1, 'z', false).getString() << std::endl;
-	std::cout << "宝牌指示牌 ";
-	for (auto& item : info.doraIndicator) { std::cout << item.getDisplay() << " "; }
+	std::cout << BookManager::lang.mj_wind[static_cast<int>(info.prevailingWind)] 
+			  << info.round << BookManager::lang.mj_round <<" " 
+			  << info.honba << BookManager::lang.mj_honba << " "
+			  <<BookManager::lang.mj_remain << info.remainTiles << BookManager::lang.mj_tileMeasureWord << std::endl;
+	//宝牌指示牌
+	std::cout << BookManager::lang.mj_doraIndicator<<" ";
+	for (auto& item : info.doraIndicator) {
+		printTile(info, item);
+		std::cout << " "; 
+	}
 	std::cout << std::endl;
-	std::cout << "信息:" << std::endl;
 	for (auto wind = 0; wind <= 3; ++wind) {
-		std::cout << windName[wind] << "家  " << std::setw(7) << std::left << info.playerInfo[wind].score << std::setw(0)
-			<< (info.playerInfo[wind].riichiJunme != -1 ? ("（立直）") : ("")) << "|";
+		//x家
+		if(wind==info.nowWind)
+			InfoPrinter::printColorString(BookManager::lang.mj_wind[wind]+BookManager::lang.mj_direction, Color(255, 255, 0));
+		else 
+			std::cout << BookManager::lang.mj_wind[wind] + BookManager::lang.mj_direction;
+		//分数以及是否立直
+		std::cout << "  " << std::setw(7) << std::left << info.playerInfo[wind].score << std::setw(0)
+			<< (info.playerInfo[wind].riichiJunme != -1 ? ("("+ BookManager::lang.mj_riichi+")") : ("")) << "|";
+		//副露牌
 		for (auto& item : info.playerInfo[wind].groupTile) { std::cout << item.getString() << " "; }
 		std::cout << std::endl;
-		for (auto& item : info.playerInfo[wind].discardTile) { std::cout << item.getDisplay() << " "; }
+		//牌河
+		for (auto& item : info.playerInfo[wind].discardTile) { 
+			printTile(info,item);
+			std::cout << " ";
+		}
 		std::cout << std::endl << std::endl;
 	}
 	auto hand = info.handTile;
 	hand.push_back(info.nowTile);
-	std::cout << "当前面子手" << Algorithms::getDistanceStandard(CompactSingles(hand)) << "向听，七对" << Algorithms::getDistanceChiitoi(CompactSingles(hand)) <<
-		"向听，国士"<< Algorithms::getDistanceKokushi(CompactSingles(hand)) <<"向听"<< std::endl;
-	std::cout << windName[info.selfWind] << "| ";
-
-	for (auto& item : info.handTile)
-		std::cout << item.getDisplay() << " ";
-
+	/*
+	//向听数
+	std::cout << BookManager::lang.mj_standardType << Algorithms::getDistanceStandard(CompactSingles(hand)) << BookManager::lang.mj_syanten<<" "
+			  << BookManager::lang.mj_chiitoiType << Algorithms::getDistanceChiitoi(CompactSingles(hand)) << BookManager::lang.mj_syanten << " "
+		      << BookManager::lang.mj_kokushiType << Algorithms::getDistanceKokushi(CompactSingles(hand)) << BookManager::lang.mj_syanten << std::endl;
+	*/
+	InfoPrinter::printColorString(BookManager::lang.mj_wind[static_cast<int>(info.selfWind)], Color(255, 255, 0));
+	std::cout << "| ";
+	for (auto& item : info.handTile) {
+		printTile(info, item);
+		std::cout << " ";
+	}
 	std::cout << std::endl;
 	std::cout << "ID| ";
 	const int add = info.gameState == GameState::OneAct && info.nowTile == Null;
@@ -204,6 +238,8 @@ void Human::printInfo(const GameInfo& info) {
 	std::cout << std::endl;
 }
 
+
+
 Action Human::generateAction(const GameInfo& info) {
 	Action res;
 	res.type = ActionType::Null;
@@ -213,16 +249,21 @@ Action Human::generateAction(const GameInfo& info) {
 		printInfo(info);
 	if (info.gameState == GameState::OneAct) {
 		if (info.nowTile != Null) {
-			std::cout << "摸 " << info.nowTile.getDisplay() << std::endl << std::endl;
+			//摸 x
+			std::cout << BookManager::lang.mj_get << " ";
+			printTile(info, info.nowTile); 
+			std::cout << std::endl << std::endl;
 			auto actions = getAllNormalActions(info);
-			std::cout << "请选择:" << std::endl;
+			//请选择：
+			InfoPrinter::printControlInfoLine(BookManager::lang.ct_makeChoice + ":");
 			printActions(actions);
 			int index;
 			std::cin >> index;
 			res = actions[index];
 		}
 		else {
-			std::cout << "打第几张牌?" << std::endl;
+			//请选择：
+			InfoPrinter::printControlInfoLine(BookManager::lang.ct_makeChoice + ":");
 			int index;
 			std::cin >> index;
 			if (index <= info.handTile.size()) {
@@ -236,11 +277,13 @@ Action Human::generateAction(const GameInfo& info) {
 		auto actions = getAllNakiActions(info);
 		if (actions.size() != 1)
 			printInfo(info);
-		std::cout << windName[static_cast<int>(info.nowWind)] << "家打出了" << info.nowTile.getDisplay() << std::endl;
+		std::cout << BookManager::lang.mj_wind[static_cast<int>(info.nowWind)] << BookManager::lang.ct_hasDiscard;
+		printTile(info, info.nowTile);
+		std::cout << std::endl;
 		if (actions.size() == 1)
 			res = actions[0];
 		else {
-			std::cout << "请选择一种操作:" << std::endl;
+			InfoPrinter::printControlInfoLine(BookManager::lang.ct_makeChoice+":");
 			printActions(actions);
 			auto opt = 0;
 			std::cin >> opt;

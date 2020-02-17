@@ -1,4 +1,37 @@
 #include "Game.h"
+//新游戏
+void Game::startNewGame(Rule rule_) {
+	player.resize(4);
+	rule = rule_; //设置规则
+	prevailingWind = EAST; //东场
+	round = 1; //1局
+	east = rand() % 4; //随机庄家
+	honba = 0; //0本场
+	riichibouValue = 0;//场上立直棒清空
+	doraIndicatorCount = 0;
+	gameIsOver = false;
+	for (auto i = 0; i < 4; ++i)
+		player[i].score = rule.startPoint;
+	startNewRound();
+}
+
+//开始下一局
+void Game::startNextRound() {
+	//连庄，本场数+1，局数不变
+	if (result.renchan) { honba++; }
+	else //不连庄，进入下一局
+	{
+		east = (east + 1) % 4; //东家换成其下家
+		if (round == 4) //4局的话换场风,局数重置
+		{
+			prevailingWind = static_cast<WindType>((prevailingWind + 1) % 4);
+			round = 1;
+		}
+		else { round++; }
+	}
+	startNewRound();
+}
+
 //开始新局
 void Game::startNewRound() {
 	w = true;
@@ -259,7 +292,6 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 			top = i;
 	}
 	//有人和牌
-	//TODO:分数计算 
 	if (!res.empty()) {
 		result.ryuukyoku = false;
 		result.renchan = false;
@@ -439,40 +471,6 @@ void Game::processNari() {
 	else { this->newTurn((turn + 1) % 4, false); }
 }
 
-//新游戏
-
-void Game::startNewGame(Rule rule_) {
-	player.resize(4);
-	rule = rule_; //设置规则
-	prevailingWind = EAST; //东场
-	round = 1; //1局
-	east = rand() % 4; //随机庄家
-	honba = 0; //0本场
-	riichibouValue = 0;//场上立直棒清空
-	doraIndicatorCount = 0;
-	gameIsOver = false;
-	for (auto i = 0; i < 4; ++i)
-		player[i].score = rule.startPoint;
-	startNewRound();
-}
-
-//开始下一局
-
-void Game::startNextRound() {
-	//连庄，本场数+1，局数不变
-	if (result.renchan) { honba++; }
-	else //不连庄，进入下一局
-	{
-		east = (east + 1) % 4; //东家换成其下家
-		if (round == 4) //4局的话换场风,局数重置
-		{
-			prevailingWind = static_cast<WindType>((prevailingWind + 1) % 4);
-			round = 1;
-		}
-		else { round++; }
-	}
-	startNewRound();
-}
 
 //玩家获取游戏信息
 GameInfo Game::getGameInfo(int index)const {

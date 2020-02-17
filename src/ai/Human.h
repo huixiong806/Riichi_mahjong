@@ -13,7 +13,9 @@ private:
 	std::vector<Action> getRonAction(const GameInfo& info);
 	std::vector<Action> getAllNakiActions(const GameInfo& info);
 	std::vector<Action> getAllNormalActions(const GameInfo& info);
+	void printTile(const GameInfo& info,const Single& tile);
 	void printInfo(const GameInfo& info);
+	bool isDora(const GameInfo& info,const Single& tile);
 public:
 	Human() { name = "No Name"; }
 	Human(std::string name_) { name = name_; }

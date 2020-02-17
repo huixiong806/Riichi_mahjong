@@ -100,12 +100,14 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <OutDir>$(SolutionDir)bin\$(ProjectName)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(ProjectName)-$(Configuration)\Internal\</IntDir>
-    <IncludePath>$(SolutionDir)src\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)src\;$(SolutionDir)dependencies\include\;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)dependencies\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <OutDir>$(SolutionDir)bin\$(ProjectName)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(ProjectName)-$(Configuration)\Internal\</IntDir>
-    <IncludePath>$(SolutionDir)src\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)src\;$(SolutionDir)dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)dependencies\lib\x86;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
     <OutDir>$(SolutionDir)bin\$(ProjectName)-$(Configuration)\</OutDir>
@@ -120,7 +122,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)bin\$(ProjectName)-$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)bin\$(ProjectName)-$(Configuration)\Internal\</IntDir>
-    <IncludePath>$(SolutionDir)src\;$(IncludePath)</IncludePath>
+    <IncludePath>$(SolutionDir)src\;$(SolutionDir)dependencies\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(SolutionDir)dependencies\lib\x64;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
     <OutDir>$(SolutionDir)bin\$(ProjectName)-$(Configuration)\</OutDir>
@@ -136,6 +139,9 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/utf-8 %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
+    <Link>
+      <AdditionalDependencies>CGE_DBG.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -163,6 +169,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>Console Graphic Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|Win32'">
@@ -200,6 +207,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>Console Graphic Engine.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Profile|x64'">
@@ -226,9 +234,11 @@
     <ClInclude Include="..\src\ai\Tester.h" />
     <ClInclude Include="..\src\Algorithms.h" />
     <ClInclude Include="..\src\ai\AutoFurikomu.hpp" />
+    <ClInclude Include="..\src\BookManager.h" />
     <ClInclude Include="..\src\Game.h" />
     <ClInclude Include="..\src\Group.h" />
     <ClInclude Include="..\src\ai\Human.h" />
+    <ClInclude Include="..\src\InformationStream.hpp" />
     <ClInclude Include="..\src\Mountain.h" />
     <ClInclude Include="..\src\ActionGenerator.hpp" />
     <ClInclude Include="..\src\Player.h" />
@@ -243,6 +253,7 @@
     <ClCompile Include="..\src\ai\Human.cpp" />
     <ClCompile Include="..\src\ai\Tester.cpp" />
     <ClCompile Include="..\src\Algorithms.cpp" />
+    <ClCompile Include="..\src\BookManager.cpp" />
     <ClCompile Include="..\src\Game.cpp" />
     <ClCompile Include="..\src\Group.cpp" />
     <ClCompile Include="..\src\main.cpp" />

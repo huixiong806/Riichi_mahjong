@@ -481,7 +481,6 @@ bool YakuChecker::yakuhaiChun() const noexcept
 //立直
 bool YakuChecker::riichi() const noexcept
 {
-	
 	return par.riichiJunme != -1 && par.riichiJunme != -2;
 }
 //两立直
@@ -519,6 +518,7 @@ bool YakuChecker::menchintsumo() const noexcept
 {
 	return par.type == AgariWays::Tsumo && menchin;
 }
+//三暗刻
 bool YakuChecker::sanankou() const noexcept
 {
 	auto fuurou = 0;
@@ -672,7 +672,7 @@ TryToAgariResult YakuChecker::getResult() {
 	}
 	auto myHandTile = par.handTile;
 	myHandTile.push_back(par.target);
-	//检查dora，akadora和uradora,并在最后有役的情况下增加翻数。
+	//数dora，akadora和uradora,并在最后有役的情况下增加翻数。
 	for (auto& doraneko : par.dora)
 		for (auto& item : myHandTile)
 			if (doraneko.valueEqual(item))
@@ -732,14 +732,15 @@ TryToAgariResult YakuChecker::getResult() {
 	if (menchintsumo())addYaku<Yaku::Menzenchintsumo>(result);
 	//抢杠，岭上，海底，河底
 	if (chankan())addYaku<Yaku::Ippatsu>(result);
-	else if (menchintsumo())addYaku<Yaku::Menzenchintsumo>(result);
+	else if (rinshan())addYaku<Yaku::Rinshankaihou>(result);
 	else if (haitei())addYaku<Yaku::Haiteiraoyue>(result);
 	else if (houtei())addYaku<Yaku::Houteiraoyui>(result);
 	//std::cout << "*" << std::endl;
 	if (result.han == 0) { return TryToAgariResult(AgariFaildReason::NoYaku); }
 	result.han += result.dora + result.akadora + result.uradora;
 	result = Algorithms::getScore(par.selfWind, result);
-	/*//输出调试信息-不同拆牌方式的牌型和役种
+	//输出调试信息-不同拆牌方式的牌型和役种
+	/*
 	for (auto& item : mentsu)
 	{
 		std::cout << item.getString() << " ";
@@ -753,7 +754,7 @@ TryToAgariResult YakuChecker::getResult() {
 	std::cout << std::endl;*/
 	return TryToAgariResult(result);
 }
-//menchinGroup 下标为0的元素描述雀头，下标为1~3的元素描述门前清的面子(可选)
+//menchinGroup 下标为0的元素描述雀头，下标为1~3的元素描述门前清的面子(面子数量可选)
 TryToAgariResult CheckYakuForStandardType(const AgariParameters& par, const std::vector<Group>& menchinGroup) {
 	return YakuChecker(par, menchinGroup).getResult();
 }
