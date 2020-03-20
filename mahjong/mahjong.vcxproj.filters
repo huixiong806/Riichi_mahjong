@@ -73,6 +73,9 @@
     <ClInclude Include="..\src\InformationStream.hpp">
       <Filter>src\hppFiles</Filter>
     </ClInclude>
+    <ClInclude Include="..\src\ai\AI.h">
+      <Filter>src\ai</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\YakuChecker.cpp">
@@ -116,6 +119,9 @@
     </ClCompile>
     <ClCompile Include="..\src\BookManager.cpp">
       <Filter>src\sourceFiles</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ai\AI.cpp">
+      <Filter>src\ai</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

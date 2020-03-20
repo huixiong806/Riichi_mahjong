@@ -50,6 +50,9 @@ void Game::startNewRound() {
 		player[i].riichiJunme = -1;
 		player[i].setNowTile(Null, false);
 		player[i].subround = -1;
+		player[i].riichiFuriten = false;
+		player[i].doujunFuriten = false;
+		player[i].sutehaiFuriten = false;
 	}
 	for (auto& item : isReady)
 		item = false;
@@ -76,6 +79,8 @@ void Game::newTurn(int who, bool lingShang) {
 	player[who].subround++;
 	if (player[who].subround > 0)
 		w = false;
+	//解除同巡振听
+	player[who].resetDoujunFuriten();
 }
 
 //鸣牌(除了杠)后打牌
@@ -85,6 +90,8 @@ void Game::newTurnAfterNari(int who) {
 	for (auto i = 0; i < 4; ++i) { player[i].setNowTile(Null, false); }
 	//巡数+1
 	player[who].subround++;
+	//解除同巡振听
+	player[who].resetDoujunFuriten();
 }
 bool Game::endThisTurn()
 {
@@ -134,13 +141,14 @@ bool Game::endThisTurn()
 	for (auto i = 0; i < 4; ++i) {
 		isReady[i] = false;
 		playerAction[i] = Action();
+		player[i].updateSutehaiFuriten();
 	}
 	return true;
 }
 SetActionResult Game::setPlayerAction(int playerID, Action action) {
-	SetActionResult setActionResult = { true ,ErrorType::None };
+	SetActionResult setActionResult = { true ,ErrorType::Success };
 	if (gameState == GameState::WaitingForNaki) {
-		Single target = *player[turn].discardedTile.rbegin();
+		Single target = player[turn].discardedTile.rbegin()->tile;
 		if (playerID == turn) {
 			isReady[playerID] = true;
 			playerAction[playerID] = Action();
@@ -170,16 +178,15 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				break;
 			}
 			case ActionType::Chii:
-				if (!player[playerID].canChii(target, action.group,
-				                          (static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4)) {
-					setActionResult.success = false;
-					setActionResult.type = ErrorType::ActionRejected;
+				setActionResult.type = player[playerID].canChii(target, action.group,
+					(static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4);
+				setActionResult.success = setActionResult.type == ErrorType::Success;
+				if (!setActionResult.success)
 					return setActionResult;
-				}
 				//立直后不能鸣牌
 				if (player[playerID].riichiJunme != -1) {
 					setActionResult.success = false;
-					setActionResult.type = ErrorType::ActionRejected;
+					setActionResult.type = ErrorType::Naki_AlreadyRiichi;
 					return setActionResult;
 				}
 				isReady[playerID] = true;
@@ -249,10 +256,14 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 			playerAction[playerID] = action;
 			break;
 		case ActionType::Riichi: {
-			if (mountain.remainCount() < 4 ||
-				!player[playerID].canRiichi(static_cast<BonusYakuState>(w),action.target)){
+			if (mountain.remainCount() < 4) {
 				setActionResult.success = false;
-				setActionResult.type = ErrorType::CantRiichi;
+				setActionResult.type = ErrorType::Riichi_lessTilesLeft;
+				return setActionResult;
+			}
+			if (!player[playerID].canRiichi(static_cast<BonusYakuState>(w),action.target)){
+				setActionResult.success = false;
+				setActionResult.type = ErrorType::Riichi_Other;
 				return setActionResult;
 			}
 			playerAction[playerID] = action;
@@ -419,13 +430,14 @@ void Game::processNari() {
 	//荣
 	for (auto i = 0; i < 4; ++i) {
 		if (playerAction[i].type == ActionType::Ron) {
+			assert(player[turn].discardedTile.rbegin()->exist);
 			std::vector<Single> allDora;
 			std::vector<Single> allUra;
 			for (auto i = 0; i < doraIndicatorCount; ++i) {
 				allDora.push_back(mountain.getDora(i));
 				allUra.push_back(mountain.getUra(i));
 			}
-			auto tmp = player[i].ron(*player[turn].discardedTile.rbegin(), prevailingWind, AgariWays::Ron,
+			auto tmp = player[i].ron(player[turn].discardedTile.rbegin()->tile, prevailingWind, AgariWays::Ron,
 									  static_cast<BonusYakuState>(w), allDora, allUra);
 			tmp.agariID = i;
 			tmp.furikomiID = turn;
@@ -441,16 +453,17 @@ void Game::processNari() {
 	//杠和碰
 	for (auto i = 0; i < 4; ++i) {
 		if (playerAction[i].type == ActionType::Kan) {
+			assert(player[turn].discardedTile.rbegin()->exist);
 			player[i].minkan(playerAction[i].group);
-			player[turn].discardedTile.pop_back();
-
+			player[turn].discardedTile.rbegin()->exist = false;
 			resetBounusYaku();
 			newTurn(i, true);
 			return;
 		}
 		if (playerAction[i].type == ActionType::Pon) {
+			assert(player[turn].discardedTile.rbegin()->exist);
 			player[i].pon(playerAction[i].group);
-			player[turn].discardedTile.pop_back();
+			player[turn].discardedTile.rbegin()->exist = false;
 			resetBounusYaku();
 			newTurnAfterNari(i);
 			return;
@@ -459,14 +472,33 @@ void Game::processNari() {
 	//吃
 	for (auto i = (turn + 1) % 4, j = 0; j < 3; ++j, i = (i + 1) % 4) {
 		if (playerAction[i].type == ActionType::Chii) {
+			assert(player[turn].discardedTile.rbegin()->exist);
 			player[i].chii(playerAction[i].group);
-			player[turn].discardedTile.pop_back();
+			player[turn].discardedTile.rbegin()->exist=false;
 			resetBounusYaku();
 			newTurnAfterNari(i);
 			return;
 		}
 	}
 	//全部放弃鸣牌或者没法鸣牌
+	//更新立直振听和同巡振听
+	for (auto i = 0; i < 4; ++i) {
+		if (i == turn)continue;
+		assert(player[turn].discardedTile.rbegin()->exist);
+		auto target = player[turn].discardedTile.rbegin()->tile;
+		auto machihai = Algorithms::tenpai(player[i].handTile);
+		if (!machihai.empty()){
+			for (auto& item : machihai) {
+				if (item.valueEqual(target)){
+					if (player[i].riichiJunme != -1) {
+						player[i].riichiFuriten = true;
+					}
+					player[i].doujunFuriten = true;
+					break;
+				}
+			}
+		}
+	}
 	if (mountain.remainCount() == 0) { endThisRound(std::vector<AgariResult>(), false); }
 	else { this->newTurn((turn + 1) % 4, false); }
 }
@@ -497,7 +529,8 @@ GameInfo Game::getGameInfo(int index)const {
 	res.selfWind = player[index].selfWind; //门风
 	if (gameState == GameState::WaitingForNaki) {
 		res.nowWind = player[turn].selfWind;
-		res.nowTile = *player[turn].discardedTile.rbegin();
+		res.nowTile = player[turn].discardedTile.rbegin()->tile;
+		assert(player[turn].discardedTile.rbegin()->exist);
 	}
 	else {
 		res.nowWind = player[turn].selfWind;
@@ -506,6 +539,10 @@ GameInfo Game::getGameInfo(int index)const {
 		else
 			res.nowTile = Null;
 	}
+	//振听状态
+	res.doujunFuriten = player[index].doujunFuriten;
+	res.sutehaiFuriten = player[index].sutehaiFuriten;
+	res.riichiFuriten = player[index].riichiFuriten;
 	res.remainTiles = mountain.remainCount();
 	res.riichibouCount = riichibouValue; //额外立直棒数量
 	res.honba = honba; //本场

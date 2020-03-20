@@ -39,6 +39,10 @@ struct Language{
 	std::string mj_jikaze;
 	std::string mj_bakaze;
 	std::string mj_direction;
+	std::string mj_furiten;
+	std::string mj_doujunFuriten;
+	std::string mj_riichiFuriten;
+	std::string mj_sutehaiFuriten;
 	std::string ct_makeChoice;
 	std::string ct_hasDiscard;
 	std::string ct_gameStarted;

@@ -61,6 +61,16 @@ public:
 
 using Tiles = std::vector<Single>;
 
+struct DiscardedTile {
+	Single tile;
+	bool exist;
+	DiscardedTile() {}
+	DiscardedTile(const Single& i_tile) {
+		tile = i_tile;
+		exist = true;
+	}
+};
+using DiscardedTiles = std::vector<DiscardedTile>;
 //Null牌在排序中永远是最大的
 static constexpr Single Null{};
 

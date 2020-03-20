@@ -523,8 +523,8 @@ bool Algorithms::agariWithoutYaku(const Single& target, const Tiles& handTile) {
 
 
 //获得单花色向听数
-int Algorithms::getDistanceSingle(int shape, int mentsu, int jyantou, bool z) {
-	if (!z)return BookManager::distanceToTarget[shape][mentsu + jyantou * 5];
+int Algorithms::getDistanceSingle(int shape, int mentsu, int jyantou, bool jihai) {
+	if (!jihai)return BookManager::distanceToTarget[shape][mentsu + jyantou * 5];
 	return BookManager::distanceToTargetZ[shape][mentsu + jyantou * 5];
 }
 

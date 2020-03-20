@@ -6,7 +6,7 @@ void Player::setInfo(int subround_,
 					 const std::vector<bool>& disabledHandTile_, 
 					 const std::vector<Group>& groupTile_, 
 					 const Single& nowTile_, 
-					 const std::vector<Single>& discardedTile_, 
+					 const DiscardedTiles& discardedTile_, 
 					 bool rinshan_, 
 					 bool tsumogiri_, 
 					 int riichi_, 
@@ -27,43 +27,58 @@ void Player::setInfo(int subround_,
 	ippatsu = ippatsu_; //当前是否为一发巡
 }
 
-bool Player::canChii(Single target, Group result, int relativePosition) const
+ErrorType Player::canChii(Single target, Group result, int relativePosition) const
 {
-	return false;
 	//检查类型
 	if (result.type != GroupType::Shuntsu)
-		return false;
+		return	ErrorType::Chii_WrongType;
 	//检查颜色
 	if (target.color() != result.color)
-		return false;
+		return ErrorType::Chii_WrongColor;
+	if (target.color() == 'z')
+		return ErrorType::Chii_CantBeJihai;
 	//检查数值
-	if (target.value() != result.value)
-		return false;
+	if (target.value() != result.value + result.state / 10)
+		return ErrorType::Chii_WrongValue;
 	//检查位置
-	if (relativePosition != result.state)
-		return false;
+	if (relativePosition != result.state%10)
+		return ErrorType::Chii_WrongPosition;
+	if (relativePosition != 3)
+		return ErrorType::Chii_WrongPosition;
 	//检查红宝牌是否正确
-	if ((result.akadora & 1) != target.isAkadora())
-		return false;
-	const auto akadoraCount = (result.akadora & 2) + (result.akadora & 4);
-	auto realAkadoraCount = 0;
-	auto tileCount = 0;
+	if(static_cast<bool>(result.akadora & (1<<(result.state / 10))) != target.isAkadora())
+		return ErrorType::Chii_WrongAkadora;
+	//下标0-2分别表示value+0,value+1,value+2
+	int akadoraCount[3] = { 0,0,0 };	//提供的面子中的akadora数量
+	int realAkadoraCount[3] = { 0,0,0 };//实际手牌中的akadora数量
+	int tileCount[3] = { 0,0,0 };		//实际的牌数
+	for(int i=0;i<3;++i)
+		akadoraCount[i] = (result.akadora & (1<<i))>0?1:0;
 	for (auto& item : handTile) {
-		if (item.color() == result.color && item.value() == result.value) {
-			tileCount++;
-			if (item.isAkadora())
-				realAkadoraCount++;
+		if (item.color() == result.color) {
+			for (auto delta = 0; delta < 3; ++delta) {
+				if (item.value()==result.value + delta) {
+					tileCount[delta]++;
+					if (item.isAkadora())
+						realAkadoraCount[delta]++;
+				}
+			}
 		}
 	}
-	//牌数不够
-	if (tileCount < 2)return false;
-	//红宝牌不够
-	if (realAkadoraCount < akadoraCount)
-		return false;
-	//非红宝牌不够
-	if ((tileCount - realAkadoraCount) < (2 - akadoraCount))
-		return false;
-	return true;
+	for (int i = 0; i < 3; ++i) {
+		if (i == result.state / 10)
+			continue;
+		//牌数不够
+		if (tileCount[i] < 1)
+			return ErrorType::Chii_WrongTiles;
+		//红宝牌不够
+		if (realAkadoraCount[i] < akadoraCount[i])
+			return ErrorType::Chii_WrongTiles;
+		//非红宝牌不够
+		if ((tileCount[i] - realAkadoraCount[i]) < (1 - akadoraCount[i]))
+			return ErrorType::Chii_WrongTiles;
+	}
+	return ErrorType::Success;
 }
 
 bool Player::canPon(Single target, Group result, int relativePosition) const {
@@ -114,7 +129,7 @@ bool Player::canMinKan(Single target, Group result, int relativePosition) const 
 	if (target.value() != result.value)
 		return false;
 	//检查位置
-	if (relativePosition != result.state)
+	if (relativePosition != static_cast<int>(result.state))
 		return false;
 	//检查红宝牌是否正确
 	if ((result.akadora & 1) != target.isAkadora())
@@ -142,8 +157,8 @@ bool Player::canMinKan(Single target, Group result, int relativePosition) const 
 
 void Player::pon(Group result) {
 	groupTile.push_back(result);
-	const auto other0 = Single(result.value, result.color, result.akadora & 2);
-	const auto other1 = Single(result.value, result.color, result.akadora & 4);
+	const auto other0 = Single(result.value, result.color, result.akadora & 0b010);
+	const auto other1 = Single(result.value, result.color, result.akadora & 0b100);
 	auto ok0 = false, ok1 = false;
 	for (auto& item : handTile) {
 		if (!ok0 && other0 == item) {
@@ -161,9 +176,9 @@ void Player::pon(Group result) {
 
 void Player::minkan(Group result) {
 	groupTile.push_back(result);
-	const auto other0 = Single(result.value, result.color, result.akadora & 2);
-	const auto other1 = Single(result.value, result.color, result.akadora & 4);
-	const auto other2 = Single(result.value, result.color, result.akadora & 8);
+	const auto other0 = Single(result.value, result.color, result.akadora & 0b0010);
+	const auto other1 = Single(result.value, result.color, result.akadora & 0b0100);
+	const auto other2 = Single(result.value, result.color, result.akadora & 0b1000);
 	auto ok0 = false, ok1 = false, ok2 = false;
 	for (auto& item : handTile) {
 		if (!ok0 && other0 == item) {
@@ -185,6 +200,32 @@ void Player::minkan(Group result) {
 
 void Player::chii(Group result)
 {
+	groupTile.push_back(result);
+	Single other0;
+	Single other1;
+	if (result.state / 10 == 0) {
+		other0 = Single(result.value+1, result.color, result.akadora & 0b010);
+		other1 = Single(result.value+2, result.color, result.akadora & 0b100);
+	}else if (result.state / 10 == 1){
+		other0 = Single(result.value+0, result.color, result.akadora & 0b001);
+		other1 = Single(result.value+2, result.color, result.akadora & 0b100);
+	}else {
+		other0 = Single(result.value+0, result.color, result.akadora & 0b001);
+		other1 = Single(result.value+1, result.color, result.akadora & 0b010);
+	}
+	auto ok0 = false, ok1 = false;
+	for (auto& item : handTile) {
+		if (!ok0 && other0 == item) {
+			ok0 = true;
+			item = Null;
+		}
+		else if (!ok1 && other1 == item) {
+			ok1 = true;
+			item = Null;
+		}
+	}
+	sort(handTile.begin(), handTile.end());
+	while (handTile.back() == Null)handTile.pop_back();
 }
 
 bool Player::canDiscardTile(Single target) const {
@@ -223,6 +264,39 @@ void Player::discardTile(Single target) {//打牌
 		}
 	}
 	throw("打牌失败-要打的牌不存在");
+}
+
+void Player::updateSutehaiFuriten()
+{
+	auto watingTiles=Algorithms::tenpai(handTile);
+	if (watingTiles.size()) {
+		sutehaiFuriten = false;
+		for (auto sutehai : discardedTile) {
+			for (auto machihai : watingTiles) {
+				if (sutehai.tile.valueEqual(machihai)){
+					sutehaiFuriten = true;
+					return;
+				}
+			}
+		}
+	}else {
+		sutehaiFuriten = false;
+	}
+}
+
+void Player::setRiichiFuriten()
+{
+	riichiFuriten = true;
+}
+
+void Player::setDoujunFuriten()
+{
+	doujunFuriten = true;
+}
+
+void Player::resetDoujunFuriten()
+{
+	doujunFuriten = false;
 }
 
 /*

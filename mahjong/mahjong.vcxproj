@@ -231,6 +231,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\src\ai\AI.h" />
     <ClInclude Include="..\src\ai\Tester.h" />
     <ClInclude Include="..\src\Algorithms.h" />
     <ClInclude Include="..\src\ai\AutoFurikomu.hpp" />
@@ -250,6 +251,7 @@
     <ClInclude Include="..\src\YakuChecker.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\src\ai\AI.cpp" />
     <ClCompile Include="..\src\ai\Human.cpp" />
     <ClCompile Include="..\src\ai\Tester.cpp" />
     <ClCompile Include="..\src\Algorithms.cpp" />

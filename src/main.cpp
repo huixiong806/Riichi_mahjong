@@ -12,6 +12,7 @@
 #include "Game.h"
 #include "ai/Human.h"
 #include "ai/AutoFurikomu.hpp"
+#include "ai/AI.h"
 #include "InformationStream.hpp"
 #include "utils/console.h"
 #include "ai/Tester.h"
@@ -33,33 +34,33 @@ void test() {
 	}
 	res.remainTiles = 10;
 	//手牌
+	res.handTile.emplace_back(1, 'm', 0);
+	res.handTile.emplace_back(1, 'm', 0);
+	res.handTile.emplace_back(1, 'm', 0);
+	res.handTile.emplace_back(2, 'p', 0);
+	res.handTile.emplace_back(3, 'p', 0);
+	res.handTile.emplace_back(3, 'p', 0);
+	res.handTile.emplace_back(3, 'p', 0);
+	res.handTile.emplace_back(4, 'p', 0);
 	res.handTile.emplace_back(1, 's', 0);
 	res.handTile.emplace_back(1, 's', 0);
 	res.handTile.emplace_back(2, 's', 0);
 	res.handTile.emplace_back(2, 's', 0);
-	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(3, 's', 0);
-	res.handTile.emplace_back(4, 's', 0);
-	res.handTile.emplace_back(4, 's', 0);
-	res.handTile.emplace_back(5, 'm', 0);
-	res.handTile.emplace_back(5, 'm', 0);
-	res.handTile.emplace_back(6, 'm', 0);
-	res.handTile.emplace_back(6, 'm', 0);
-	res.handTile.emplace_back(7, 's', 0);
+	res.handTile.emplace_back(2, 's', 0);
 	sort(res.handTile.begin(), res.handTile.end());
-	res.nowTile = Single(7,'s',false);
+	res.nowTile = Single(1,'s',false);
 	res.prevailingWind = EAST; //场风
-	res.selfWind = EAST; //门风
+	res.selfWind = WEST; //门风
 	res.nowWind = EAST;
-	res.gameState = GameState::OneAct;
+	res.gameState = GameState::WaitingForNaki;
 	res.w = false;
 	human->generateAction(res);
 	Player p;
 	p.setInfo(0, 1000, res.selfWind, res.handTile, {}, {}, res.nowTile, {}, false, false, -1, -1, false);
 	TryToAgariResult r{};
 	//for (int i = 1000000; i > 0; --i) {
-	r = p.tsumo(res.prevailingWind, static_cast<BonusYakuState>(res.w), {}, {});
-	//r = p.ron(res.nowTile,res.prevailingWind,AgariWays::Ron, static_cast<BonusYakuState>(res.w), {}, {});
+	//r = p.tsumo(res.prevailingWind, static_cast<BonusYakuState>(res.w), {}, {});
+	r = p.ron(res.nowTile,res.prevailingWind,AgariWays::Ron, static_cast<BonusYakuState>(res.w), {}, {});
 	//}
 	auto re = r.result;
 	cout << BookManager::lang.mj_yaku << ":" << endl;
@@ -101,11 +102,12 @@ int main_loop() {
 	//cout << "输入种子:" << endl;
 	//cin >> seed;
 	srand(time(0));
-	player[0] = make_shared<Tester>("A");
-	player[1] = make_shared<Tester>("B");
-	player[2] = make_shared<Tester>("C");
+	player[0] = make_shared<AutoFurikomu>("A");
+	player[1] = make_shared<AutoFurikomu>("B");
+	player[2] = make_shared<AutoFurikomu>("C");
 	player[3] = make_shared<Human>("Tester");
 	game.startNewGame();
+
 	InfoPrinter::printControlInfoLine(BookManager::lang.ct_gameStarted);
 	auto first = true;
 	do {
@@ -155,6 +157,7 @@ int main_loop() {
 int main() {
 	//push_console_locale_utf8("zh_CN");
 	system("chcp 936");
+	InfoPrinter::printInfoLine("version:alpha 200218_00");
 	BookManager::init();
 	//test();
 	//system("pause");

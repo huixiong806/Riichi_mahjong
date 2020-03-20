@@ -15,7 +15,7 @@ public:
 		res.type = ActionType::Null;
 		if (info.nowWind != info.selfWind && info.gameState == GameState::OneAct)return res;
 		if (info.nowWind == info.selfWind && info.gameState == GameState::WaitingForNaki)return res;
-		if (info.gameState== GameState::OneAct) { res.type = ActionType::Skip; }
+		if (info.gameState== GameState::WaitingForNaki) { res.type = ActionType::Skip; }
 		else {
 			res.type = ActionType::DiscardTile;
 			res.target = info.nowTile;

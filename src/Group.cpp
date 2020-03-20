@@ -54,7 +54,7 @@ Group Group::createToitsu(Single a, Single b) {
 }
 
 Group Group::createShuntsu(Single a, Single b, Single target, int source) {
-	if (!a.color() == b.color() || !b.color() == target.color())return Group_Null; // TODO: verify this
+	if (!(a.color() == b.color()) || !(b.color() == target.color()))return Group_Null;
 	if (b < a)std::swap(a, b);
 	Group res;
 	res.type = GroupType::Shuntsu;

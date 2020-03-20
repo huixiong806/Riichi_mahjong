@@ -183,6 +183,10 @@ void BookManager::initLanguage(){
 		langStream >> lang.mj_jikaze;
 		langStream >> lang.mj_bakaze;
 		langStream >> lang.mj_direction;
+		langStream >> lang.mj_furiten;
+		langStream >> lang.mj_doujunFuriten;
+		langStream >> lang.mj_riichiFuriten;
+		langStream >> lang.mj_sutehaiFuriten;
 		langStream.close();
 	}
 	langStream.open("language/zh_ANSI/control.lang", ios::in);

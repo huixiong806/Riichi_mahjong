@@ -15,12 +15,15 @@ private:
 	std::vector<bool> disabledHandTile; //禁打手牌(食替)
 	std::vector<Group> groupTile; //副露牌组
 	Single nowTile; //自摸牌
-	Tiles discardedTile; //牌河
+	DiscardedTiles discardedTile; //牌河(包含被鸣走的)
 	bool rinshan{}; //玩家当前的自摸牌是岭上牌
 	bool tsumogiri = false; //表示牌河里最后一张牌是否为摸切
 	int riichi = -1; //立直宣言牌是牌河中的第几张，-1为未立直
 	int riichiJunme = -1; //立直的巡目,从0开始,-1为未立直,-2为w立
 	bool ippatsu{}; //当前是否为一发巡
+	bool riichiFuriten;//立直振听
+	bool doujunFuriten;//同巡振听
+	bool sutehaiFuriten;//舍张振听
 	friend class Game;
 public:
 	void setInfo(
@@ -31,7 +34,7 @@ public:
 		const std::vector<bool>& disabledHandTile_, //禁打手牌
 		const std::vector<Group>& groupTile_, //副露牌组
 		const Single& nowTile_, //自摸牌
-		const std::vector<Single>& discardTile_, //牌河
+		const DiscardedTiles& discardTile_, //牌河
 		bool rinshan_, //玩家当前的自摸牌是岭上牌
 		bool tsumogiri_, //表示牌河里最后一张牌是否为摸切
 		int riichi_, //立直宣言牌是牌河中的第几张，-1为未立直
@@ -45,8 +48,8 @@ public:
 		nowTile = target;
 	}
 
-	//TODO:检测玩家给出的吃操作的正确性，relativePosition 0,1,2,3分别表示自下对上
-	bool canChii(Single target, Group result, int relativePosition)const;
+	//检测玩家给出的吃操作的正确性，relativePosition 0,1,2,3分别表示自下对上
+	ErrorType canChii(Single target, Group result, int relativePosition)const;
 
 	//检测玩家给出的碰操作的正确性，relativePosition 0,1,2,3分别表示自下对上
 	bool canPon(Single target, Group result, int relativePosition)const;
@@ -66,6 +69,8 @@ public:
 
 	//检查玩家给出的荣和操作的正确性
 	bool canRon(Single target, WindType prevailingWind, AgariWays type, BonusYakuState state, const Tiles& dora, const Tiles& ura)const {
+		if (doujunFuriten || sutehaiFuriten || riichiFuriten)
+			return false;
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, type, target,
 			handTile, groupTile, dora, ura)).success;
 	}
@@ -107,5 +112,12 @@ public:
 
 	//是否听牌
 	bool tenpai()const { return !Algorithms::tenpai(handTile).empty(); }
-	
+	//更新舍张振听
+	void updateSutehaiFuriten();
+	//设置立直振听
+	void setRiichiFuriten();
+	//设置同巡振听
+	void setDoujunFuriten();
+	//取消同巡振听
+	void resetDoujunFuriten();
 };

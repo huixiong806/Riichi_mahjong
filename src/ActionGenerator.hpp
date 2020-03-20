@@ -50,7 +50,7 @@ struct Action {
 
 struct PlayerInfo {
 	std::vector<Group> groupTile; //副露牌组
-	std::vector<Single> discardTile; //牌河
+	DiscardedTiles discardTile; //牌河
 	int riichi{}; //立直宣言牌是牌河中的第几张，-1为未立直
 	int riichiJunme{}; //立直的巡目，-1为未立直，-2为w立
 	int ippatsu{}; //是否处于一发巡
@@ -74,10 +74,10 @@ struct GameInfo {
 	WindType nowWind;
 
 	//手牌
-	std::vector<Single> handTile;
+	Tiles handTile;
 
 	//宝牌指示牌,先翻出来的下标小
-	std::vector<Single> doraIndicator;
+	Tiles doraIndicator;
 
 	//决策者的自摸牌或是可以鸣牌/荣和的对象
 	Single nowTile; 
@@ -115,6 +115,15 @@ struct GameInfo {
 
 	//是否处于w立,天和,地和可成立的状态
 	bool w{}; 
+
+	//是否处于立直振听状态
+	bool riichiFuriten{};
+
+	//是否处于同巡振听状态
+	bool doujunFuriten{};
+
+	//是否处于舍张振听状态
+	bool sutehaiFuriten{};
 };
 
 class ActionGenerator {

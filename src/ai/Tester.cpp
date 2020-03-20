@@ -55,6 +55,8 @@ void Tester::printActions(std::vector<Action> actions) {
 
 std::vector<Action> Tester::getRonAction(const GameInfo& info) {
 	std::vector<Action> res;
+	if (info.riichiFuriten || info.doujunFuriten || info.sutehaiFuriten)
+		return res;
 	BonusYakuState state = BonusYakuState::Normal;
 	if (info.w)BonusYakuState::FirstTurn;
 	else if (info.remainTiles == 0)BonusYakuState::LastTurn;
@@ -126,7 +128,8 @@ std::vector<Single> Tester::getShowedTiles(const GameInfo& info){
 			}
 		}
 		for (auto& item : info.playerInfo[wind].discardTile) { 
-			res.push_back(item);
+			if(item.exist)
+				res.push_back(item.tile);
 		}
 	}
 	for (auto& item : info.handTile) {
