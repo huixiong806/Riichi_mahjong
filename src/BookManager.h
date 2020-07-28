@@ -2,6 +2,7 @@
 #include"Single.h"
 #include<queue>
 struct Language{
+	//MahJong
 	std::string mj_wind[4];			//东 南 西 北
 	std::string mj_sangen[3];		//白 发 中
 	std::string mj_han;				//番
@@ -12,9 +13,9 @@ struct Language{
 	std::string mj_get;				//摸
 	std::string mj_discard;			//切
 	std::string mj_tsumogiri;		//摸切
-	std::string mj_tsumo;
-	std::string mj_ron;
-	std::string mj_furikomu;
+	std::string mj_tsumo;			//自摸
+	std::string mj_ron;				//荣
+	std::string mj_furikomu;		//放铳
 	std::string mj_discardTile;
 	std::string mj_riichi;
 	std::string mj_ryuukyoku;
@@ -43,6 +44,7 @@ struct Language{
 	std::string mj_doujunFuriten;
 	std::string mj_riichiFuriten;
 	std::string mj_sutehaiFuriten;
+	//ConTrol
 	std::string ct_makeChoice;
 	std::string ct_hasDiscard;
 	std::string ct_gameStarted;
@@ -50,6 +52,7 @@ struct Language{
 	std::string ct_gameOver;
 	std::string ct_roundOver;
 	std::string ct_action[11];
+	//Information
 	std::string i_tableNotFound;
 	std::string i_tableBroken;
 	std::string i_tableFound;
@@ -58,7 +61,9 @@ struct Language{
 	std::string i_calculationFinished;
 	std::string i_saveSuccess;
 	std::string i_saveUnsuccess;
+	//Yaku
 	std::string y_yakuName[52];
+	//Pai
 	std::string p_pai[37];
 };
 class BookManager {

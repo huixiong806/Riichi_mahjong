@@ -11,11 +11,6 @@ struct RoundResult {
 	std::vector<AgariResult> agariResult;
 };
 
-struct SetActionResult {
-	bool success;
-	ErrorType type;
-};
-
 class Game {
 private:
 	//int mIndex;//表示本局的编号
@@ -48,7 +43,7 @@ private:
 	void newTurnAfterNari(int who);
 
 	//途中流局连庄
-	void endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju);
+	void endThisRound(std::vector<AgariResult> res, bool tochuuRyuukyoku);
 
 	//消去w立,一发,地和
 	void resetBounusYaku();
@@ -74,7 +69,7 @@ public:
 	//获取某个玩家能看到的游戏信息
 	GameInfo getGameInfo(int index)const;
 
-	//一轮是否结束？
+	//一局是否结束？
 	bool roundOver()const { return roundIsOver; }
 
 	//游戏是否结束？
@@ -88,5 +83,5 @@ public:
 		返回值为设置Action是否成功，以及失败的话失败的原因
 	*/
 	//注意:改mTurn,mLast,player的disabledHandTile等
-	SetActionResult setPlayerAction(int index, Action act);
+	ActionCheckingResult setPlayerAction(int index, Action act);
 };

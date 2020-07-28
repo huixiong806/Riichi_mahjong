@@ -1,4 +1,5 @@
 #include"Player.h"
+#include<set>
 void Player::setInfo(int subround_, 
 					 int score_, 
 					 WindType selfWind_, 
@@ -27,27 +28,27 @@ void Player::setInfo(int subround_,
 	ippatsu = ippatsu_; //当前是否为一发巡
 }
 
-ErrorType Player::canChii(Single target, Group result, int relativePosition) const
+ActionCheckingResult Player::canChii(Single target, Group result, int relativePosition) const
 {
 	//检查类型
 	if (result.type != GroupType::Shuntsu)
-		return	ErrorType::Chii_WrongType;
+		return	ActionCheckingResult::Chii_WrongType;
 	//检查颜色
 	if (target.color() != result.color)
-		return ErrorType::Chii_WrongColor;
+		return ActionCheckingResult::Chii_WrongColor;
 	if (target.color() == 'z')
-		return ErrorType::Chii_CantBeJihai;
+		return ActionCheckingResult::Chii_CantBeJihai;
 	//检查数值
 	if (target.value() != result.value + result.state / 10)
-		return ErrorType::Chii_WrongValue;
+		return ActionCheckingResult::Chii_WrongValue;
 	//检查位置
 	if (relativePosition != result.state%10)
-		return ErrorType::Chii_WrongPosition;
+		return ActionCheckingResult::Chii_WrongPosition;
 	if (relativePosition != 3)
-		return ErrorType::Chii_WrongPosition;
+		return ActionCheckingResult::Chii_WrongPosition;
 	//检查红宝牌是否正确
 	if(static_cast<bool>(result.akadora & (1<<(result.state / 10))) != target.isAkadora())
-		return ErrorType::Chii_WrongAkadora;
+		return ActionCheckingResult::Chii_WrongAkadora;
 	//下标0-2分别表示value+0,value+1,value+2
 	int akadoraCount[3] = { 0,0,0 };	//提供的面子中的akadora数量
 	int realAkadoraCount[3] = { 0,0,0 };//实际手牌中的akadora数量
@@ -70,15 +71,15 @@ ErrorType Player::canChii(Single target, Group result, int relativePosition) con
 			continue;
 		//牌数不够
 		if (tileCount[i] < 1)
-			return ErrorType::Chii_WrongTiles;
+			return ActionCheckingResult::Chii_WrongTiles;
 		//红宝牌不够
 		if (realAkadoraCount[i] < akadoraCount[i])
-			return ErrorType::Chii_WrongTiles;
+			return ActionCheckingResult::Chii_WrongTiles;
 		//非红宝牌不够
 		if ((tileCount[i] - realAkadoraCount[i]) < (1 - akadoraCount[i]))
-			return ErrorType::Chii_WrongTiles;
+			return ActionCheckingResult::Chii_WrongTiles;
 	}
-	return ErrorType::Success;
+	return ActionCheckingResult::Success;
 }
 
 bool Player::canPon(Single target, Group result, int relativePosition) const {
@@ -337,6 +338,19 @@ bool Player::canRiichi(BonusYakuState state, Single target) const {
 		return false;
 	//是否听牌?
 	return !Algorithms::tenpai(myTile).empty();
+}
+
+bool Player::canRyuukyouku(BonusYakuState state) const
+{
+	if(state!=BonusYakuState::FirstTurn)
+		return false;
+	assert(groupTile.empty());
+	std::set<Single> all;
+	for (auto& item : handTile) {
+		if (item.is19Z())
+			all.insert(item);
+	}
+	return all.size() >= 9;
 }
 
 void Player::doRiichi(BonusYakuState state, Single target) {

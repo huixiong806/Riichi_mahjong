@@ -30,11 +30,12 @@ enum class ActionType {
 	Peinuki,	//拔北
 };
 
-enum class ErrorType {
+//决策器提供的决策的检查结果
+enum class ActionCheckingResult {
 	Success,						//成功了，没有error
 	NotYourTurn,					//非自己可以行动的情况
 	AlreadyActed,					//已经行动过
-	ActionRejected,					//行动被拒绝
+	ActionRejected,					//行动被拒绝(所有不属于其他错误的错误都属于此种，需要细化)
 	TileNotExist,					//打牌时不存在要打的东西
 	Chii_WrongType,					//吃错误_类型不正确(必须为顺子)
 	Chii_WrongColor,				//吃错误_花色不匹配

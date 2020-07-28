@@ -49,7 +49,7 @@ public:
 	YakuChecker(const AgariParameters& i_par, const std::vector<Group>& i_allMentsu) noexcept;
 	//役满型
 	[[nodiscard]] bool tenhou() const noexcept;
-	[[nodiscard]] bool chihou() const noexcept;
+	[[nodiscard]] bool chiihou() const noexcept;
 	[[nodiscard]] bool tsuuiisou() const noexcept;
 	[[nodiscard]] bool suukantsu() const noexcept;
 	[[nodiscard]] bool shousuushi() const noexcept;

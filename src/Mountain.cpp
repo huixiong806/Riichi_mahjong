@@ -2,11 +2,11 @@
 #include <algorithm>
 #include <random>
 
-Mountain::Mountain() { mHandPtr = mRinshanPtr = 0; }
+Mountain::Mountain() { handPtr = rinshanPtr = 0; }
 
 std::string Mountain::getMountainString() {//获得牌山序列
 	std::string res;
-	for (auto& item : mMountain) {
+	for (auto& item : mountain) {
 		int value = item.value();
 		if (item.isAkadora())value = 0;
 		res.push_back(value + '0');
@@ -16,18 +16,18 @@ std::string Mountain::getMountainString() {//获得牌山序列
 }
 
 Single Mountain::nextRinshan() {//获取下一张岭上牌(自动移海底牌)
-	const auto res = mB[mRinshanPtr++];
-	mB.push_back(mA[mA.size() - 1]);
-	mA.pop_back();
+	const auto res = B[rinshanPtr++];
+	B.push_back(A[A.size() - 1]);
+	A.pop_back();
 	return res;
 }
 
 Single Mountain::nextHand() {//获取下一张手牌
-	return mA[mHandPtr++];
+	return A[handPtr++];
 }
 
 int Mountain::remainCount()const {//获取剩余牌数
-	return mA.size() - mHandPtr;
+	return A.size() - handPtr;
 }
 
 Single Mountain::getDora(int index)const { //获取宝牌
@@ -53,11 +53,11 @@ std::vector<Single> Mountain::getUras(int count) const{
 }
 
 Single Mountain::getDoraIndicator(int index)const{//获取宝牌指示牌,下标范围0~4
-	return mB[4 + index * 2];
+	return B[4 + index * 2];
 }
 
 Single Mountain::getUraIndicator(int index)const{//获取里宝牌指示牌,下标范围0~4
-	return mB[5 + index * 2];
+	return B[5 + index * 2];
 }
 
 std::vector<Single> Mountain::getDoraIndicators(int count)const{
@@ -75,11 +75,11 @@ std::vector<Single> Mountain::getUraIndicators(int count)const{
 }
 
 void Mountain::reset(const Rule& rule) {
-	mHandPtr = 0;
-	mRinshanPtr = 0;
-	mMountain.clear();
-	mA.clear();
-	mB.clear();
+	handPtr = 0;
+	rinshanPtr = 0;
+	mountain.clear();
+	A.clear();
+	B.clear();
 	for (auto& j : hand)
 		j.clear();
 	std::vector<Single> all;
@@ -114,27 +114,27 @@ void Mountain::reset(const Rule& rule) {
 			j.push_back(all[ptr++]);
 	tsumohai = all[ptr++];
 	for (auto i = ptr; i < all.size(); ++i)
-		mMountain.push_back(all[i]);
+		mountain.push_back(all[i]);
 	for (auto i = 1; i <= 69; ++i)
-		mA.push_back(all[ptr++]);
+		A.push_back(all[ptr++]);
 	ptr = all.size();
 	for (auto i = 1; i <= 14; ++i)
-		mB.push_back(all[--ptr]);
+		B.push_back(all[--ptr]);
 }
 
-void Mountain::DEBUG_RESET(const Rule & rule)
+void Mountain::DEBUG_RESET(const Rule & rule,uint64_t seed)
 {
-	mHandPtr = 0;
-	mRinshanPtr = 0;
-	mMountain.clear();
-	mA.clear();
-	mB.clear();
+	handPtr = 0;
+	rinshanPtr = 0;
+	mountain.clear();
+	A.clear();
+	B.clear();
 	for (auto& j : hand)
 		j.clear();
 	std::vector<Single> all;
-	for (auto ii = 1; ii <= 9; ++ii) {
-		auto i = (ii + 3) % 9 + 1;
-		for (auto j = 1; j <= 4; ++j) {
+	for (auto j = 4; j >= 1; --j) {
+		for (auto ii = 1; ii <= 9; ++ii) {
+			auto i = ii;
 			if (i == 5 && j == 1 && rule.doraCount > 0) //红宝牌
 			{
 				all.emplace_back(i, 'm', true);
@@ -155,16 +155,18 @@ void Mountain::DEBUG_RESET(const Rule & rule)
 			if (i <= 7)all.emplace_back(i, 'z', false);
 		}
 	}
+	//std::mt19937 g(seed);
+	//std::shuffle(all.begin(), all.end(), g);
 	auto ptr = 0;
 	for (auto& j : hand)
 		for (auto i = 1; i <= 13; ++i)
 			j.push_back(all[ptr++]);
 	tsumohai = all[ptr++];
 	for (auto i = ptr; i < all.size(); ++i)
-		mMountain.push_back(all[i]);
+		mountain.push_back(all[i]);
 	for (auto i = 1; i <= 69; ++i)
-		mA.push_back(all[ptr++]);
+		A.push_back(all[ptr++]);
 	ptr = all.size();
 	for (auto i = 1; i <= 14; ++i)
-		mB.push_back(all[--ptr]);
+		B.push_back(all[--ptr]);
 }

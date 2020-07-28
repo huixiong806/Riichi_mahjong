@@ -34,6 +34,8 @@ std::vector<Action> AI::getAllNormalActions(const GameInfo& info) {
 	return res;
 }
 
+
+
 void AI::printActions(std::vector<Action> actions) {
 	auto num = 0;
 	for (auto i = 0; i < actions.size(); ++i) {
@@ -328,8 +330,34 @@ std::vector<Single> AI::getShowedTiles(const GameInfo& info) {
 	res.push_back(info.nowTile);
 	return res;
 }
+/*
+hand 手牌
+remainDepth 剩余深度，为0则是叶子节点
+*/
+void AI::dfs14(Tiles hand,int remainDepth)
+{
+	if (remainDepth == 0)
+	{
 
-Action AI::generateAction(const GameInfo& info) {
+	}
+	for (int i = 0; i < hand.size();++i) {
+		Tiles newHand;
+		for (int j = 0; j < hand.size(); ++j)
+			if (i != j)newHand.push_back(hand[j]);
+		//枚举打出去的牌，dfs13
+		dfs13(newHand,remainDepth);
+	}
+}
+/*
+hand 手牌
+remainDepth 剩余深度，为0则其子(dfs14)节点是叶子节点
+*/
+void AI::dfs13(Tiles hand, int remainDepth)
+{
+
+}
+Action AI::generateAction(const GameInfo& info)
+{
 	Action res;
 	res.type = ActionType::Null;
 	if (info.nowWind != info.selfWind && info.gameState == GameState::OneAct)return res;

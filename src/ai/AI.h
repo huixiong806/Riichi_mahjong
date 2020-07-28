@@ -12,6 +12,8 @@ private:
 	std::vector<Action> getRonAction(const GameInfo& info);
 	std::vector<Action> getAllNakiActions(const GameInfo& info);
 	std::vector<Action> getAllNormalActions(const GameInfo& info);
+	void dfs14(Tiles hand, int remainDepth);//牌效率深度优先搜索，14张牌
+	void dfs13(Tiles hand, int remainDepth);//牌效率深度优先搜索，13张牌
 	void printTile(const GameInfo& info, const Single& tile);
 	void printInfo(const GameInfo& info);
 	void printAction(const Action& action);

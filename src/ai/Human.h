@@ -9,6 +9,7 @@ private:
 	std::vector<Action> getPonActions(const GameInfo& info);
 	std::vector<Action> getChiiActions(const GameInfo& info);
 	std::vector<Action> getTsumoAction(const GameInfo& info);
+	std::vector<Action> getRyuukyokuAction(const GameInfo& info);
 	std::vector<Action> getRiichiAction(const GameInfo& info);
 	std::vector<Action> getRonAction(const GameInfo& info);
 	std::vector<Action> getAllNakiActions(const GameInfo& info);

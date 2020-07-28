@@ -49,7 +49,7 @@ public:
 	}
 
 	//检测玩家给出的吃操作的正确性，relativePosition 0,1,2,3分别表示自下对上
-	ErrorType canChii(Single target, Group result, int relativePosition)const;
+	ActionCheckingResult canChii(Single target, Group result, int relativePosition)const;
 
 	//检测玩家给出的碰操作的正确性，relativePosition 0,1,2,3分别表示自下对上
 	bool canPon(Single target, Group result, int relativePosition)const;
@@ -77,8 +77,8 @@ public:
 	//检查玩家给出的立直操作的正确性
 	bool canRiichi(BonusYakuState state, Single target)const;
 	
-	//TODO:检查玩家给出的九种九牌流局操作是否正确
-	bool canRyuukyouku() { return false; }
+	//检查玩家给出的九种九牌流局操作是否正确
+	bool canRyuukyouku(BonusYakuState state)const;
 
 	//执行碰操作
 	void pon(Group result);
@@ -106,9 +106,6 @@ public:
 		return Algorithms::agari(AgariParameters(selfWind, prevailingWind, riichiJunme, ippatsu, rinshan, state, type, target,
 			handTile, groupTile, dora, ura)).result;
 	}
-
-	//TODO:执行流局操作
-	void ryuukyoku()const { }
 
 	//是否听牌
 	bool tenpai()const { return !Algorithms::tenpai(handTile).empty(); }

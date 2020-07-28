@@ -136,6 +136,9 @@ bool Game::endThisTurn()
 				throw("不具备自摸条件");
 			}
 		}
+		else if (action.type == ActionType::Ryuukyoku) {
+			endThisRound({}, true);
+		}
 		gameState = GameState::WaitingForNaki;
 	}
 	for (auto i = 0; i < 4; ++i) {
@@ -145,8 +148,8 @@ bool Game::endThisTurn()
 	}
 	return true;
 }
-SetActionResult Game::setPlayerAction(int playerID, Action action) {
-	SetActionResult setActionResult = { true ,ErrorType::Success };
+ActionCheckingResult Game::setPlayerAction(int playerID, Action action) {
+	ActionCheckingResult setActionResult = ActionCheckingResult::Success;
 	if (gameState == GameState::WaitingForNaki) {
 		Single target = player[turn].discardedTile.rbegin()->tile;
 		if (playerID == turn) {
@@ -156,8 +159,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 		if (isReady[playerID] == false) {
 			switch (action.type) {
 			case ActionType::Null:
-				setActionResult.success = false;
-				setActionResult.type = ErrorType::CannotChooseNull;
+				setActionResult = ActionCheckingResult::CannotChooseNull;
 				break;
 			case ActionType::Skip:
 				isReady[playerID] = true;
@@ -169,8 +171,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				TryToAgariResult result;
 				if (!player[playerID].canRon(target, prevailingWind, AgariWays::Ron,
 											  static_cast<BonusYakuState>(w), allDora, allUra)) {
-					setActionResult.success = false;
-					setActionResult.type = ErrorType::ActionRejected;
+					setActionResult = ActionCheckingResult::ActionRejected;
 					return setActionResult;
 				}
 				isReady[playerID] = true;
@@ -178,15 +179,13 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				break;
 			}
 			case ActionType::Chii:
-				setActionResult.type = player[playerID].canChii(target, action.group,
+				setActionResult = player[playerID].canChii(target, action.group,
 					(static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4);
-				setActionResult.success = setActionResult.type == ErrorType::Success;
-				if (!setActionResult.success)
+				if (setActionResult!=ActionCheckingResult::Success)
 					return setActionResult;
 				//立直后不能鸣牌
 				if (player[playerID].riichiJunme != -1) {
-					setActionResult.success = false;
-					setActionResult.type = ErrorType::Naki_AlreadyRiichi;
+					setActionResult = ActionCheckingResult::Naki_AlreadyRiichi;
 					return setActionResult;
 				}
 				isReady[playerID] = true;
@@ -197,14 +196,12 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				                           (static_cast<int>(player[turn].selfWind) + 4 - static_cast<int>(player[playerID].selfWind)) % 4)
 				) {
 					//std::cout<<"*********"<< std::endl;
-					setActionResult.success = false;
-					setActionResult.type = ErrorType::ActionRejected;
+					setActionResult = ActionCheckingResult::ActionRejected;
 					return setActionResult;
 				}
 				//立直后不能鸣牌
 				if (player[playerID].riichiJunme != -1) {
-					setActionResult.success = false;
-					setActionResult.type = ErrorType::ActionRejected;
+					setActionResult = ActionCheckingResult::ActionRejected;
 					return setActionResult;
 				}
 				isReady[playerID] = true;
@@ -214,22 +211,19 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 				if (!player[playerID].canMinKan(target, action.group,
 				                           (static_cast<int>(player[turn].selfWind) + 4 - player[playerID].selfWind) % 4)
 				) {
-					setActionResult.success = false;
-					setActionResult.type = ErrorType::ActionRejected;
+					setActionResult= ActionCheckingResult::ActionRejected;
 					return setActionResult;
 				}
 				//立直后不能鸣牌
 				if (player[playerID].riichiJunme != -1) {
-					setActionResult.success = false;
-					setActionResult.type = ErrorType::ActionRejected;
+					setActionResult = ActionCheckingResult::ActionRejected;
 					return setActionResult;
 				}
 				isReady[playerID] = true;
 				playerAction[playerID] = action;
 				break;
 			default:
-				setActionResult.success = false;
-				setActionResult.type = ErrorType::ActionRejected;
+				setActionResult = ActionCheckingResult::ActionRejected;
 				return setActionResult;
 			}
 		}
@@ -242,28 +236,24 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 			return setActionResult;
 		}
 		if (playerID != turn) {
-			setActionResult.success = false;
-			setActionResult.type = ErrorType::NotYourTurn;
+			setActionResult = ActionCheckingResult::NotYourTurn;
 			return setActionResult;
 		}
 		switch (action.type) {
 		case ActionType::DiscardTile:
 			if (!player[playerID].canDiscardTile(action.target)){
-				setActionResult.success = false;
-				setActionResult.type = ErrorType::ActionRejected;
+				setActionResult = ActionCheckingResult::ActionRejected;
 				return setActionResult;
 			}
 			playerAction[playerID] = action;
 			break;
 		case ActionType::Riichi: {
 			if (mountain.remainCount() < 4) {
-				setActionResult.success = false;
-				setActionResult.type = ErrorType::Riichi_lessTilesLeft;
+				setActionResult = ActionCheckingResult::Riichi_lessTilesLeft;
 				return setActionResult;
 			}
 			if (!player[playerID].canRiichi(static_cast<BonusYakuState>(w),action.target)){
-				setActionResult.success = false;
-				setActionResult.type = ErrorType::Riichi_Other;
+				setActionResult = ActionCheckingResult::Riichi_Other;
 				return setActionResult;
 			}
 			playerAction[playerID] = action;
@@ -273,16 +263,22 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 			std::vector<Single> allDora=mountain.getDoras(doraIndicatorCount);
 			std::vector<Single> allUra = mountain.getUras(doraIndicatorCount);
 			if (!player[playerID].canTsumo(prevailingWind, static_cast<BonusYakuState>(w), allDora, allUra)){
-				setActionResult.success = false;
-				setActionResult.type = ErrorType::ActionRejected;
+				setActionResult = ActionCheckingResult::ActionRejected;
+				return setActionResult;
+			}
+			playerAction[playerID] = action;
+			break;
+		}
+		case ActionType::Ryuukyoku: {
+			if (!player[playerID].canRyuukyouku(static_cast<BonusYakuState>(w))) {
+				setActionResult = ActionCheckingResult::ActionRejected;
 				return setActionResult;
 			}
 			playerAction[playerID] = action;
 			break;
 		}
 		default:
-			setActionResult.success = false;
-			setActionResult.type = ErrorType::ActionRejected;
+			setActionResult = ActionCheckingResult::ActionRejected;
 			return setActionResult;
 		}
 		isReady[playerID] = true;
@@ -292,7 +288,7 @@ SetActionResult Game::setPlayerAction(int playerID, Action action) {
 }
 
 //途中流局连庄
-void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
+void Game::endThisRound(std::vector<AgariResult> res, bool tochuuRyuukyoku) {
 	result = RoundResult();
 	roundIsOver = true;
 	gameIsOver = false;
@@ -377,7 +373,7 @@ void Game::endThisRound(std::vector<AgariResult> res, bool tuzhongLiuju) {
 	//*****以下为流局****** 
 	//TODO：流局满贯结算 
 	result.ryuukyoku = true;
-	if (tuzhongLiuju) {
+	if (tochuuRyuukyoku) {
 		result.renchan = true;
 		return;
 	}

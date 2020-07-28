@@ -62,8 +62,8 @@ public:
 using Tiles = std::vector<Single>;
 
 struct DiscardedTile {
-	Single tile;
-	bool exist;
+	Single tile;//牌
+	bool exist;//是否存在于牌河中
 	DiscardedTile() {}
 	DiscardedTile(const Single& i_tile) {
 		tile = i_tile;

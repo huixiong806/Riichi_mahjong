@@ -101,17 +101,7 @@ public:
 					res.push_back(')');
 				}
 				res.push_back(((akadora & 2) ? 0 : value + 1) + '0');
-				if (state % 10 == 2) {
-					res.push_back('(');
-					res.push_back(((akadora & 1) ? 0 : value) + '0');
-					res.push_back(')');
-				}
 				res.push_back(((akadora & 4) ? 0 : value + 2) + '0');
-				if (state % 10 == 1) {
-					res.push_back('(');
-					res.push_back(((akadora & 1) ? 0 : value) + '0');
-					res.push_back(')');
-				}
 			}
 			else if (state / 10 == 1) {
 				if (state % 10 == 3) {
@@ -120,17 +110,7 @@ public:
 					res.push_back(')');
 				}
 				res.push_back(((akadora & 1) ? 0 : value) + '0');
-				if (state % 10 == 2) {
-					res.push_back('(');
-					res.push_back(((akadora & 2) ? 0 : value + 1) + '0');
-					res.push_back(')');
-				}
 				res.push_back(((akadora & 4) ? 0 : value + 2) + '0');
-				if (state % 10 == 1) {
-					res.push_back('(');
-					res.push_back(((akadora & 2) ? 0 : value + 1) + '0');
-					res.push_back(')');
-				}
 			}
 			else if (state / 10 == 2) {
 				if (state % 10 == 3) {
@@ -139,17 +119,7 @@ public:
 					res.push_back(')');
 				}
 				res.push_back(((akadora & 1) ? 0 : value) + '0');
-				if (state % 10 == 2) {
-					res.push_back('(');
-					res.push_back(((akadora & 4) ? 0 : value + 2) + '0');
-					res.push_back(')');
-				}
 				res.push_back(((akadora & 2) ? 0 : value + 1) + '0');
-				if (state % 10 == 1) {
-					res.push_back('(');
-					res.push_back(((akadora & 4) ? 0 : value + 2) + '0');
-					res.push_back(')');
-				}
 			}
 			//if (state / 10 == 1 || state / 10 == 2)res.push_back(' ');
 			//if (state / 10 == 3 || state / 10 == 2)res.push_back(' ');
@@ -243,5 +213,5 @@ public:
 		return true;
 	}
 };
-
+using Groups = std::vector<Group>;
 extern Group Group_Null;

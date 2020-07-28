@@ -8,18 +8,18 @@
 class Mountain {
 private:
 protected:
-	std::vector<Single> mA; //四家摸牌
-	std::vector<Single> mB; //岭上，dora指示牌
-	std::vector<Single> mMountain; //牌山序列
-	int mHandPtr; //手牌指针
-	int mRinshanPtr; //岭上牌指针
+	std::vector<Single> A; //四家摸牌
+	std::vector<Single> B; //岭上，dora指示牌
+	std::vector<Single> mountain; //牌山序列
+	int handPtr; //手牌指针
+	int rinshanPtr; //岭上牌指针
 public:
 	virtual ~Mountain() noexcept = default;
 	std::vector<Single> hand[4]; //四家初始手牌
 	Single tsumohai; //庄家0巡的自摸牌
 	Mountain(); //构造函数
 	virtual void reset(const Rule& rule); //产生新牌山
-	void DEBUG_RESET(const Rule& rule); //产生作弊的牌山，方便debug
+	void DEBUG_RESET(const Rule& rule, uint64_t seed); //产生固定种子的牌山，方便debug
 	Single getDora(int index)const; //获取宝牌
 	Single getUra(int index)const; //获取里宝牌
 	std::vector<Single> getDoras(int count)const; //获取宝牌组,count表示获得前几个

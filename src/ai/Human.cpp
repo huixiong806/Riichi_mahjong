@@ -30,6 +30,8 @@ std::vector<Action> Human::getAllNormalActions(const GameInfo& info) {
 	res.insert(res.end(), temp.begin(), temp.end());
 	temp = getRiichiAction(info);
 	res.insert(res.end(), temp.begin(), temp.end());
+	temp = getRyuukyokuAction(info);
+	res.insert(res.end(), temp.begin(), temp.end());
 	return res;
 }
 
@@ -89,6 +91,22 @@ std::vector<Action> Human::getTsumoAction(const GameInfo& info) {
 	                                                      std::vector<Single>(), std::vector<Single>())).success;
 	if (result)
 		res.emplace_back(ActionType::Tsumo);
+	return res;
+}
+
+std::vector<Action> Human::getRyuukyokuAction(const GameInfo& info)
+{
+	auto res = std::vector<Action>();
+	if (!info.w)
+		return res;
+	std::set<Single> all;
+	for (auto& item : info.handTile) {
+		if (item.is19Z())
+			all.insert(item);
+	}
+	if (all.size() < 9)
+		return res;
+	res.push_back(Action(ActionType::Ryuukyoku));
 	return res;
 }
 

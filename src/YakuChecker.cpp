@@ -44,7 +44,7 @@ bool YakuChecker::tenhou() const noexcept { return par.state == BonusYakuState::
 												   par.type == AgariWays::Tsumo && 
 												   par.selfWind == EAST; }
 //判断地和
-bool YakuChecker::chihou() const noexcept { return par.state == BonusYakuState::FirstTurn && 
+bool YakuChecker::chiihou() const noexcept { return par.state == BonusYakuState::FirstTurn && 
 												   par.type == AgariWays::Tsumo &&
 												   par.selfWind != EAST; }
 //判断字一色
@@ -651,7 +651,7 @@ TryToAgariResult YakuChecker::getResult() {
 	//役满型 
 	//天地和
 	if (tenhou())addYaku<Yaku::Tenhou>(result);
-	if (chihou())addYaku<Yaku::Chihou>(result);
+	if (chiihou())addYaku<Yaku::Chihou>(result);
 	//字一色、四杠子
 	if (tsuuiisou())addYaku<Yaku::Tsuuiisou>(result);
 	if (suukantsu())addYaku<Yaku::Suukantsu>(result);
@@ -737,7 +737,9 @@ TryToAgariResult YakuChecker::getResult() {
 	else if (houtei())addYaku<Yaku::Houteiraoyui>(result);
 	//std::cout << "*" << std::endl;
 	if (result.han == 0) { return TryToAgariResult(AgariFaildReason::NoYaku); }
-	result.han += result.dora + result.akadora + result.uradora;
+	result.han += result.dora + result.akadora;
+	if(riichi()|| doubleRiichi())
+		result.han += result.uradora;
 	result = Algorithms::getScore(par.selfWind, result);
 	//输出调试信息-不同拆牌方式的牌型和役种
 	/*
